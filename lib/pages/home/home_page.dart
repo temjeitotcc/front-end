@@ -140,7 +140,16 @@ class _HomePageState extends State<HomePage> {
                       BotaoNav(
                         imagem: 'assets/icon1.png',
                         ativo: botaoSelecionado == 0,
-                        onTap: () => setState(() => botaoSelecionado = 0),
+                        onTap: () {
+                          setState(() => botaoSelecionado = 0);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Page1(),
+                            ),
+                          );
+                        },
                       ),
                       BotaoNav(
                         imagem: 'assets/icon2.png',

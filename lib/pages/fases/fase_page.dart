@@ -12,6 +12,8 @@ class FasePage extends StatelessWidget {
       backgroundColor: const Color(0xFF1B1819),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFED23E),
+
+        centerTitle: true,
         title: Text('Fase $numero'),
       ),
       body: Center(

@@ -9,11 +9,12 @@ class Page1 extends StatelessWidget {
       backgroundColor: const Color(0xFF1B1819),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFED23E),
-        title: const Text('Página 1'),
+        centerTitle: true,
+        title: const Text('Loja'),
       ),
       body: const Center(
         child: Text(
-          'Tela 1',
+          'Loja',
           style: TextStyle(color: Colors.white, fontSize: 24),
         ),
       ),
