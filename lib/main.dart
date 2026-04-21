@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pages/home/home_page.dart'; // importa a tela principal
+import 'mainscreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      home: HomePage(), // chama a home
+      home: const MainScreen(), // chama a home
     );
   }
 }
