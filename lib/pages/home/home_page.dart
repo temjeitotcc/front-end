@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/circulo_fase.dart';
 import '../../services/fases_service.dart';
-import '../fases/fase_page.dart';
 
-// Tela principal do app
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -12,9 +10,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Lista de datas das fases concluídas
   List<DateTime?> fasesConcluidas = [null, null, null, null, null, null];
-
   final service = FasesService();
 
   @override
@@ -23,24 +19,23 @@ class _HomePageState extends State<HomePage> {
     carregarFases();
   }
 
-  // Carrega dados salvos
   Future<void> carregarFases() async {
     fasesConcluidas = await service.carregarFases();
     setState(() {});
   }
 
-  // Salva progresso
   Future<void> salvarFases() async {
     await service.salvarFases(fasesConcluidas);
   }
 
   @override
   Widget build(BuildContext context) {
+    final fundo = Theme.of(context).scaffoldBackgroundColor;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1819),
+      backgroundColor: fundo,
       body: Column(
         children: [
-          //  BARRA SUPERIOR
           Container(
             width: double.infinity,
             height: 60,
@@ -55,7 +50,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          // ÁREA CENTRAL (FASES)
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 40),
@@ -68,7 +62,6 @@ class _HomePageState extends State<HomePage> {
                       liberado: service.faseLiberada(fasesConcluidas, 0),
                       onTap: () => abrirFase(0, '1'),
                     ),
-
                     const SizedBox(height: 20),
 
                     Row(
@@ -119,13 +112,11 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          // NAVBAR
         ],
       ),
     );
   }
 
-  // abre fase
   void abrirFase(int index, String numero) {
     setState(() {
       fasesConcluidas[index] = DateTime.now();
