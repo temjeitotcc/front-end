@@ -56,7 +56,7 @@ class _ConfigPageState extends State<ConfigPage> {
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.only(top: 40, bottom: 24),
+            padding: const EdgeInsets.only(top: 20, bottom: 24),
             decoration: const BoxDecoration(
               color: Color(0xFFFED23E),
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),

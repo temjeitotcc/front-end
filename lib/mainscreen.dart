@@ -46,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
         ],
       ),
 
-      // 🔥 NAVBAR NOVA
+      // NAVBAR NOVA
       bottomNavigationBar: Container(
         height: 90,
         decoration: const BoxDecoration(
@@ -80,7 +80,9 @@ class _MainScreenState extends State<MainScreen> {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: ativo ? Colors.white.withOpacity(0.15) : Colors.transparent,
+          color: ativo
+              ? const Color.fromARGB(255, 223, 183, 38)
+              : Colors.transparent,
           boxShadow: ativo
               ? [
                   BoxShadow(
@@ -113,7 +115,7 @@ class _MainScreenState extends State<MainScreen> {
           width: 75,
           height: 75,
           decoration: BoxDecoration(
-            color: const Color(0xFFFFC107),
+            color: const Color.fromARGB(255, 255, 193, 7),
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
