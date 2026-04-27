@@ -1,42 +1,29 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Serviço responsável pela lógica das fases
 class FasesService {
-  Future<List<DateTime?>> carregarFases() async {
+  Future<List<DateTime?>> carregarFases(int totalFases) async {
     final prefs = await SharedPreferences.getInstance();
-    List<String>? datas = prefs.getStringList('fases');
 
-    if (datas != null) {
-      return datas.map((d) {
-        return d.isEmpty ? null : DateTime.parse(d);
-      }).toList();
+    return List.generate(totalFases, (index) {
+      final dataSalva = prefs.getString('fase_$index');
+
+      if (dataSalva == null) return null;
+
+      return DateTime.tryParse(dataSalva);
+    });
+  }
+
+  Future<void> salvarFases(List<DateTime?> fasesConcluidas) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    for (int i = 0; i < fasesConcluidas.length; i++) {
+      final data = fasesConcluidas[i];
+
+      if (data == null) {
+        await prefs.remove('fase_$i');
+      } else {
+        await prefs.setString('fase_$i', data.toIso8601String());
+      }
     }
-
-    return [null, null, null, null, null, null];
-  }
-
-  Future<void> salvarFases(List<DateTime?> fases) async {
-    final prefs = await SharedPreferences.getInstance();
-
-    List<String> datas = fases.map((data) {
-      return data?.toIso8601String() ?? '';
-    }).toList();
-
-    await prefs.setStringList('fases', datas);
-  }
-
-  bool faseLiberada(List<DateTime?> fases, int index) {
-    if (index == 0) return true;
-
-    DateTime? anterior = fases[index - 1];
-    if (anterior == null) return false;
-
-    DateTime meiaNoite = DateTime(
-      anterior.year,
-      anterior.month,
-      anterior.day + 1,
-    );
-
-    return DateTime.now().isAfter(meiaNoite);
   }
 }
