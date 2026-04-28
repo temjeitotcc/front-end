@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'config.dart';
 import 'pages/home/home_page.dart';
+import 'pages/menu/loja.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -38,7 +39,7 @@ class _MainScreenState extends State<MainScreen> {
           });
         },
         children: [
-          Center(child: Text("Lojinha")),
+          Page1(),
           Center(child: Text("Conteudo")),
           HomePage(),
           Center(child: Text("É o pet")),

@@ -63,12 +63,12 @@ class _ConfigPageState extends State<ConfigPage> {
             ),
             child: const Column(
               children: [
-                Icon(Icons.settings_rounded, color: Colors.black, size: 34),
+                Icon(Icons.settings_rounded, color: Colors.white, size: 34),
                 SizedBox(height: 8),
                 Text(
                   'Configurações',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Colors.white,
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                   ),
