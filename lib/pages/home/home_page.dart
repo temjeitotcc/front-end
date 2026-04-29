@@ -101,7 +101,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CirculoFase(
-              numero: '${inicio + 6}',
+              numero: '${inicio + 1}',
               liberado: faseLiberada(inicio),
               onTap: () => abrirFase(inicio),
             ),
@@ -112,13 +112,13 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CirculoFase(
-                  numero: '${inicio + 5}',
+                  numero: '${inicio + 6}',
                   liberado: faseLiberada(inicio + 5),
                   onTap: () => abrirFase(inicio + 5),
                 ),
                 const SizedBox(width: 150),
                 CirculoFase(
-                  numero: '${inicio + 4}',
+                  numero: '${inicio + 2}',
                   liberado: faseLiberada(inicio + 1),
                   onTap: () => abrirFase(inicio + 1),
                 ),
@@ -131,13 +131,13 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CirculoFase(
-                  numero: '${inicio + 3}',
+                  numero: '${inicio + 5}',
                   liberado: faseLiberada(inicio + 4),
                   onTap: () => abrirFase(inicio + 4),
                 ),
                 const SizedBox(width: 150),
                 CirculoFase(
-                  numero: '${inicio + 2}',
+                  numero: '${inicio + 3}',
                   liberado: faseLiberada(inicio + 2),
                   onTap: () => abrirFase(inicio + 2),
                 ),
@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 20),
 
             CirculoFase(
-              numero: '${inicio + 1}',
+              numero: '${inicio + 4}',
               liberado: faseLiberada(inicio + 3),
               onTap: () => abrirFase(inicio + 3),
             ),

@@ -6,20 +6,12 @@ class Page1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fundo = Theme.of(context).scaffoldBackgroundColor;
-    final textoPrincipal = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
-    final textoSecundario = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white70
-        : Colors.black54;
-    final cardColor = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF2A2527)
-        : Colors.white;
 
     return Scaffold(
       backgroundColor: fundo,
       body: Column(
         children: [
+          // 🔥 TOPO (COM IMAGEM)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.only(top: 20, bottom: 24),
@@ -27,11 +19,11 @@ class Page1 extends StatelessWidget {
               color: Color(0xFFFED23E),
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                Icon(Icons.settings_rounded, color: Colors.white, size: 34),
-                SizedBox(height: 8),
-                Text(
+                Image.asset('assets/iconloja.png', height: 34),
+                const SizedBox(height: 8),
+                const Text(
                   'Lojinha',
                   style: TextStyle(
                     color: Colors.white,
@@ -43,7 +35,7 @@ class Page1 extends StatelessWidget {
             ),
           ),
 
-          // 🔥 CONTEÚDO
+          // CONTEÚDO
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -62,9 +54,9 @@ class Page1 extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
+                        const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
                               'PONTOS:',
                               style: TextStyle(
@@ -90,15 +82,15 @@ class Page1 extends StatelessWidget {
                           ],
                         ),
 
-                        // 🐱 imagem (opcional)
-                        Image.asset('assets/icon3.png', height: 60),
+                        // 🐱 imagem lateral
+                        Image.asset('assets/icon4.png', height: 60),
                       ],
                     ),
                   ),
 
                   const SizedBox(height: 20),
 
-                  // 🧱 GRID DE ITENS
+                  // GRID DE ITENS
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: GridView.count(
@@ -152,7 +144,7 @@ class Page1 extends StatelessWidget {
   }
 }
 
-// 🔥 CARD DE ITEM (REUTILIZÁVEL)
+// 🔥 CARD DOS ITENS
 class ItemCard extends StatelessWidget {
   final String nome;
   final int preco;
@@ -177,7 +169,7 @@ class ItemCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Image.asset(imagem, height: 60),
+          Expanded(child: Image.asset(imagem, fit: BoxFit.contain)),
 
           Text(nome, style: const TextStyle(color: Colors.white)),
 
