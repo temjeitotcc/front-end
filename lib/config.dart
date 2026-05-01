@@ -14,6 +14,7 @@ class _ConfigPageState extends State<ConfigPage> {
   bool som = true;
   bool vibracao = true;
   bool modoEscuro = true;
+  double volume = 50;
 
   @override
   void initState() {
@@ -29,6 +30,7 @@ class _ConfigPageState extends State<ConfigPage> {
       som = prefs.getBool('som') ?? true;
       vibracao = prefs.getBool('vibracao') ?? true;
       modoEscuro = prefs.getBool('modoEscuro') ?? true;
+      volume = prefs.getDouble('volume') ?? 50;
     });
   }
 
@@ -126,18 +128,51 @@ class _ConfigPageState extends State<ConfigPage> {
                     await salvarBool('notificacoes', valor);
                   },
                 ),
-                _SwitchTile(
-                  icon: Icons.volume_up_outlined,
-                  titulo: 'Som',
-                  subtitulo: 'Efeitos sonoros do app',
-                  valor: som,
-                  cardColor: cardColor,
-                  textoPrincipal: textoPrincipal,
-                  textoSecundario: textoSecundario,
-                  onChanged: (valor) async {
-                    setState(() => som = valor);
-                    await salvarBool('som', valor);
-                  },
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const _LeadingIcon(icon: Icons.volume_up_outlined),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Text(
+                              'Volume: ${volume.round()}%',
+                              style: TextStyle(
+                                color: textoPrincipal,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Slider(
+                        value: volume,
+                        min: 0,
+                        max: 100,
+                        divisions: 100,
+                        activeColor: const Color(0xFFFED23E),
+                        inactiveColor: Colors.white24,
+                        label: '${volume.round()}%',
+                        onChanged: (valor) async {
+                          setState(() {
+                            volume = valor;
+                          });
+
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setDouble('volume', valor);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
                 _SwitchTile(
                   icon: Icons.vibration_rounded,
