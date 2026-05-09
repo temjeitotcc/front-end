@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
+import 'services/notificacao_service.dart';
 
 class ConfigPage extends StatefulWidget {
   const ConfigPage({super.key});
@@ -126,6 +127,12 @@ class _ConfigPageState extends State<ConfigPage> {
                   onChanged: (valor) async {
                     setState(() => notificacoes = valor);
                     await salvarBool('notificacoes', valor);
+
+                    if (valor) {
+                      await NotificacaoService.ativarLembretes();
+                    } else {
+                      await NotificacaoService.desativarLembretes();
+                    }
                   },
                 ),
                 Container(
@@ -375,7 +382,7 @@ class _SwitchTile extends StatelessWidget {
             Switch(
               value: valor,
               onChanged: onChanged,
-              activeColor: Colors.black,
+              activeThumbColor: Colors.black,
               activeTrackColor: const Color(0xFFFED23E),
               inactiveThumbColor: Colors.white70,
               inactiveTrackColor: Colors.white24,

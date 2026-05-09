@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'config.dart';
 import 'pages/home/home_page.dart';
 import 'pages/menu/loja.dart';
+import 'config.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -28,9 +28,10 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1B1819),
+    final fundo = Theme.of(context).scaffoldBackgroundColor;
 
+    return Scaffold(
+      backgroundColor: fundo,
       body: PageView(
         controller: _controller,
         onPageChanged: (index) {
@@ -38,16 +39,15 @@ class _MainScreenState extends State<MainScreen> {
             currentIndex = index;
           });
         },
-        children: [
+        children: const [
           Page1(),
-          Center(child: Text("Conteudo")),
+          Center(child: Text("Perfil")),
           HomePage(),
-          Center(child: Text("É o pet")),
+          Center(child: Text("Ranking")),
           ConfigPage(),
         ],
       ),
 
-      // NAVBAR NOVA
       bottomNavigationBar: Container(
         height: 90,
         decoration: const BoxDecoration(
@@ -59,7 +59,7 @@ class _MainScreenState extends State<MainScreen> {
           children: [
             _botaoNav(0, 'assets/icon1.png'),
             _botaoNav(1, 'assets/icon2.png'),
-            _botaoCentral(2, 'assets/icon3.png'), // 🔥 destaque
+            _botaoCentral(2, 'assets/icon3.png'),
             _botaoNav(3, 'assets/icon4.png'),
             _botaoNav(4, 'assets/icon5.png'),
           ],
@@ -68,7 +68,6 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // 🔥 BOTÕES NORMAIS
   Widget _botaoNav(int index, String imagem) {
     final ativo = currentIndex == index;
 
@@ -81,29 +80,29 @@ class _MainScreenState extends State<MainScreen> {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: ativo
-              ? const Color.fromARGB(255, 223, 183, 38)
-              : Colors.transparent,
+          color: ativo ? Colors.white.withOpacity(0.15) : Colors.transparent,
           boxShadow: ativo
               ? [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.25),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
-                  ),
+                  )
                 ]
               : [],
         ),
         child: AnimatedScale(
           duration: const Duration(milliseconds: 200),
           scale: ativo ? 1.15 : 1.0,
-          child: Image.asset(imagem, height: 28),
+          child: Image.asset(
+            imagem,
+            height: 28,
+          ),
         ),
       ),
     );
   }
 
-  // 💣 BOTÃO CENTRAL (ESTILO JOGO)
   Widget _botaoCentral(int index, String imagem) {
     final ativo = currentIndex == index;
 
@@ -116,7 +115,7 @@ class _MainScreenState extends State<MainScreen> {
           width: 75,
           height: 75,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 255, 193, 7),
+            color: const Color(0xFFFFC107),
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
@@ -129,7 +128,12 @@ class _MainScreenState extends State<MainScreen> {
           child: AnimatedScale(
             duration: const Duration(milliseconds: 200),
             scale: ativo ? 1.1 : 1.0,
-            child: Center(child: Image.asset(imagem, height: 35)),
+            child: Center(
+              child: Image.asset(
+                imagem,
+                height: 35,
+              ),
+            ),
           ),
         ),
       ),

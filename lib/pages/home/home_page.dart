@@ -12,6 +12,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final int totalFases = 24;
+  static const double _alturaGrupo = 640;
+  static const double _tamanhoCirculoFase = 76;
 
   late List<DateTime?> fasesConcluidas;
   final service = FasesService();
@@ -95,66 +97,54 @@ class _HomePageState extends State<HomePage> {
     final inicio = grupo * 6;
 
     return SizedBox(
-      height: 430,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CirculoFase(
-              numero: '${inicio + 1}',
-              liberado: faseLiberada(inicio),
-              onTap: () => abrirFase(inicio),
-            ),
+      height: _alturaGrupo,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final posicoes = _posicoesCaminho(
+            constraints.maxWidth,
+            _alturaGrupo,
+          );
 
-            const SizedBox(height: 20),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CirculoFase(
-                  numero: '${inicio + 6}',
-                  liberado: faseLiberada(inicio + 5),
-                  onTap: () => abrirFase(inicio + 5),
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _CaminhoFasesPainter(posicoes),
                 ),
-                const SizedBox(width: 150),
-                CirculoFase(
-                  numero: '${inicio + 2}',
-                  liberado: faseLiberada(inicio + 1),
-                  onTap: () => abrirFase(inicio + 1),
+              ),
+              for (int i = 0; i < posicoes.length; i++)
+                Positioned(
+                  left: posicoes[i].dx - (_tamanhoCirculoFase / 2),
+                  top: posicoes[i].dy - (_tamanhoCirculoFase / 2),
+                  width: _tamanhoCirculoFase,
+                  height: _tamanhoCirculoFase,
+                  child: CirculoFase(
+                    numero: '${inicio + i + 1}',
+                    liberado: faseLiberada(inicio + i),
+                    onTap: () => abrirFase(inicio + i),
+                  ),
                 ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CirculoFase(
-                  numero: '${inicio + 5}',
-                  liberado: faseLiberada(inicio + 4),
-                  onTap: () => abrirFase(inicio + 4),
-                ),
-                const SizedBox(width: 150),
-                CirculoFase(
-                  numero: '${inicio + 3}',
-                  liberado: faseLiberada(inicio + 2),
-                  onTap: () => abrirFase(inicio + 2),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            CirculoFase(
-              numero: '${inicio + 4}',
-              liberado: faseLiberada(inicio + 3),
-              onTap: () => abrirFase(inicio + 3),
-            ),
-          ],
-        ),
+            ],
+          );
+        },
       ),
     );
+  }
+
+  List<Offset> _posicoesCaminho(double largura, double altura) {
+    final larguraUtil = largura.clamp(260.0, 430.0);
+    final centro = largura / 2;
+    final deslocamentoPequeno = (larguraUtil * 0.18).clamp(46.0, 72.0);
+    final deslocamentoGrande = (larguraUtil * 0.30).clamp(82.0, 126.0);
+
+    return [
+      Offset(centro - deslocamentoPequeno, altura * 0.90),
+      Offset(centro + deslocamentoPequeno, altura * 0.74),
+      Offset(centro + deslocamentoGrande, altura * 0.58),
+      Offset(centro + deslocamentoPequeno, altura * 0.42),
+      Offset(centro - deslocamentoPequeno, altura * 0.26),
+      Offset(centro, altura * 0.10),
+    ];
   }
 
   void abrirFase(int index) {
@@ -178,5 +168,51 @@ class _HomePageState extends State<HomePage> {
       context,
       MaterialPageRoute(builder: (context) => FasePage(numero: '${index + 1}')),
     );
+  }
+}
+
+class _CaminhoFasesPainter extends CustomPainter {
+  final List<Offset> posicoes;
+
+  const _CaminhoFasesPainter(this.posicoes);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (posicoes.length < 2) return;
+
+    final sombra = Paint()
+      ..color = Colors.black.withAlpha(12)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 18
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final caminho = Paint()
+      ..color = const Color(0xFFFFE58A).withAlpha(92)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 8
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final path = Path()..moveTo(posicoes.first.dx, posicoes.first.dy);
+
+    for (int i = 1; i < posicoes.length; i++) {
+      final anterior = posicoes[i - 1];
+      final atual = posicoes[i];
+      final controle = Offset(
+        (anterior.dx + atual.dx) / 2,
+        (anterior.dy + atual.dy) / 2,
+      );
+
+      path.quadraticBezierTo(controle.dx, controle.dy, atual.dx, atual.dy);
+    }
+
+    canvas.drawPath(path, sombra);
+    canvas.drawPath(path, caminho);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CaminhoFasesPainter oldDelegate) {
+    return oldDelegate.posicoes != posicoes;
   }
 }

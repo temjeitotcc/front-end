@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Tela de desafio/fase
 class FasePage extends StatelessWidget {
   final String numero;
 
@@ -11,12 +12,9 @@ class FasePage extends StatelessWidget {
       backgroundColor: const Color(0xFF1B1819),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFED23E),
+
         centerTitle: true,
-        title: Text(
-          'Fase $numero',
-          style: const TextStyle(color: Colors.black),
-        ),
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: Text('Fase $numero'),
       ),
       body: Center(
         child: Text(

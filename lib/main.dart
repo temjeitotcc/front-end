@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'mainscreen.dart';
+import 'services/notificacao_service.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificacaoService.inicializar();
+  await NotificacaoService.configurarPeloPreferencias();
   runApp(const MyApp());
 }
 
