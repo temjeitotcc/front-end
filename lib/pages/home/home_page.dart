@@ -401,7 +401,7 @@ class _HomePageState extends State<HomePage> {
     ];
   }
 
-  void abrirFase(int index) {
+  Future<void> abrirFase(int index) async {
     if (!faseLiberada(index)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -412,16 +412,18 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
+    final concluida = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (context) => FasePage(numero: '${index + 1}')),
+    );
+
+    if (concluida != true) return;
+
     setState(() {
       fasesConcluidas[index] = DateTime.now();
     });
 
     salvarFases();
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => FasePage(numero: '${index + 1}')),
-    );
   }
 }
 

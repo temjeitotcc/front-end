@@ -141,9 +141,7 @@ class _ConfigPageState extends State<ConfigPage> {
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text(
-                              'Permissao de notificacao negada.',
-                            ),
+                            content: Text('Permissao de notificacao negada.'),
                           ),
                         );
                       }
