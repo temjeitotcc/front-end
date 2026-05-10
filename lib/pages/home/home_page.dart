@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/circulo_fase.dart';
 import '../../services/fases_service.dart';
+import '../../services/pontos_service.dart';
 import '../fases/fase_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,6 +24,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     fasesConcluidas = List.generate(totalFases, (_) => null);
     carregarFases();
+    PontosService.carregarPontos();
   }
 
   Future<void> carregarFases() async {
@@ -70,8 +72,55 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Image.asset('assets/imagem_esquerda.png', height: 50),
-                Image.asset('assets/imagem_direita.png', height: 70),
+                GestureDetector(
+                  onTap: _abrirPainelPersonagem,
+                  onHorizontalDragEnd: (details) {
+                    final velocidade = details.primaryVelocity ?? 0;
+                    if (velocidade > 120) {
+                      _abrirPainelPersonagem();
+                    }
+                  },
+                  child: Image.asset('assets/imagem_esquerda.png', height: 50),
+                ),
+                Row(
+                  children: [
+                    ValueListenableBuilder<int>(
+                      valueListenable: PontosService.pontos,
+                      builder: (context, pontos, _) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withAlpha(28),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
+                            children: [
+                              Text(
+                                '$pontos',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.star,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    Image.asset('assets/imagem_direita.png', height: 70),
+                  ],
+                ),
               ],
             ),
           ),
@@ -90,6 +139,211 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _abrirPainelPersonagem() {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Fechar',
+      barrierColor: Colors.black.withAlpha(90),
+      transitionDuration: const Duration(milliseconds: 320),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        final modoEscuro = Theme.of(context).brightness == Brightness.dark;
+        final corTextoSuave = modoEscuro ? Colors.white70 : Colors.black54;
+        final corCardInterno = modoEscuro
+            ? Colors.black.withAlpha(24)
+            : const Color(0xFFFFF2B8);
+
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: SafeArea(
+            top: false,
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.62,
+                height: MediaQuery.of(context).size.height * 0.55,
+                margin: const EdgeInsets.only(left: 0),
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
+                decoration: BoxDecoration(
+                  color: modoEscuro
+                      ? const Color(0xFF2A2527)
+                      : const Color(0xFFFFFBF0),
+                  borderRadius: const BorderRadius.horizontal(
+                    right: Radius.circular(34),
+                  ),
+                  border: Border.all(
+                    color: const Color(0xFFFED23E),
+                    width: 3,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(100),
+                      blurRadius: 30,
+                      offset: const Offset(14, 0),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/imagem_esquerda.png',
+                              height: 72,
+                              fit: BoxFit.contain,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFED23E),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: const Text(
+                                  'Personagem',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: corCardInterno,
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                            child: ValueListenableBuilder<int>(
+                              valueListenable: PontosService.pontos,
+                              builder: (context, pontos, _) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'PONTOS',
+                                      style: TextStyle(
+                                        color: corTextoSuave,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            '$pontos',
+                                            style: const TextStyle(
+                                              color: Color(0xFFFED23E),
+                                              fontSize: 52,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          const Icon(
+                                            Icons.star_rounded,
+                                            color: Color(0xFFFED23E),
+                                            size: 36,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      'Use na lojinha para comprar itens.',
+                                      style: TextStyle(
+                                        color: corTextoSuave,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: modoEscuro
+                                ? const Color(0xFF211D1F)
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.swipe_right_alt_rounded,
+                                color: Color(0xFFFED23E),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Puxe o personagem para abrir.',
+                                  style: TextStyle(
+                                    color: corTextoSuave,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: IconButton(
+                        style: IconButton.styleFrom(
+                          backgroundColor: const Color(0xFFFED23E),
+                          foregroundColor: Colors.black,
+                          minimumSize: const Size(36, 36),
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.close_rounded, size: 20),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final deslocamento = Tween<Offset>(
+          begin: const Offset(-1, 0),
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+        );
+
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(position: deslocamento, child: child),
+        );
+      },
     );
   }
 

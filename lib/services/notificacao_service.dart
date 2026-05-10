@@ -2,7 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificacaoConfig {
-  static const Duration intervalo = Duration(seconds: 4);
+  static const Duration intervalo = Duration(hours: 4);
   static const String titulo = 'Tem Jeito';
 
   static const List<String> mensagens = [
@@ -15,6 +15,7 @@ class NotificacaoConfig {
 
 class NotificacaoService {
   static const int _notificacaoMotivacionalId = 1001;
+  static const int _notificacaoTesteId = 1002;
   static const String _canalId = 'lembretes_motivacionais';
   static const String _canalNome = 'Lembretes motivacionais';
   static const String _canalDescricao =
@@ -46,17 +47,19 @@ class NotificacaoService {
     final notificacoesAtivas = prefs.getBool('notificacoes') ?? true;
 
     if (notificacoesAtivas) {
-      await ativarLembretes();
+      await ativarLembretes(pedirPermissao: false);
     } else {
       await desativarLembretes();
     }
   }
 
-  static Future<void> ativarLembretes() async {
+  static Future<bool> ativarLembretes({bool pedirPermissao = true}) async {
     await inicializar();
 
-    final permitido = await _pedirPermissao();
-    if (!permitido) return;
+    final permitido = pedirPermissao
+        ? await _pedirPermissao()
+        : await _temPermissao();
+    if (!permitido) return false;
 
     await _plugin.cancel(id: _notificacaoMotivacionalId);
 
@@ -78,11 +81,39 @@ class NotificacaoService {
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: 'lembrete_motivacional',
     );
+
+    return true;
   }
 
   static Future<void> desativarLembretes() async {
     await inicializar();
     await _plugin.cancel(id: _notificacaoMotivacionalId);
+  }
+
+  static Future<bool> mostrarTeste() async {
+    await inicializar();
+
+    final permitido = await _pedirPermissao();
+    if (!permitido) return false;
+
+    await _plugin.show(
+      id: _notificacaoTesteId,
+      title: NotificacaoConfig.titulo,
+      body: _mensagemAtual(),
+      notificationDetails: const NotificationDetails(
+        android: AndroidNotificationDetails(
+          _canalId,
+          _canalNome,
+          channelDescription: _canalDescricao,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+      payload: 'teste_notificacao',
+    );
+
+    return true;
   }
 
   static Future<bool> _pedirPermissao() async {
@@ -106,6 +137,18 @@ class NotificacaoService {
     );
 
     return permissaoIos ?? true;
+  }
+
+  static Future<bool> _temPermissao() async {
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+
+    final permitidoAndroid = await android?.areNotificationsEnabled();
+    if (permitidoAndroid == false) return false;
+
+    return true;
   }
 
   static String _mensagemAtual() {

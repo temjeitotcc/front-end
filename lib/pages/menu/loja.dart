@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
+import '../../services/pontos_service.dart';
 
-class Page1 extends StatelessWidget {
+class Page1 extends StatefulWidget {
   const Page1({super.key});
+
+  @override
+  State<Page1> createState() => _Page1State();
+}
+
+class _Page1State extends State<Page1> {
+  @override
+  void initState() {
+    super.initState();
+    PontosService.carregarPontos();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,30 +66,38 @@ class Page1 extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'PONTOS:',
                               style: TextStyle(
                                 color: Colors.white70,
                                 fontSize: 16,
                               ),
                             ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Text(
-                                  '100',
-                                  style: TextStyle(
-                                    color: Color(0xFFFED23E),
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(width: 6),
-                                Icon(Icons.star, color: Color(0xFFFED23E)),
-                              ],
+                            const SizedBox(height: 8),
+                            ValueListenableBuilder<int>(
+                              valueListenable: PontosService.pontos,
+                              builder: (context, pontos, _) {
+                                return Row(
+                                  children: [
+                                    Text(
+                                      '$pontos',
+                                      style: const TextStyle(
+                                        color: Color(0xFFFED23E),
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Icon(
+                                      Icons.star,
+                                      color: Color(0xFFFED23E),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                           ],
                         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
+import 'services/auth_service.dart';
 import 'services/notificacao_service.dart';
 
 class ConfigPage extends StatefulWidget {
@@ -129,10 +130,60 @@ class _ConfigPageState extends State<ConfigPage> {
                     await salvarBool('notificacoes', valor);
 
                     if (valor) {
-                      await NotificacaoService.ativarLembretes();
+                      final ativado =
+                          await NotificacaoService.ativarLembretes();
+
+                      if (!context.mounted) return;
+
+                      if (!ativado) {
+                        setState(() => notificacoes = false);
+                        await salvarBool('notificacoes', false);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Permissao de notificacao negada.',
+                            ),
+                          ),
+                        );
+                      }
                     } else {
                       await NotificacaoService.desativarLembretes();
                     }
+                  },
+                ),
+                _ActionTile(
+                  icon: Icons.notification_add_outlined,
+                  titulo: 'Testar notificacao',
+                  subtitulo: 'Enviar uma notificacao agora',
+                  cardColor: cardColor,
+                  textoPrincipal: textoPrincipal,
+                  textoSecundario: textoSecundario,
+                  onTap: () async {
+                    if (!notificacoes) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Ative as notificacoes para enviar um teste.',
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+
+                    final enviado = await NotificacaoService.mostrarTeste();
+
+                    if (!context.mounted) return;
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          enviado
+                              ? 'Notificacao de teste enviada.'
+                              : 'Permissao de notificacao negada.',
+                        ),
+                      ),
+                    );
                   },
                 ),
                 Container(
@@ -413,8 +464,29 @@ class _LeadingIcon extends StatelessWidget {
   }
 }
 
-class ContaPage extends StatelessWidget {
+class ContaPage extends StatefulWidget {
   const ContaPage({super.key});
+
+  @override
+  State<ContaPage> createState() => _ContaPageState();
+}
+
+class _ContaPageState extends State<ContaPage> {
+  String email = '';
+
+  @override
+  void initState() {
+    super.initState();
+    carregarEmail();
+  }
+
+  Future<void> carregarEmail() async {
+    final emailAtual = await AuthService.emailAtual();
+
+    setState(() {
+      email = emailAtual ?? 'Email nao encontrado';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -422,6 +494,9 @@ class ContaPage extends StatelessWidget {
     final texto = Theme.of(context).brightness == Brightness.dark
         ? Colors.white
         : Colors.black;
+    final cardColor = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF2A2527)
+        : Colors.white;
 
     return Scaffold(
       backgroundColor: fundo,
@@ -435,9 +510,69 @@ class ContaPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(18),
-        child: Text(
-          'Aqui você pode mostrar informações do usuário, nome, email e outras opções de conta.',
-          style: TextStyle(color: texto, fontSize: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Row(
+                children: [
+                  const _LeadingIcon(icon: Icons.person_outline_rounded),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Email',
+                          style: TextStyle(
+                            color: texto,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          email,
+                          style: const TextStyle(
+                            color: Colors.white60,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              onPressed: () async {
+                await MyApp.of(context).sairDaConta();
+
+                if (!context.mounted) return;
+
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.logout_rounded),
+              label: const Text(
+                'Sair da conta',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
         ),
       ),
     );
