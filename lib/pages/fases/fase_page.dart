@@ -38,8 +38,6 @@ class _FasePageState extends State<FasePage> {
   int instrucaoAtual = 0;
   int perguntaAtual = 0;
 
-  bool get faseComQuestionario => widget.numero == '1';
-
   @override
   void initState() {
     super.initState();
@@ -48,10 +46,6 @@ class _FasePageState extends State<FasePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!faseComQuestionario) {
-      return _faseSimples(context);
-    }
-
     final fundo = Theme.of(context).scaffoldBackgroundColor;
     final textoPrincipal = Theme.of(context).brightness == Brightness.dark
         ? Colors.white
@@ -79,7 +73,7 @@ class _FasePageState extends State<FasePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Desafio 1',
+                          'Desafio ${widget.numero}',
                           style: TextStyle(
                             color: textoPrincipal,
                             fontSize: 24,
@@ -206,7 +200,7 @@ class _FasePageState extends State<FasePage> {
 
     return [
       Text(
-        'Instrucoes do Desafio 1',
+        'Instrucoes do Desafio ${widget.numero}',
         style: TextStyle(
           color: textoPrincipal,
           fontSize: 22,
@@ -286,28 +280,6 @@ class _FasePageState extends State<FasePage> {
         ],
       ),
     ];
-  }
-
-  Widget _faseSimples(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFFED23E),
-        centerTitle: true,
-        title: Text('Fase ${widget.numero}'),
-      ),
-      body: Center(
-        child: Text(
-          'Desafio ${widget.numero}',
-          style: TextStyle(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white
-                : Colors.black,
-            fontSize: 24,
-          ),
-        ),
-      ),
-    );
   }
 
   void _voltarEtapa() {

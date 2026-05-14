@@ -11,8 +11,8 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int currentIndex = 0;
-  final PageController _controller = PageController();
+  int currentIndex = 2;
+  final PageController _controller = PageController(initialPage: 2);
 
   void mudarPagina(int index) {
     setState(() {

@@ -28,7 +28,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> carregarFases() async {
+    await service.prepararRegrasAtuais(totalFases);
     fasesConcluidas = await service.carregarFases(totalFases);
+    fasesConcluidas = await service.corrigirSequenciaDeFases(fasesConcluidas);
     setState(() {});
   }
 
@@ -37,23 +39,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   bool faseLiberada(int index) {
-    if (index == 0) return true;
-
-    final grupoAtual = index ~/ 6;
-    final inicioGrupoAtual = grupoAtual * 6;
-
-    if (index == inicioGrupoAtual) {
-      final inicioGrupoAnterior = inicioGrupoAtual - 6;
-      final fimGrupoAnterior = inicioGrupoAtual;
-
-      for (int i = inicioGrupoAnterior; i < fimGrupoAnterior; i++) {
-        if (fasesConcluidas[i] == null) return false;
-      }
-
-      return true;
-    }
-
-    return fasesConcluidas[index - 1] != null;
+    return service.faseLiberada(fasesConcluidas, index);
   }
 
   @override
@@ -403,12 +389,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> abrirFase(int index) async {
     if (!faseLiberada(index)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Complete as fases anteriores primeiro!'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
+      _mostrarMensagemFaseBloqueada(index);
       return;
     }
 
@@ -424,6 +405,52 @@ class _HomePageState extends State<HomePage> {
     });
 
     salvarFases();
+  }
+
+  String _mensagemFaseBloqueada(int index) {
+    return service.mensagemFaseBloqueada(fasesConcluidas, index);
+  }
+
+  void _mostrarMensagemFaseBloqueada(int index) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF2A2527),
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        margin: const EdgeInsets.fromLTRB(18, 0, 18, 96),
+        duration: const Duration(seconds: 3),
+        content: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFED23E),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.lock_rounded,
+                color: Colors.black,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                _mensagemFaseBloqueada(index),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
