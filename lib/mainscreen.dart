@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'pages/conteudos/conteudos_page.dart';
 import 'pages/home/home_page.dart';
 import 'pages/menu/loja.dart';
 import 'config.dart';
@@ -12,11 +13,15 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int currentIndex = 2;
+  int conteudosRefreshKey = 0;
   final PageController _controller = PageController(initialPage: 2);
 
   void mudarPagina(int index) {
     setState(() {
       currentIndex = index;
+      if (index == 1) {
+        conteudosRefreshKey++;
+      }
     });
 
     _controller.animateToPage(
@@ -37,14 +42,17 @@ class _MainScreenState extends State<MainScreen> {
         onPageChanged: (index) {
           setState(() {
             currentIndex = index;
+            if (index == 1) {
+              conteudosRefreshKey++;
+            }
           });
         },
-        children: const [
-          Page1(),
-          Center(child: Text("Perfil")),
-          HomePage(),
-          Center(child: Text("Ranking")),
-          ConfigPage(),
+        children: [
+          const Page1(),
+          ConteudosPage(refreshKey: conteudosRefreshKey),
+          const HomePage(),
+          const Center(child: Text("Ranking")),
+          const ConfigPage(),
         ],
       ),
 

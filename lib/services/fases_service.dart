@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'regras_fases.dart';
 
 class FasesService {
   static const String _versaoBloqueioKey = 'versao_bloqueio_fases';
@@ -30,18 +31,11 @@ class FasesService {
   }
 
   bool faseLiberada(List<DateTime?> fasesConcluidas, int index) {
-    if (index == 0) return true;
-    return _liberadaPorData(fasesConcluidas, index);
+    return RegrasFases.faseLiberada(fasesConcluidas, index);
   }
 
   String mensagemFaseBloqueada(List<DateTime?> fasesConcluidas, int index) {
-    final dataConclusaoAnterior = fasesConcluidas[index - 1];
-
-    if (dataConclusaoAnterior == null) {
-      return 'Complete o desafio anterior primeiro!';
-    }
-
-    return 'Este desafio libera a partir da meia-noite do dia seguinte.';
+    return RegrasFases.mensagemFaseBloqueada(fasesConcluidas, index);
   }
 
   Future<List<DateTime?>> corrigirSequenciaDeFases(
@@ -51,7 +45,7 @@ class FasesService {
     var alterou = false;
 
     for (int i = 1; i < corrigida.length; i++) {
-      if (corrigida[i] != null && !_liberadaPorData(corrigida, i)) {
+      if (corrigida[i] != null && !RegrasFases.faseLiberada(corrigida, i)) {
         for (int j = i; j < corrigida.length; j++) {
           corrigida[j] = null;
         }
@@ -84,18 +78,5 @@ class FasesService {
         await prefs.setString('fase_$i', data.toIso8601String());
       }
     }
-  }
-
-  bool _liberadaPorData(List<DateTime?> fasesConcluidas, int index) {
-    final dataConclusaoAnterior = fasesConcluidas[index - 1];
-    if (dataConclusaoAnterior == null) return false;
-
-    final dataLiberacao = DateTime(
-      dataConclusaoAnterior.year,
-      dataConclusaoAnterior.month,
-      dataConclusaoAnterior.day + 1,
-    );
-
-    return !DateTime.now().isBefore(dataLiberacao);
   }
 }

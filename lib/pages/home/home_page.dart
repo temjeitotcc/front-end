@@ -12,8 +12,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final int totalFases = 24;
-  static const double _alturaGrupo = 640;
+  final int totalFases = 28;
+  static const double _alturaGrupo = 760;
   static const double _tamanhoCirculoFase = 76;
 
   late List<DateTime?> fasesConcluidas;
@@ -334,7 +334,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _grupoFases(int grupo) {
-    final inicio = grupo * 6;
+    final inicio = grupo * 7;
 
     return SizedBox(
       height: _alturaGrupo,
@@ -344,6 +344,11 @@ class _HomePageState extends State<HomePage> {
             constraints.maxWidth,
             _alturaGrupo,
           );
+          final posicaoEspecial = Offset(
+            constraints.maxWidth / 2,
+            _alturaGrupo * 0.055,
+          );
+          final indexEspecial = inicio + 6;
 
           return Stack(
             children: [
@@ -364,6 +369,18 @@ class _HomePageState extends State<HomePage> {
                     onTap: () => abrirFase(inicio + i),
                   ),
                 ),
+              Positioned(
+                left: posicaoEspecial.dx - (_tamanhoCirculoFase / 2),
+                top: posicaoEspecial.dy - (_tamanhoCirculoFase / 2),
+                width: _tamanhoCirculoFase,
+                height: _tamanhoCirculoFase,
+                child: CirculoFase(
+                  numero: '${grupo + 1}',
+                  especial: true,
+                  liberado: faseLiberada(indexEspecial),
+                  onTap: () => abrirFase(indexEspecial),
+                ),
+              ),
             ],
           );
         },
@@ -379,11 +396,11 @@ class _HomePageState extends State<HomePage> {
 
     return [
       Offset(centro - deslocamentoPequeno, altura * 0.90),
-      Offset(centro + deslocamentoPequeno, altura * 0.74),
-      Offset(centro + deslocamentoGrande, altura * 0.58),
-      Offset(centro + deslocamentoPequeno, altura * 0.42),
-      Offset(centro - deslocamentoPequeno, altura * 0.26),
-      Offset(centro, altura * 0.10),
+      Offset(centro + deslocamentoPequeno, altura * 0.76),
+      Offset(centro + deslocamentoGrande, altura * 0.62),
+      Offset(centro + deslocamentoPequeno, altura * 0.48),
+      Offset(centro - deslocamentoPequeno, altura * 0.34),
+      Offset(centro, altura * 0.20),
     ];
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class CirculoFase extends StatelessWidget {
   final String numero;
   final bool liberado;
+  final bool especial;
   final VoidCallback onTap;
 
   const CirculoFase({
@@ -11,6 +12,7 @@ class CirculoFase extends StatelessWidget {
     required this.numero,
     required this.liberado,
     required this.onTap,
+    this.especial = false,
   });
 
   @override
@@ -24,7 +26,9 @@ class CirculoFase extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: liberado
-              ? const Color(0xFFFFE58A)
+              ? especial
+                  ? const Color(0xFFFFC107)
+                  : const Color(0xFFFFE58A)
               : const Color(0xFFE2E8F0),
           boxShadow: [
             BoxShadow(
@@ -38,18 +42,34 @@ class CirculoFase extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: liberado
-                ? const Color(0xFFFED23E)
+                ? especial
+                    ? const Color(0xFF2A2527)
+                    : const Color(0xFFFED23E)
                 : const Color(0xFF94A3B8),
+            border: especial && liberado
+                ? Border.all(color: const Color(0xFFFED23E), width: 3)
+                : null,
           ),
           alignment: Alignment.center,
           child: liberado
-              ? Text(
-                  numero,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 21,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (especial)
+                      const Icon(
+                        Icons.auto_awesome_rounded,
+                        color: Color(0xFFFED23E),
+                        size: 18,
+                      ),
+                    Text(
+                      numero,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: especial ? 18 : 21,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 )
               : const Icon(
                   Icons.lock_rounded,

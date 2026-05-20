@@ -1,47 +1,67 @@
 import 'package:flutter/material.dart';
+import '../../services/conteudos_service.dart';
+import 'desafio_01/desafio_01_page.dart';
+import 'desafio_02/desafio_02_page.dart';
 
-class FasePage extends StatefulWidget {
+class FasePage extends StatelessWidget {
   final String numero;
 
   const FasePage({super.key, required this.numero});
 
   @override
-  State<FasePage> createState() => _FasePageState();
+  Widget build(BuildContext context) {
+    final numeroInt = int.tryParse(numero) ?? 0;
+    if (_missaoEspecial(numeroInt)) {
+      return MissaoEspecialPage(numero: numeroInt);
+    }
+
+    return switch (numero) {
+      '1' => const Desafio1Page(),
+      '2' => const Desafio2Page(),
+      _ => _DesafioPlaceholderPage(numero: numero),
+    };
+  }
+
+  bool _missaoEspecial(int numero) {
+    return numero == 7 || numero == 14 || numero == 21 || numero == 28;
+  }
 }
 
-class _FasePageState extends State<FasePage> {
-  List<String> get perguntas => const [
-    'Familiar',
-    'Relacional',
-    'Social',
-    'Saúde',
-    'Intelectual',
-    'Profissional',
-    'Emocional',
-    'Solidariedade',
-    'Futuro',
-  ];
+class MissaoEspecialPage extends StatefulWidget {
+  final int numero;
 
-  List<String> get subtitulos => const [
-    'Como está sua relação com sua família?',
-    'Você está em um relacionamento? Se sim, você se sente feliz nele?',
-    'Você tem amigos? Tá satisfeito com a quantidade e qualidade dessas amizades?',
-    'Como está sua alimentação? Você cuida do que come? Faz exercício? Dorme bem?',
-    'Você estuda de verdade ou só “vai levando”? Tem rotina de estudos? Lê livros?',
-    'Você trabalha com algo que gosta? Se dedica de verdade? Ou vive reclamando?',
-    'Você sabe lidar com suas emoções ou vive agindo no impulso? Se estressa fácil? Se arrepende das suas atitudes?',
-    'Você ajuda alguém? Você se sente bem fazendo isso? Ou nem pensa muito sobre?',
-    ' Você tem planos claros para o seu futuro? Ou tá vivendo no automático? ',
-  ];
+  const MissaoEspecialPage({
+    super.key,
+    required this.numero,
+  });
 
-  late final List<int?> respostas;
-  int instrucaoAtual = 0;
-  int perguntaAtual = 0;
+  @override
+  State<MissaoEspecialPage> createState() => _MissaoEspecialPageState();
+}
+
+class _MissaoEspecialPageState extends State<MissaoEspecialPage> {
+  late final TextEditingController controller;
+
+  int get reflexaoSemanaNumero {
+    return switch (widget.numero) {
+      7 => 1,
+      14 => 2,
+      21 => 3,
+      28 => 4,
+      _ => widget.numero,
+    };
+  }
 
   @override
   void initState() {
     super.initState();
-    respostas = List<int?>.filled(perguntas.length, null);
+    controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,10 +73,6 @@ class _FasePageState extends State<FasePage> {
     final textoSecundario = Theme.of(context).brightness == Brightness.dark
         ? Colors.white70
         : Colors.black54;
-    final cardColor = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF2A2527)
-        : Colors.white;
-    final mostrandoInstrucoes = instrucaoAtual < instrucoes.length;
 
     return Scaffold(
       backgroundColor: fundo,
@@ -73,7 +89,7 @@ class _FasePageState extends State<FasePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Desafio ${widget.numero}',
+                          'Reflexão da semana $reflexaoSemanaNumero',
                           style: TextStyle(
                             color: textoPrincipal,
                             fontSize: 24,
@@ -81,9 +97,7 @@ class _FasePageState extends State<FasePage> {
                           ),
                         ),
                         Text(
-                          mostrandoInstrucoes
-                              ? 'Instrucoes ${instrucaoAtual + 1} de ${instrucoes.length}'
-                              : 'Pergunta ${perguntaAtual + 1} de ${perguntas.length}',
+                          'Uma lembranca da sua semana',
                           style: TextStyle(color: textoSecundario),
                         ),
                       ],
@@ -103,15 +117,222 @@ class _FasePageState extends State<FasePage> {
               const SizedBox(height: 18),
               ClipRRect(
                 borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: mostrandoInstrucoes
-                      ? (instrucaoAtual + 1) /
-                            (instrucoes.length + perguntas.length)
-                      : (instrucoes.length + perguntaAtual + 1) /
-                            (instrucoes.length + perguntas.length),
+                child: const LinearProgressIndicator(
+                  value: 1,
                   minHeight: 10,
                   backgroundColor: Colors.white12,
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFFFED23E)),
+                  valueColor: AlwaysStoppedAnimation(Color(0xFFFED23E)),
+                ),
+              ),
+              const SizedBox(height: 22),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF2A2527)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: const Color(0xFFFED23E).withAlpha(130),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Icon(
+                        Icons.auto_awesome_rounded,
+                        color: Color(0xFFFED23E),
+                        size: 42,
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        'Escreva uma reflexão da semana para guardar.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: textoPrincipal,
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Depois essa mensagem vai aparecer numa caixinha propria do livrinho.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: textoSecundario,
+                          fontSize: 14,
+                          height: 1.3,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Expanded(
+                        child: TextField(
+                          controller: controller,
+                          expands: true,
+                          maxLines: null,
+                          minLines: null,
+                          textAlignVertical: TextAlignVertical.top,
+                          style: TextStyle(
+                            color: textoPrincipal,
+                            fontSize: 16,
+                            height: 1.35,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Minha reflexão da semana...',
+                            hintStyle: TextStyle(
+                              color: textoSecundario.withAlpha(140),
+                            ),
+                            filled: true,
+                            fillColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF171315)
+                                : const Color(0xFFF6F1E7),
+                            contentPadding: const EdgeInsets.all(16),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(18),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(18),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFFED23E),
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: textoPrincipal,
+                        side: const BorderSide(color: Color(0xFFFED23E)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(false),
+                      icon: const Icon(Icons.arrow_back_rounded),
+                      label: const Text('Voltar'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFED23E),
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: _concluir,
+                      icon: const Icon(Icons.check_rounded),
+                      label: const Text('Concluir'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _concluir() async {
+    if (controller.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Escreva sua lembranca antes de concluir.')),
+      );
+      return;
+    }
+
+    await ConteudosService().salvarConteudosDoDesafio(
+      desafio: widget.numero,
+      itens: [
+        ConteudoItem(
+          titulo: 'Reflexão da semana $reflexaoSemanaNumero',
+          texto: controller.text.trim(),
+        ),
+      ],
+    );
+
+    if (!mounted) return;
+    Navigator.of(context).pop(true);
+  }
+}
+
+class _DesafioPlaceholderPage extends StatelessWidget {
+  final String numero;
+
+  const _DesafioPlaceholderPage({required this.numero});
+
+  @override
+  Widget build(BuildContext context) {
+    final fundo = Theme.of(context).scaffoldBackgroundColor;
+    final textoPrincipal = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+    final textoSecundario = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white70
+        : Colors.black54;
+    final cardColor = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF2A2527)
+        : Colors.white;
+
+    return Scaffold(
+      backgroundColor: fundo,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Desafio $numero',
+                          style: TextStyle(
+                            color: textoPrincipal,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Em construcao',
+                          style: TextStyle(color: textoSecundario),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Sair',
+                    style: IconButton.styleFrom(
+                      backgroundColor: const Color(0xFFFED23E),
+                      foregroundColor: Colors.black,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(false),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: const LinearProgressIndicator(
+                  value: 1,
+                  minHeight: 10,
+                  backgroundColor: Colors.white12,
+                  valueColor: AlwaysStoppedAnimation(Color(0xFFFED23E)),
                 ),
               ),
               const SizedBox(height: 22),
@@ -125,263 +346,31 @@ class _FasePageState extends State<FasePage> {
                       color: const Color(0xFFFED23E).withAlpha(110),
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: mostrandoInstrucoes
-                        ? _conteudoInstrucao(
-                            textoPrincipal,
-                            textoSecundario,
-                            instrucaoAtual,
-                          )
-                        : _conteudoPergunta(textoPrincipal, textoSecundario),
+                  child: Center(
+                    child: Text(
+                      'A pasta deste desafio ja pode receber o codigo proprio depois.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: textoSecundario,
+                        fontSize: 16,
+                        height: 1.35,
+                      ),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 18),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: perguntaAtual == 0
-                            ? textoSecundario
-                            : textoPrincipal,
-                        side: const BorderSide(color: Color(0xFFFED23E)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: _voltarEtapa,
-                      icon: const Icon(Icons.arrow_back_rounded),
-                      label: const Text('Voltar'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFED23E),
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: _proximaPergunta,
-                      icon: Icon(
-                        !mostrandoInstrucoes &&
-                                perguntaAtual == perguntas.length - 1
-                            ? Icons.check_rounded
-                            : Icons.arrow_forward_rounded,
-                      ),
-                      label: Text(
-                        !mostrandoInstrucoes &&
-                                perguntaAtual == perguntas.length - 1
-                            ? 'Concluir'
-                            : 'Proximo',
-                      ),
-                    ),
-                  ),
-                ],
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: textoPrincipal,
+                  side: const BorderSide(color: Color(0xFFFED23E)),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                onPressed: () => Navigator.of(context).pop(false),
+                icon: const Icon(Icons.arrow_back_rounded),
+                label: const Text('Voltar'),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  List<String> get instrucoes => const [
-    'Agora a gente vai dividir a sua vida em 9 areas, tipo uma empresa mesmo: familiar, relacionamentos, social, saude, intelectual, profissional, emocional, solidariedade e futuro.\n\nA ideia e voce dar uma nota de 0 a 10 para cada uma dessas areas, de acordo com como voce enxerga sua realidade hoje. Mas antes, leia todas as perguntas e orientacoes com calma, para responder da forma mais consciente possivel, beleza?',
-    'Agora imagina cada area da sua vida funcionando MUITO bem, tipo no seu melhor nivel mesmo. Essa versao que voce imaginou e o seu "nota 10".\n\nCom isso em mente, compara com a sua realidade de hoje e da uma nota sincera para cada area. Sem se iludir, mas tambem sem se julgar demais, e so um retrato do agora.\n\nAs areas que estao mais baguncadas, que te geram ansiedade, estresse ou desconforto, provavelmente vao ficar abaixo de 5. Ja aquelas que estao fluindo melhor, mesmo que ainda tenham espaco para melhorar, podem ficar entre 6 e 9.\n\nE um detalhe importante: evite colocar 10 em alguma area, mesmo que esteja tudo otimo. Quando voce faz isso, seu cerebro entende que nao precisa mais evoluir ali e a ideia aqui e sempre crescer mais.\n\nPra te ajudar nisso, vou te guiar com algumas perguntas em cada area, para voce refletir de verdade.',
-  ];
-
-  List<Widget> _conteudoInstrucao(
-    Color textoPrincipal,
-    Color textoSecundario,
-    int index,
-  ) {
-    final destaque = index == 1;
-
-    return [
-      Text(
-        'Instrucoes do Desafio ${widget.numero}',
-        style: TextStyle(
-          color: textoPrincipal,
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      const SizedBox(height: 14),
-      Expanded(
-        child: SingleChildScrollView(
-          child: Text(
-            instrucoes[index],
-            style: TextStyle(
-              color: textoSecundario,
-              fontSize: 16,
-              height: 1.35,
-            ),
-          ),
-        ),
-      ),
-      if (destaque) ...[
-        const SizedBox(height: 14),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFED23E).withAlpha(38),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFFED23E)),
-          ),
-          child: const Text(
-            'Evite colocar 10 em alguma area: a ideia aqui e sempre crescer mais.',
-            style: TextStyle(
-              color: Color(0xFFFED23E),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ],
-    ];
-  }
-
-  List<Widget> _conteudoPergunta(Color textoPrincipal, Color textoSecundario) {
-    return [
-      Text(
-        perguntas[perguntaAtual],
-        style: TextStyle(
-          color: textoPrincipal,
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      const SizedBox(height: 10),
-      Text(
-        subtitulos[perguntaAtual],
-        style: TextStyle(color: textoSecundario, fontSize: 15),
-      ),
-      const SizedBox(height: 10),
-      Text(
-        'Escolha uma nota de 1 a 10.',
-        style: TextStyle(color: textoSecundario, fontSize: 14),
-      ),
-      const SizedBox(height: 24),
-      Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        alignment: WrapAlignment.center,
-        children: [
-          for (int nota = 1; nota <= 10; nota++)
-            _BotaoNota(
-              nota: nota,
-              selecionado: respostas[perguntaAtual] == nota,
-              onTap: () {
-                setState(() {
-                  respostas[perguntaAtual] = nota;
-                });
-              },
-            ),
-        ],
-      ),
-    ];
-  }
-
-  void _voltarEtapa() {
-    if (instrucaoAtual < instrucoes.length && instrucaoAtual > 0) {
-      setState(() {
-        instrucaoAtual--;
-      });
-      return;
-    }
-
-    if (instrucaoAtual < instrucoes.length && perguntaAtual == 0) {
-      Navigator.of(context).pop(false);
-      return;
-    }
-
-    if (perguntaAtual == 0) {
-      setState(() {
-        instrucaoAtual = instrucoes.length - 1;
-      });
-      return;
-    }
-
-    if (perguntaAtual > 0) {
-      setState(() {
-        perguntaAtual--;
-      });
-    }
-  }
-
-  void _proximaPergunta() {
-    if (instrucaoAtual < instrucoes.length) {
-      setState(() {
-        instrucaoAtual++;
-      });
-      return;
-    }
-
-    if (respostas[perguntaAtual] == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Escolha uma nota antes de continuar.')),
-      );
-      return;
-    }
-
-    if (perguntaAtual < perguntas.length - 1) {
-      setState(() {
-        perguntaAtual++;
-      });
-      return;
-    }
-
-    Navigator.of(context).pop(true);
-  }
-}
-
-class _BotaoNota extends StatelessWidget {
-  final int nota;
-  final bool selecionado;
-  final VoidCallback onTap;
-
-  const _BotaoNota({
-    required this.nota,
-    required this.selecionado,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cor = HSVColor.lerp(
-      const HSVColor.fromAHSV(1, 0, 0.95, 0.95),
-      const HSVColor.fromAHSV(1, 125, 0.98, 0.82),
-      (nota - 1) / 9,
-    )!.toColor();
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        width: 54,
-        height: 54,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: cor,
-          border: Border.all(
-            color: selecionado ? Colors.white : Colors.transparent,
-            width: 4,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(selecionado ? 95 : 35),
-              blurRadius: selecionado ? 12 : 5,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Text(
-          '$nota',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
           ),
         ),
       ),
