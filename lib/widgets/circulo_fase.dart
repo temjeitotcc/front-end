@@ -17,6 +17,9 @@ class CirculoFase extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final corTema = Theme.of(context).colorScheme.primary;
+    final corTemaSuave = Theme.of(context).colorScheme.secondary;
+
     return GestureDetector(
       onTap: liberado ? onTap : null,
       child: Container(
@@ -27,8 +30,8 @@ class CirculoFase extends StatelessWidget {
           shape: BoxShape.circle,
           color: liberado
               ? especial
-                  ? const Color(0xFFFFC107)
-                  : const Color(0xFFFFE58A)
+                  ? corTema
+                  : corTemaSuave
               : const Color(0xFFE2E8F0),
           boxShadow: [
             BoxShadow(
@@ -44,10 +47,10 @@ class CirculoFase extends StatelessWidget {
             color: liberado
                 ? especial
                     ? const Color(0xFF2A2527)
-                    : const Color(0xFFFED23E)
+                    : corTema
                 : const Color(0xFF94A3B8),
             border: especial && liberado
-                ? Border.all(color: const Color(0xFFFED23E), width: 3)
+                ? Border.all(color: corTema, width: 3)
                 : null,
           ),
           alignment: Alignment.center,
@@ -58,7 +61,7 @@ class CirculoFase extends StatelessWidget {
                     if (especial)
                       const Icon(
                         Icons.auto_awesome_rounded,
-                        color: Color(0xFFFED23E),
+                        color: Colors.white,
                         size: 18,
                       ),
                     Text(

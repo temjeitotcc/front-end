@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/conteudos_service.dart';
 import 'desafio_01/desafio_01_page.dart';
 import 'desafio_02/desafio_02_page.dart';
+import 'desafio_03/desafio_03_page.dart';
 
 class FasePage extends StatelessWidget {
   final String numero;
@@ -18,6 +19,7 @@ class FasePage extends StatelessWidget {
     return switch (numero) {
       '1' => const Desafio1Page(),
       '2' => const Desafio2Page(),
+      '3' => const Desafio3Page(),
       _ => _DesafioPlaceholderPage(numero: numero),
     };
   }

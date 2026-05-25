@@ -45,6 +45,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final fundo = Theme.of(context).scaffoldBackgroundColor;
+    final corTema = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
       backgroundColor: fundo,
@@ -53,7 +54,7 @@ class _HomePageState extends State<HomePage> {
           Container(
             width: double.infinity,
             height: 60,
-            color: const Color(0xFFFED23E),
+            color: corTema,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -141,6 +142,7 @@ class _HomePageState extends State<HomePage> {
         final corCardInterno = modoEscuro
             ? Colors.black.withAlpha(24)
             : const Color(0xFFFFF2B8);
+        final corTema = Theme.of(context).colorScheme.primary;
 
         return Align(
           alignment: Alignment.centerLeft,
@@ -161,7 +163,7 @@ class _HomePageState extends State<HomePage> {
                     right: Radius.circular(34),
                   ),
                   border: Border.all(
-                    color: const Color(0xFFFED23E),
+                    color: corTema,
                     width: 3,
                   ),
                   boxShadow: [
@@ -192,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFED23E),
+                                  color: corTema,
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                                 child: const Text(
@@ -238,16 +240,16 @@ class _HomePageState extends State<HomePage> {
                                         children: [
                                           Text(
                                             '$pontos',
-                                            style: const TextStyle(
-                                              color: Color(0xFFFED23E),
+                                            style: TextStyle(
+                                              color: corTema,
                                               fontSize: 52,
                                               fontWeight: FontWeight.w900,
                                             ),
                                           ),
                                           const SizedBox(width: 8),
-                                          const Icon(
+                                          Icon(
                                             Icons.star_rounded,
-                                            color: Color(0xFFFED23E),
+                                            color: corTema,
                                             size: 36,
                                           ),
                                         ],
@@ -278,9 +280,9 @@ class _HomePageState extends State<HomePage> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.swipe_right_alt_rounded,
-                                color: Color(0xFFFED23E),
+                                color: corTema,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
@@ -302,7 +304,7 @@ class _HomePageState extends State<HomePage> {
                       right: 0,
                       child: IconButton(
                         style: IconButton.styleFrom(
-                          backgroundColor: const Color(0xFFFED23E),
+                          backgroundColor: corTema,
                           foregroundColor: Colors.black,
                           minimumSize: const Size(36, 36),
                         ),
@@ -354,7 +356,10 @@ class _HomePageState extends State<HomePage> {
             children: [
               Positioned.fill(
                 child: CustomPaint(
-                  painter: _CaminhoFasesPainter(posicoes),
+                  painter: _CaminhoFasesPainter(
+                    posicoes,
+                    Theme.of(context).colorScheme.secondary,
+                  ),
                 ),
               ),
               for (int i = 0; i < posicoes.length; i++)
@@ -473,8 +478,9 @@ class _HomePageState extends State<HomePage> {
 
 class _CaminhoFasesPainter extends CustomPainter {
   final List<Offset> posicoes;
+  final Color cor;
 
-  const _CaminhoFasesPainter(this.posicoes);
+  const _CaminhoFasesPainter(this.posicoes, this.cor);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -488,7 +494,7 @@ class _CaminhoFasesPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
 
     final caminho = Paint()
-      ..color = const Color(0xFFFFE58A).withAlpha(92)
+      ..color = cor.withAlpha(92)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round
@@ -513,6 +519,6 @@ class _CaminhoFasesPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _CaminhoFasesPainter oldDelegate) {
-    return oldDelegate.posicoes != posicoes;
+    return oldDelegate.posicoes != posicoes || oldDelegate.cor != cor;
   }
 }

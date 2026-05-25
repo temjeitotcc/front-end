@@ -11,6 +11,7 @@ class AuthPage extends StatefulWidget {
 
 class _AuthPageState extends State<AuthPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nomeUsuarioController = TextEditingController();
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
 
@@ -20,18 +21,21 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   void dispose() {
+    _nomeUsuarioController.dispose();
     _emailController.dispose();
     _senhaController.dispose();
     super.dispose();
   }
 
   Future<void> _enviar() async {
-    if (!_formKey.currentState!.validate()) return;
+    final formState = _formKey.currentState;
+    if (formState == null || !formState.validate()) return;
 
     setState(() => _carregando = true);
 
     final erro = _criandoConta
         ? await AuthService.criarConta(
+            nomeUsuario: _nomeUsuarioController.text,
             email: _emailController.text,
             senha: _senhaController.text,
           )
@@ -51,7 +55,10 @@ class _AuthPageState extends State<AuthPage> {
       return;
     }
 
-    await MyApp.of(context).atualizarLogin();
+    final appState = MyApp.maybeOf(context);
+    if (appState != null) {
+      await appState.atualizarLogin();
+    }
   }
 
   @override
@@ -105,6 +112,27 @@ class _AuthPageState extends State<AuthPage> {
                     ),
                     child: Column(
                       children: [
+                        if (_criandoConta) ...[
+                          TextFormField(
+                            controller: _nomeUsuarioController,
+                            textInputAction: TextInputAction.next,
+                            decoration: const InputDecoration(
+                              labelText: 'Nome de usuario',
+                              prefixIcon: Icon(Icons.person_outline_rounded),
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (valor) {
+                              if (!_criandoConta) return null;
+
+                              final nome = valor?.trim() ?? '';
+                              if (nome.length < 2) {
+                                return 'Digite seu nome de usuario.';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 14),
+                        ],
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,

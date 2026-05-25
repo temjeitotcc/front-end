@@ -73,10 +73,12 @@ class _Desafio2PageState extends State<Desafio2Page> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Desafio 2',
+                          'Dia 2 - Minha empresa, minha vida',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: textoPrincipal,
-                            fontSize: 24,
+                            fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -174,7 +176,7 @@ class _Desafio2PageState extends State<Desafio2Page> {
   ) {
     return [
       Text(
-        'Instrucoes do Desafio 2',
+        'Dia 2 - Minha empresa, minha vida',
         style: TextStyle(
           color: textoPrincipal,
           fontSize: 22,
@@ -185,7 +187,7 @@ class _Desafio2PageState extends State<Desafio2Page> {
       Expanded(
         child: SingleChildScrollView(
           child: Text(
-            'Texto introdutorio do Desafio 2.\n\nNa proxima pagina voce vai preencher as janelas do predio da sua vida.',
+            'Texto introdutorio do Dia 2.\n\nNa proxima pagina voce vai preencher as janelas do predio da sua vida.',
             style: TextStyle(
               color: textoSecundario,
               fontSize: 16,

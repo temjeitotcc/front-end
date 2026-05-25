@@ -34,9 +34,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
     'Você tem planos claros para o seu futuro? Ou tá vivendo no automático? Define metas? Se organiza? Pensa nos próximos passos da sua vida?',
   ];
 
-  List<String> get instrucoes => const [
-    'Vamos dividir sua vida em 9 areas: familia, relacionamentos, vida social, saude, intelectual, profissional, emocional, solidariedade e futuro. Para cada uma delas, voce vai dar uma nota de 0 a 10 com base em como enxerga sua vida hoje.\n\nAntes de responder, imagine como seria cada area funcionando no seu melhor nivel possivel, essa sera sua "nota 10". Depois, compare com sua realidade atual e de notas sinceras, sem se cobrar demais.\n\nAreas que te causam ansiedade, estresse ou desconforto provavelmente terao notas mais baixas. Ja as que estao indo bem podem ficar entre 6 e 9, mesmo ainda podendo melhorar.\n\nPara ajudar na reflexao, havera perguntas especificas sobre cada area.',
-  ];
+  List<String> get instrucoes => const [];
 
   late final List<int?> respostas;
   late final TextEditingController reflexaoController;
@@ -70,12 +68,12 @@ class _Desafio1PageState extends State<Desafio1Page> {
         ? const Color(0xFF2A2527)
         : Colors.white;
     final mostrandoInstrucoes = instrucaoAtual < instrucoes.length;
-    final totalEtapas = instrucoes.length + perguntas.length + 1;
+    final totalEtapas = perguntas.length + 1;
     final progresso = mostrandoInstrucoes
-        ? (instrucaoAtual + 1) / totalEtapas
+        ? 0.0
         : mostrandoReflexao
         ? 1.0
-        : (instrucoes.length + perguntaAtual + 1) / totalEtapas;
+        : (perguntaAtual + 1) / totalEtapas;
 
     return Scaffold(
       backgroundColor: fundo,
@@ -92,10 +90,12 @@ class _Desafio1PageState extends State<Desafio1Page> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Desafio 1',
+                          'Dia 1 - Bem Vindo ao seu treinamento',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: textoPrincipal,
-                            fontSize: 24,
+                            fontSize: 22,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -196,7 +196,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
   List<Widget> _conteudoInstrucao(Color textoPrincipal, Color textoSecundario) {
     return [
       Text(
-        'Instrucoes do Desafio 1',
+        'Dia 1 - Bem Vindo ao seu treinamento',
         style: TextStyle(
           color: textoPrincipal,
           fontSize: 22,
@@ -360,9 +360,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
     }
 
     if (perguntaAtual == 0) {
-      setState(() {
-        instrucaoAtual = instrucoes.length - 1;
-      });
+      Navigator.of(context).pop(false);
       return;
     }
 
@@ -437,11 +435,13 @@ class _BotaoNota extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cor = HSVColor.lerp(
+    final cor = (HSVColor.lerp(
       const HSVColor.fromAHSV(1, 0, 0.95, 0.95),
       const HSVColor.fromAHSV(1, 125, 0.98, 0.82),
       (nota - 1) / 9,
-    )!.toColor();
+    ) ??
+            const HSVColor.fromAHSV(1, 0, 0.95, 0.95))
+        .toColor();
 
     return GestureDetector(
       onTap: onTap,

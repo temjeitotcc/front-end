@@ -34,6 +34,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final fundo = Theme.of(context).scaffoldBackgroundColor;
+    final corTema = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
       backgroundColor: fundo,
@@ -58,16 +59,16 @@ class _MainScreenState extends State<MainScreen> {
 
       bottomNavigationBar: Container(
         height: 90,
-        decoration: const BoxDecoration(
-          color: Color(0xFFFED23E),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        decoration: BoxDecoration(
+          color: corTema,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _botaoNav(0, 'assets/icon1.png'),
             _botaoNav(1, 'assets/icon2.png'),
-            _botaoCentral(2, 'assets/icon3.png'),
+            _botaoCentral(2, 'assets/icon3.png', corTema),
             _botaoNav(3, 'assets/icon4.png'),
             _botaoNav(4, 'assets/icon5.png'),
           ],
@@ -111,7 +112,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _botaoCentral(int index, String imagem) {
+  Widget _botaoCentral(int index, String imagem, Color corTema) {
     final ativo = currentIndex == index;
 
     return GestureDetector(
@@ -123,7 +124,7 @@ class _MainScreenState extends State<MainScreen> {
           width: 75,
           height: 75,
           decoration: BoxDecoration(
-            color: const Color(0xFFFFC107),
+            color: corTema,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(

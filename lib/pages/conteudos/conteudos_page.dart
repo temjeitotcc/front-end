@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../../services/conteudos_service.dart';
 
+String tituloDesafio(int numero) {
+  return switch (numero) {
+    1 => 'Dia 1 - Bem Vindo ao seu treinamento',
+    2 => 'Dia 2 - Minha empresa, minha vida',
+    3 => 'Dia 3 - Eu escolho',
+    _ => 'Desafio $numero',
+  };
+}
+
 class ConteudosPage extends StatefulWidget {
   final int refreshKey;
 
@@ -18,6 +27,7 @@ class _ConteudosPageState extends State<ConteudosPage> {
   final ConteudosService service = ConteudosService();
   static const List<int> missoesEspeciais = [7, 14, 21, 28];
   Map<int, ConteudoDesafio> conteudos = {};
+  List<BlocoReflexao> blocosReflexao = [];
 
   @override
   void initState() {
@@ -36,10 +46,12 @@ class _ConteudosPageState extends State<ConteudosPage> {
 
   Future<void> carregarConteudos() async {
     final dados = await service.carregarConteudos();
+    final blocos = await service.carregarBlocosReflexao();
     if (!mounted) return;
 
     setState(() {
       conteudos = dados;
+      blocosReflexao = blocos;
     });
   }
 
@@ -129,7 +141,21 @@ class _ConteudosPageState extends State<ConteudosPage> {
                         carregarConteudos();
                       },
                     ),
-                    for (int i = 3; i <= 6; i++)
+                    _ConteudoCard(
+                      titulo: 'Bloco de reflexoes',
+                      subtitulo: '${blocosReflexao.length} bloco(s)',
+                      icon: Icons.edit_note_rounded,
+                      onTap: () async {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const BlocosReflexaoPage(),
+                          ),
+                        );
+                        carregarConteudos();
+                      },
+                    ),
+                    for (int i = 4; i <= 6; i++)
                       _ConteudoCard(
                         titulo: 'Espaco $i',
                         subtitulo: 'Em breve',
@@ -222,6 +248,267 @@ class _ConteudoCard extends StatelessWidget {
   }
 }
 
+class BlocosReflexaoPage extends StatefulWidget {
+  const BlocosReflexaoPage({super.key});
+
+  @override
+  State<BlocosReflexaoPage> createState() => _BlocosReflexaoPageState();
+}
+
+class _BlocosReflexaoPageState extends State<BlocosReflexaoPage> {
+  final ConteudosService service = ConteudosService();
+  List<BlocoReflexao> blocos = [];
+
+  @override
+  void initState() {
+    super.initState();
+    carregarBlocos();
+  }
+
+  Future<void> carregarBlocos() async {
+    final dados = await service.carregarBlocosReflexao();
+    if (!mounted) return;
+
+    setState(() {
+      blocos = dados;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fundo = Theme.of(context).scaffoldBackgroundColor;
+
+    return Scaffold(
+      backgroundColor: fundo,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFFED23E),
+        foregroundColor: Colors.black,
+        title: const Text('Bloco de reflexoes'),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFFFED23E),
+        foregroundColor: Colors.black,
+        onPressed: () => abrirEditor(),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Criar bloco'),
+      ),
+      body: blocos.isEmpty
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'Crie seu primeiro bloco para guardar uma reflexao livre.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white60, fontSize: 16),
+                ),
+              ),
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.fromLTRB(14, 16, 14, 96),
+              itemCount: blocos.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final bloco = blocos[index];
+
+                return ListTile(
+                  onTap: () => abrirEditor(bloco: bloco),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(
+                      color: const Color(0xFFFED23E).withAlpha(120),
+                    ),
+                  ),
+                  tileColor: const Color(0xFF2A2527),
+                  leading: const CircleAvatar(
+                    backgroundColor: Color(0xFFFED23E),
+                    foregroundColor: Colors.black,
+                    child: Icon(Icons.edit_note_rounded),
+                  ),
+                  title: Text(
+                    bloco.tema,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    bloco.texto.isEmpty ? 'Sem texto ainda' : bloco.texto,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white60),
+                  ),
+                  trailing: const Icon(
+                    Icons.chevron_right_rounded,
+                    color: Color(0xFFFED23E),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  Future<void> abrirEditor({BlocoReflexao? bloco}) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => EditorBlocoReflexaoPage(bloco: bloco),
+      ),
+    );
+
+    carregarBlocos();
+  }
+}
+
+class EditorBlocoReflexaoPage extends StatefulWidget {
+  final BlocoReflexao? bloco;
+
+  const EditorBlocoReflexaoPage({
+    super.key,
+    this.bloco,
+  });
+
+  @override
+  State<EditorBlocoReflexaoPage> createState() =>
+      _EditorBlocoReflexaoPageState();
+}
+
+class _EditorBlocoReflexaoPageState extends State<EditorBlocoReflexaoPage> {
+  final ConteudosService service = ConteudosService();
+  late final TextEditingController temaController;
+  late final TextEditingController textoController;
+
+  @override
+  void initState() {
+    super.initState();
+    temaController = TextEditingController(text: widget.bloco?.tema ?? '');
+    textoController = TextEditingController(text: widget.bloco?.texto ?? '');
+  }
+
+  @override
+  void dispose() {
+    temaController.dispose();
+    textoController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fundo = Theme.of(context).scaffoldBackgroundColor;
+
+    return Scaffold(
+      backgroundColor: fundo,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFFED23E),
+        foregroundColor: Colors.black,
+        title: Text(widget.bloco == null ? 'Novo bloco' : 'Editar bloco'),
+      ),
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: temaController,
+                textInputAction: TextInputAction.next,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+                decoration: InputDecoration(
+                  labelText: 'Tema da reflexao',
+                  labelStyle: const TextStyle(color: Colors.white60),
+                  prefixIcon: const Icon(
+                    Icons.bookmark_outline_rounded,
+                    color: Color(0xFFFED23E),
+                  ),
+                  filled: true,
+                  fillColor: const Color(0xFF2A2527),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(18),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(18),
+                    borderSide: const BorderSide(
+                      color: Color(0xFFFED23E),
+                      width: 2,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Expanded(
+                child: TextField(
+                  controller: textoController,
+                  expands: true,
+                  maxLines: null,
+                  minLines: null,
+                  textAlignVertical: TextAlignVertical.top,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    height: 1.35,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'Escreva sua reflexao livremente...',
+                    hintStyle: const TextStyle(color: Colors.white38),
+                    filled: true,
+                    fillColor: const Color(0xFF2A2527),
+                    contentPadding: const EdgeInsets.all(16),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFFED23E),
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFED23E),
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                onPressed: salvar,
+                icon: const Icon(Icons.save_rounded),
+                label: const Text('Salvar bloco'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> salvar() async {
+    final tema = temaController.text.trim();
+    final texto = textoController.text.trim();
+
+    if (tema.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Coloque um tema para a reflexao.')),
+      );
+      return;
+    }
+
+    await service.salvarBlocoReflexao(
+      id: widget.bloco?.id,
+      tema: tema,
+      texto: texto,
+    );
+
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
+}
+
 class DesafiosFeitosPage extends StatelessWidget {
   final Map<int, ConteudoDesafio> conteudos;
   static const List<int> missoesEspeciais = [7, 14, 21, 28];
@@ -284,7 +571,7 @@ class DesafiosFeitosPage extends StatelessWidget {
               child: Text('$numero'),
             ),
             title: Text(
-              'Desafio $numero',
+              tituloDesafio(numero),
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -412,7 +699,7 @@ class ConteudoDesafioPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFED23E),
         foregroundColor: Colors.black,
-        title: Text('Desafio ${conteudo.desafio}'),
+        title: Text(tituloDesafio(conteudo.desafio)),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 26),
@@ -507,7 +794,7 @@ class ConteudoDesafio2Page extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFED23E),
         foregroundColor: Colors.black,
-        title: const Text('Desafio 2'),
+        title: Text(tituloDesafio(2)),
       ),
       body: SafeArea(
         top: false,

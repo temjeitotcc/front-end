@@ -63,8 +63,43 @@ class ConteudoItem {
   }
 }
 
+class BlocoReflexao {
+  final String id;
+  final String tema;
+  final String texto;
+  final DateTime atualizadoEm;
+
+  const BlocoReflexao({
+    required this.id,
+    required this.tema,
+    required this.texto,
+    required this.atualizadoEm,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'tema': tema,
+      'texto': texto,
+      'atualizadoEm': atualizadoEm.toIso8601String(),
+    };
+  }
+
+  factory BlocoReflexao.fromJson(Map<String, dynamic> json) {
+    return BlocoReflexao(
+      id: json['id'] as String? ?? '',
+      tema: json['tema'] as String? ?? '',
+      texto: json['texto'] as String? ?? '',
+      atualizadoEm:
+          DateTime.tryParse(json['atualizadoEm'] as String? ?? '') ??
+              DateTime.now(),
+    );
+  }
+}
+
 class ConteudosService {
   static const String _key = 'conteudos_desafios';
+  static const String _blocosReflexaoKey = 'blocos_reflexao';
 
   Future<void> salvarConteudosDoDesafio({
     required int desafio,
@@ -101,5 +136,51 @@ class ConteudosService {
         ConteudoDesafio.fromJson(Map<String, dynamic>.from(value as Map)),
       );
     });
+  }
+
+  Future<List<BlocoReflexao>> carregarBlocosReflexao() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_blocosReflexaoKey);
+
+    if (jsonString == null || jsonString.isEmpty) return [];
+
+    final decoded = jsonDecode(jsonString);
+    if (decoded is! List) return [];
+
+    final blocos = decoded
+        .whereType<Map>()
+        .map((item) => BlocoReflexao.fromJson(Map<String, dynamic>.from(item)))
+        .toList();
+
+    blocos.sort((a, b) => b.atualizadoEm.compareTo(a.atualizadoEm));
+    return blocos;
+  }
+
+  Future<void> salvarBlocoReflexao({
+    String? id,
+    required String tema,
+    required String texto,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final blocos = await carregarBlocosReflexao();
+    final blocoId = id ?? DateTime.now().microsecondsSinceEpoch.toString();
+    final atualizado = BlocoReflexao(
+      id: blocoId,
+      tema: tema.trim(),
+      texto: texto.trim(),
+      atualizadoEm: DateTime.now(),
+    );
+    final index = blocos.indexWhere((bloco) => bloco.id == blocoId);
+
+    if (index >= 0) {
+      blocos[index] = atualizado;
+    } else {
+      blocos.add(atualizado);
+    }
+
+    await prefs.setString(
+      _blocosReflexaoKey,
+      jsonEncode(blocos.map((bloco) => bloco.toJson()).toList()),
+    );
   }
 }
