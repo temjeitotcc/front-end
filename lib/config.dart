@@ -17,8 +17,8 @@ class _ConfigPageState extends State<ConfigPage> {
   bool som = true;
   bool vibracao = true;
   bool modoEscuro = true;
+  String temaCoresAtual = AppThemeService.temaPadrao;
   List<AppThemeOption> temasComprados = [AppThemeService.temas.first];
-  AppThemeOption temaCoresAtual = AppThemeService.temas.first;
   double volume = 50;
 
   @override
@@ -29,7 +29,6 @@ class _ConfigPageState extends State<ConfigPage> {
 
   Future<void> carregarConfiguracoes() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!mounted) return;
 
     setState(() {
       notificacoes = prefs.getBool('notificacoes') ?? true;
@@ -39,84 +38,27 @@ class _ConfigPageState extends State<ConfigPage> {
       volume = prefs.getDouble('volume') ?? 50;
     });
 
-    await carregarTemasComprados();
+    final comprados = await AppThemeService.temasComprados();
+    final temaAtual = AppThemeService.temaAtual.value;
+    final temasDisponiveis = [...comprados];
+    if (!temasDisponiveis.any(
+      (tema) => tema.id == AppThemeService.temaPadrao,
+    )) {
+      temasDisponiveis.insert(0, AppThemeService.temas.first);
+    }
+    if (!temasDisponiveis.any((tema) => tema.id == temaAtual.id)) {
+      temasDisponiveis.add(temaAtual);
+    }
+
+    setState(() {
+      temasComprados = temasDisponiveis;
+      temaCoresAtual = temaAtual.id;
+    });
   }
 
   Future<void> salvarBool(String chave, bool valor) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(chave, valor);
-  }
-
-  Future<void> carregarTemasComprados() async {
-    final temas = await AppThemeService.temasComprados();
-    final atual = AppThemeService.temaAtual.value;
-    if (!mounted) return;
-
-    setState(() {
-      temasComprados = temas.isEmpty ? [AppThemeService.temas.first] : temas;
-      temaCoresAtual = atual;
-    });
-  }
-
-  Future<void> selecionarTemaCores(AppThemeOption tema) async {
-    await AppThemeService.selecionarTema(tema.id);
-    if (!mounted) return;
-
-    setState(() => temaCoresAtual = AppThemeService.temaAtual.value);
-  }
-
-  Future<void> abrirSeletorDeTema() async {
-    await carregarTemasComprados();
-    if (!mounted) return;
-
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        final modoEscuro = Theme.of(context).brightness == Brightness.dark;
-        final fundoSheet =
-            modoEscuro ? const Color(0xFF2A2527) : const Color(0xFFFFFBF0);
-        final textoPrincipal = modoEscuro ? Colors.white : Colors.black;
-        final textoSecundario = modoEscuro ? Colors.white70 : Colors.black54;
-
-        return SafeArea(
-          child: Container(
-            margin: const EdgeInsets.all(14),
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
-            decoration: BoxDecoration(
-              color: fundoSheet,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Tema do aplicativo',
-                  style: TextStyle(
-                    color: textoPrincipal,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                for (final tema in temasComprados)
-                  _ThemeOptionTile(
-                    tema: tema,
-                    selecionado: tema.id == AppThemeService.temaAtual.value.id,
-                    textoPrincipal: textoPrincipal,
-                    textoSecundario: textoSecundario,
-                    onTap: () async {
-                      Navigator.of(context).pop();
-                      await selecionarTemaCores(tema);
-                    },
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 
   @override
@@ -198,12 +140,80 @@ class _ConfigPageState extends State<ConfigPage> {
 
                 const SizedBox(height: 18),
                 const _SectionTitle('Preferências'),
-                _ThemePickerTile(
-                  tema: temaCoresAtual,
-                  cardColor: cardColor,
-                  textoPrincipal: textoPrincipal,
-                  textoSecundario: textoSecundario,
-                  onTap: abrirSeletorDeTema,
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Row(
+                    children: [
+                      const _LeadingIcon(icon: Icons.palette_outlined),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Tema do aplicativo',
+                              style: TextStyle(
+                                color: textoPrincipal,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            DropdownButtonFormField<String>(
+                              initialValue: temaCoresAtual,
+                              dropdownColor: const Color(0xFF2A2527),
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.black.withAlpha(20),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              items: temasComprados.map((tema) {
+                                return DropdownMenuItem<String>(
+                                  value: tema.id,
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 16,
+                                        height: 16,
+                                        decoration: BoxDecoration(
+                                          color: tema.primary,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Flexible(
+                                        child: Text(
+                                          tema.nome,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (valor) async {
+                                if (valor == null) return;
+
+                                await AppThemeService.selecionarTema(valor);
+                                setState(() => temaCoresAtual = valor);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 _SwitchTile(
                   icon: Icons.notifications_none_rounded,
@@ -342,11 +352,7 @@ class _ConfigPageState extends State<ConfigPage> {
                   onChanged: (valor) async {
                     setState(() => modoEscuro = valor);
                     await salvarBool('modoEscuro', valor);
-
-                    final appState = MyApp.maybeOf(context);
-                    if (appState != null) {
-                      await appState.trocarTema(valor);
-                    }
+                    await MyApp.of(context).trocarTema(valor);
                   },
                 ),
 
@@ -392,159 +398,6 @@ class _SectionTitle extends StatelessWidget {
           color: corTema,
           fontSize: 15,
           fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-}
-
-class _ThemePickerTile extends StatelessWidget {
-  final AppThemeOption tema;
-  final VoidCallback onTap;
-  final Color cardColor;
-  final Color textoPrincipal;
-  final Color textoSecundario;
-
-  const _ThemePickerTile({
-    required this.tema,
-    required this.onTap,
-    required this.cardColor,
-    required this.textoPrincipal,
-    required this.textoSecundario,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Material(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(18),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(18),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-            child: Row(
-              children: [
-                _ThemeSwatch(tema: tema),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Tema do aplicativo',
-                        style: TextStyle(
-                          color: textoPrincipal,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        tema.nome,
-                        style: TextStyle(
-                          color: textoSecundario,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: Colors.white54,
-                  size: 16,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ThemeOptionTile extends StatelessWidget {
-  final AppThemeOption tema;
-  final bool selecionado;
-  final Color textoPrincipal;
-  final Color textoSecundario;
-  final VoidCallback onTap;
-
-  const _ThemeOptionTile({
-    required this.tema,
-    required this.selecionado,
-    required this.textoPrincipal,
-    required this.textoSecundario,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: selecionado ? tema.primary.withAlpha(42) : Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                _ThemeSwatch(tema: tema),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    tema.nome,
-                    style: TextStyle(
-                      color: textoPrincipal,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                if (selecionado)
-                  Icon(Icons.check_circle_rounded, color: tema.primary)
-                else
-                  Text(
-                    'Disponível',
-                    style: TextStyle(color: textoSecundario, fontSize: 12),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ThemeSwatch extends StatelessWidget {
-  final AppThemeOption tema;
-
-  const _ThemeSwatch({required this.tema});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 46,
-      height: 46,
-      decoration: BoxDecoration(
-        color: const Color(0xFF171315),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: tema.primary, width: 2),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(11),
-        child: Row(
-          children: [
-            Expanded(child: ColoredBox(color: tema.primary)),
-            const Expanded(child: ColoredBox(color: Color(0xFF171315))),
-          ],
         ),
       ),
     );
@@ -811,12 +664,7 @@ class _ContaPageState extends State<ContaPage> {
                 ),
               ),
               onPressed: () async {
-                final appState = MyApp.maybeOf(context);
-                if (appState != null) {
-                  await appState.sairDaConta();
-                } else {
-                  await AuthService.sair();
-                }
+                await MyApp.of(context).sairDaConta();
 
                 if (!context.mounted) return;
 

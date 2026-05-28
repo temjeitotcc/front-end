@@ -3,6 +3,7 @@ import '../../services/conteudos_service.dart';
 import 'desafio_01/desafio_01_page.dart';
 import 'desafio_02/desafio_02_page.dart';
 import 'desafio_03/desafio_03_page.dart';
+import 'desafio_04/desafio_04_page.dart';
 
 class FasePage extends StatelessWidget {
   final String numero;
@@ -20,6 +21,7 @@ class FasePage extends StatelessWidget {
       '1' => const Desafio1Page(),
       '2' => const Desafio2Page(),
       '3' => const Desafio3Page(),
+      '4' => const Desafio4Page(),
       _ => _DesafioPlaceholderPage(numero: numero),
     };
   }
@@ -32,10 +34,7 @@ class FasePage extends StatelessWidget {
 class MissaoEspecialPage extends StatefulWidget {
   final int numero;
 
-  const MissaoEspecialPage({
-    super.key,
-    required this.numero,
-  });
+  const MissaoEspecialPage({super.key, required this.numero});
 
   @override
   State<MissaoEspecialPage> createState() => _MissaoEspecialPageState();
@@ -249,7 +248,9 @@ class _MissaoEspecialPageState extends State<MissaoEspecialPage> {
   Future<void> _concluir() async {
     if (controller.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Escreva sua lembranca antes de concluir.')),
+        const SnackBar(
+          content: Text('Escreva sua lembranca antes de concluir.'),
+        ),
       );
       return;
     }

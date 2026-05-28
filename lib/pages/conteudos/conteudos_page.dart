@@ -7,6 +7,7 @@ String tituloDesafio(int numero) {
     1 => 'Dia 1 - Bem Vindo ao seu treinamento',
     2 => 'Dia 2 - Minha empresa, minha vida',
     3 => 'Dia 3 - Eu escolho',
+    4 => 'Dia 4 - Coraferido vírus',
     _ => 'Desafio $numero',
   };
 }
@@ -14,10 +15,7 @@ String tituloDesafio(int numero) {
 class ConteudosPage extends StatefulWidget {
   final int refreshKey;
 
-  const ConteudosPage({
-    super.key,
-    required this.refreshKey,
-  });
+  const ConteudosPage({super.key, required this.refreshKey});
 
   @override
   State<ConteudosPage> createState() => _ConteudosPageState();
@@ -118,9 +116,8 @@ class _ConteudosPageState extends State<ConteudosPage> {
                       onTap: () async {
                         await Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => DesafiosFeitosPage(
-                              conteudos: conteudos,
-                            ),
+                            builder: (context) =>
+                                DesafiosFeitosPage(conteudos: conteudos),
                           ),
                         );
                         carregarConteudos();
@@ -133,9 +130,8 @@ class _ConteudosPageState extends State<ConteudosPage> {
                       onTap: () async {
                         await Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => MissoesEspeciaisPage(
-                              conteudos: conteudos,
-                            ),
+                            builder: (context) =>
+                                MissoesEspeciaisPage(conteudos: conteudos),
                           ),
                         );
                         carregarConteudos();
@@ -148,8 +144,7 @@ class _ConteudosPageState extends State<ConteudosPage> {
                       onTap: () async {
                         await Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const BlocosReflexaoPage(),
+                            builder: (context) => const BlocosReflexaoPage(),
                           ),
                         );
                         carregarConteudos();
@@ -306,7 +301,7 @@ class _BlocosReflexaoPageState extends State<BlocosReflexaoPage> {
           : ListView.separated(
               padding: const EdgeInsets.fromLTRB(14, 16, 14, 96),
               itemCount: blocos.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 final bloco = blocos[index];
 
@@ -363,10 +358,7 @@ class _BlocosReflexaoPageState extends State<BlocosReflexaoPage> {
 class EditorBlocoReflexaoPage extends StatefulWidget {
   final BlocoReflexao? bloco;
 
-  const EditorBlocoReflexaoPage({
-    super.key,
-    this.bloco,
-  });
+  const EditorBlocoReflexaoPage({super.key, this.bloco});
 
   @override
   State<EditorBlocoReflexaoPage> createState() =>
@@ -513,10 +505,7 @@ class DesafiosFeitosPage extends StatelessWidget {
   final Map<int, ConteudoDesafio> conteudos;
   static const List<int> missoesEspeciais = [7, 14, 21, 28];
 
-  const DesafiosFeitosPage({
-    super.key,
-    required this.conteudos,
-  });
+  const DesafiosFeitosPage({super.key, required this.conteudos});
 
   @override
   Widget build(BuildContext context) {
@@ -532,7 +521,7 @@ class DesafiosFeitosPage extends StatelessWidget {
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(14, 16, 14, 24),
         itemCount: 24,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        separatorBuilder: (_, _) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
           final numeros = [
             for (int numero = 1; numero <= 28; numero++)
@@ -547,9 +536,8 @@ class DesafiosFeitosPage extends StatelessWidget {
                 ? () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => ConteudoDesafioPage(
-                          conteudo: conteudo,
-                        ),
+                        builder: (context) =>
+                            ConteudoDesafioPage(conteudo: conteudo),
                       ),
                     );
                   }
@@ -562,11 +550,13 @@ class DesafiosFeitosPage extends StatelessWidget {
                     : Colors.white.withAlpha(20),
               ),
             ),
-            tileColor:
-                temConteudo ? const Color(0xFF2A2527) : const Color(0xFF211D1F),
+            tileColor: temConteudo
+                ? const Color(0xFF2A2527)
+                : const Color(0xFF211D1F),
             leading: CircleAvatar(
-              backgroundColor:
-                  temConteudo ? const Color(0xFFFED23E) : Colors.white24,
+              backgroundColor: temConteudo
+                  ? const Color(0xFFFED23E)
+                  : Colors.white24,
               foregroundColor: temConteudo ? Colors.black : Colors.white60,
               child: Text('$numero'),
             ),
@@ -600,10 +590,7 @@ class MissoesEspeciaisPage extends StatelessWidget {
   final Map<int, ConteudoDesafio> conteudos;
   static const List<int> missoesEspeciais = [7, 14, 21, 28];
 
-  const MissoesEspeciaisPage({
-    super.key,
-    required this.conteudos,
-  });
+  const MissoesEspeciaisPage({super.key, required this.conteudos});
 
   @override
   Widget build(BuildContext context) {
@@ -619,7 +606,7 @@ class MissoesEspeciaisPage extends StatelessWidget {
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(14, 16, 14, 24),
         itemCount: missoesEspeciais.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        separatorBuilder: (_, _) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
           final numero = missoesEspeciais[index];
           final numeroSemana = index + 1;
@@ -631,9 +618,8 @@ class MissoesEspeciaisPage extends StatelessWidget {
                 ? () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => ConteudoDesafioPage(
-                          conteudo: conteudo,
-                        ),
+                        builder: (context) =>
+                            ConteudoDesafioPage(conteudo: conteudo),
                       ),
                     );
                   }
@@ -646,11 +632,13 @@ class MissoesEspeciaisPage extends StatelessWidget {
                     : Colors.white.withAlpha(20),
               ),
             ),
-            tileColor:
-                temConteudo ? const Color(0xFF2A2527) : const Color(0xFF211D1F),
+            tileColor: temConteudo
+                ? const Color(0xFF2A2527)
+                : const Color(0xFF211D1F),
             leading: CircleAvatar(
-              backgroundColor:
-                  temConteudo ? const Color(0xFFFED23E) : Colors.white24,
+              backgroundColor: temConteudo
+                  ? const Color(0xFFFED23E)
+                  : Colors.white24,
               foregroundColor: Colors.black,
               child: const Icon(Icons.auto_awesome_rounded),
             ),
@@ -681,10 +669,7 @@ class MissoesEspeciaisPage extends StatelessWidget {
 class ConteudoDesafioPage extends StatelessWidget {
   final ConteudoDesafio conteudo;
 
-  const ConteudoDesafioPage({
-    super.key,
-    required this.conteudo,
-  });
+  const ConteudoDesafioPage({super.key, required this.conteudo});
 
   @override
   Widget build(BuildContext context) {
@@ -704,7 +689,7 @@ class ConteudoDesafioPage extends StatelessWidget {
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 26),
         itemCount: conteudo.itens.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final item = conteudo.itens[index];
 
@@ -713,9 +698,7 @@ class ConteudoDesafioPage extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF2A2527),
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: const Color(0xFFFED23E).withAlpha(120),
-              ),
+              border: Border.all(color: const Color(0xFFFED23E).withAlpha(120)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -740,11 +723,7 @@ class ConteudoDesafioPage extends StatelessWidget {
                 const SizedBox(height: 12),
                 const Row(
                   children: [
-                    Icon(
-                      Icons.lock_rounded,
-                      color: Colors.white38,
-                      size: 15,
-                    ),
+                    Icon(Icons.lock_rounded, color: Colors.white38, size: 15),
                     SizedBox(width: 6),
                     Text(
                       'Lembranca salva',
@@ -764,10 +743,7 @@ class ConteudoDesafioPage extends StatelessWidget {
 class ConteudoDesafio2Page extends StatelessWidget {
   final ConteudoDesafio conteudo;
 
-  const ConteudoDesafio2Page({
-    super.key,
-    required this.conteudo,
-  });
+  const ConteudoDesafio2Page({super.key, required this.conteudo});
 
   List<String> get areasPredio => const [
     'Futuro',
@@ -785,9 +761,7 @@ class ConteudoDesafio2Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fundo = Theme.of(context).scaffoldBackgroundColor;
-    final textos = {
-      for (final item in conteudo.itens) item.titulo: item.texto,
-    };
+    final textos = {for (final item in conteudo.itens) item.titulo: item.texto};
 
     return Scaffold(
       backgroundColor: fundo,
@@ -901,11 +875,7 @@ class ConteudoDesafio2Page extends StatelessWidget {
                 const SizedBox(height: 12),
                 const Row(
                   children: [
-                    Icon(
-                      Icons.lock_rounded,
-                      color: Colors.white38,
-                      size: 15,
-                    ),
+                    Icon(Icons.lock_rounded, color: Colors.white38, size: 15),
                     SizedBox(width: 6),
                     Text(
                       'Somente leitura',
@@ -999,7 +969,10 @@ class _PredioConteudo extends StatelessWidget {
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(16),
                     ),
-                    border: Border.all(color: const Color(0xFFFED23E), width: 2),
+                    border: Border.all(
+                      color: const Color(0xFFFED23E),
+                      width: 2,
+                    ),
                   ),
                   child: Align(
                     alignment: const Alignment(0.55, -0.10),
@@ -1038,10 +1011,9 @@ class _PredioConteudo extends StatelessWidget {
                 ),
                 for (int coluna = 0; coluna < 2; coluna++)
                   Positioned(
-                    left: predioEsquerda +
-                        (predioLargura -
-                                (janela * 2 + espacamentoJanela)) /
-                            2 +
+                    left:
+                        predioEsquerda +
+                        (predioLargura - (janela * 2 + espacamentoJanela)) / 2 +
                         coluna * (janela + espacamentoJanela),
                     top: topo + andar * andarAltura,
                     width: janela,
@@ -1102,10 +1074,7 @@ class _JanelaConteudo extends StatelessWidget {
   final bool preenchida;
   final VoidCallback onTap;
 
-  const _JanelaConteudo({
-    required this.preenchida,
-    required this.onTap,
-  });
+  const _JanelaConteudo({required this.preenchida, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

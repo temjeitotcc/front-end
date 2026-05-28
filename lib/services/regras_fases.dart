@@ -1,9 +1,14 @@
 class RegrasFases {
+  // Para testar o app inteiro, deixe true: todas as fases ficam liberadas.
+  // Para voltar ao comportamento real, troque para false.
+  static const bool liberarTodasParaTeste = true;
+
   // Para testar o app, deixe true: o proximo desafio libera na hora.
   // Para voltar ao comportamento real, troque para false.
   static const bool liberarImediatamenteParaTeste = true;
 
   static bool faseLiberada(List<DateTime?> fasesConcluidas, int index) {
+    if (liberarTodasParaTeste) return true;
     if (index == 0) return true;
 
     final dataConclusaoAnterior = fasesConcluidas[index - 1];
@@ -18,6 +23,10 @@ class RegrasFases {
     int index,
     List<DateTime?> fasesConcluidas,
   ) {
+    if (liberarTodasParaTeste) {
+      return DateTime.now();
+    }
+
     final dataConclusaoAnterior = fasesConcluidas[index - 1];
 
     if (dataConclusaoAnterior == null) {
@@ -35,6 +44,10 @@ class RegrasFases {
     List<DateTime?> fasesConcluidas,
     int index,
   ) {
+    if (liberarTodasParaTeste) {
+      return 'Todas as fases estao liberadas para teste.';
+    }
+
     final dataConclusaoAnterior = fasesConcluidas[index - 1];
 
     if (dataConclusaoAnterior == null) {
