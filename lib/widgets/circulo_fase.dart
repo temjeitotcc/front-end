@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 // Widget reutilizável do círculo das fases
 class CirculoFase extends StatelessWidget {
@@ -59,7 +59,7 @@ class CirculoFase extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (especial)
-                      const Icon(
+                      Icon(
                         Icons.auto_awesome_rounded,
                         color: Colors.white,
                         size: 18,
@@ -74,7 +74,7 @@ class CirculoFase extends StatelessWidget {
                     ),
                   ],
                 )
-              : const Icon(
+              : Icon(
                   Icons.lock_rounded,
                   color: Colors.white70,
                   size: 28,

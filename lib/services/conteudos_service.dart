@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -99,7 +99,7 @@ class BlocoReflexao {
 
 class ConteudosService {
   static const String _key = 'conteudos_desafios';
-  static const String _blocosReflexaoKey = 'blocos_reflexao';
+  static const String _blocosReflexaoKey = 'blocos_reflexão';
 
   Future<void> salvarConteudosDoDesafio({
     required int desafio,

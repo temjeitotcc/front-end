@@ -1,4 +1,4 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+﻿import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificacaoConfig {
@@ -6,10 +6,10 @@ class NotificacaoConfig {
   static const String titulo = 'Tem Jeito';
 
   static const List<String> mensagens = [
-    'Venha concluir suas missoes de hoje.',
-    'Sua saude melhora um passo de cada vez.',
+    'Venha concluir suas missões de hoje.',
+    'Sua saúde melhora um passo de cada vez.',
     'Que tal continuar sua jornada agora?',
-    'Volte para cuidar de voce mais um pouco.',
+    'Volte para cuidar de você mais um pouco.',
   ];
 }
 
@@ -19,7 +19,7 @@ class NotificacaoService {
   static const String _canalId = 'lembretes_motivacionais';
   static const String _canalNome = 'Lembretes motivacionais';
   static const String _canalDescricao =
-      'Notificacoes para incentivar o uso do aplicativo.';
+      'Notificações para incentivar o uso do aplicativo.';
 
   static final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
@@ -44,7 +44,7 @@ class NotificacaoService {
 
   static Future<void> configurarPeloPreferencias() async {
     final prefs = await SharedPreferences.getInstance();
-    final notificacoesAtivas = prefs.getBool('notificacoes') ?? true;
+    final notificacoesAtivas = prefs.getBool('notificações') ?? true;
 
     if (notificacoesAtivas) {
       await ativarLembretes(pedirPermissao: false);
@@ -110,7 +110,7 @@ class NotificacaoService {
         ),
         iOS: DarwinNotificationDetails(),
       ),
-      payload: 'teste_notificacao',
+      payload: 'teste_notificação',
     );
 
     return true;

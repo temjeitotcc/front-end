@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../services/app_theme_service.dart';
 import '../../services/pontos_service.dart';
 
@@ -29,7 +29,7 @@ class _Page1State extends State<Page1> {
   Future<void> comprarTema(AppThemeOption tema) async {
     if (temasComprados.contains(tema.id)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${tema.nome} ja esta comprado.')),
+        SnackBar(content: Text('${tema.nome} já está comprado.')),
       );
       return;
     }
@@ -75,7 +75,7 @@ class _Page1State extends State<Page1> {
               children: [
                 Image.asset('assets/iconloja.png', height: 34),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Lojinha',
                   style: TextStyle(
                     color: Colors.white,
@@ -109,7 +109,7 @@ class _Page1State extends State<Page1> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'PONTOS:',
                               style: TextStyle(
                                 color: Colors.white70,
@@ -239,7 +239,7 @@ class ItemCard extends StatelessWidget {
         children: [
           Expanded(child: Image.asset(imagem, fit: BoxFit.contain)),
 
-          Text(nome, style: const TextStyle(color: Colors.white)),
+          Text(nome, style: TextStyle(color: Colors.white)),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -300,7 +300,7 @@ class TemaLojaCard extends StatelessWidget {
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              style: TextStyle(color: Colors.white, fontSize: 12),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

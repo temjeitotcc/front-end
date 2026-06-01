@@ -26,7 +26,7 @@ class BotaoNav extends StatelessWidget {
         width: ativo ? 100 : 70,
         height: ativo ? 67 : 50,
         decoration: BoxDecoration(
-          color: const Color(0xFFD1AA23),
+          color: Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
@@ -36,7 +36,14 @@ class BotaoNav extends StatelessWidget {
             ),
           ],
         ),
-        child: Center(child: Image.asset(imagem, height: ativo ? 60 : 40)),
+        child: Center(
+          child: Image.asset(
+            imagem,
+            height: ativo ? 60 : 40,
+            color: Colors.black.withAlpha(225),
+            colorBlendMode: BlendMode.srcIn,
+          ),
+        ),
       ),
     );
   }

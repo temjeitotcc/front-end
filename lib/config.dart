@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
 import 'services/app_theme_service.dart';
@@ -29,9 +29,10 @@ class _ConfigPageState extends State<ConfigPage> {
 
   Future<void> carregarConfiguracoes() async {
     final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
 
     setState(() {
-      notificacoes = prefs.getBool('notificacoes') ?? true;
+      notificacoes = prefs.getBool('notificações') ?? true;
       som = prefs.getBool('som') ?? true;
       vibracao = prefs.getBool('vibracao') ?? true;
       modoEscuro = prefs.getBool('modoEscuro') ?? true;
@@ -50,6 +51,7 @@ class _ConfigPageState extends State<ConfigPage> {
       temasDisponiveis.add(temaAtual);
     }
 
+    if (!mounted) return;
     setState(() {
       temasComprados = temasDisponiveis;
       temaCoresAtual = temaAtual.id;
@@ -59,6 +61,69 @@ class _ConfigPageState extends State<ConfigPage> {
   Future<void> salvarBool(String chave, bool valor) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(chave, valor);
+  }
+
+  Future<void> abrirSeletorDeTema() async {
+    final comprados = await AppThemeService.temasComprados();
+    if (!mounted) return;
+
+    setState(() {
+      temasComprados = comprados.isEmpty
+          ? [AppThemeService.temas.first]
+          : comprados;
+      temaCoresAtual = AppThemeService.temaAtual.value.id;
+    });
+
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        final modoEscuro = Theme.of(context).brightness == Brightness.dark;
+        final fundoSheet =
+            modoEscuro ? const Color(0xFF2A2527) : const Color(0xFFFFFBF0);
+        final textoPrincipal = modoEscuro ? Colors.white : Colors.black;
+        final textoSecundario = modoEscuro ? Colors.white70 : Colors.black54;
+
+        return SafeArea(
+          child: Container(
+            margin: const EdgeInsets.all(14),
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
+            decoration: BoxDecoration(
+              color: fundoSheet,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Tema do aplicativo',
+                  style: TextStyle(
+                    color: textoPrincipal,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                for (final tema in temasComprados)
+                  _ThemeOptionTile(
+                    tema: tema,
+                    selecionado: tema.id == AppThemeService.temaAtual.value.id,
+                    textoPrincipal: textoPrincipal,
+                    textoSecundario: textoSecundario,
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      await AppThemeService.selecionarTema(tema.id);
+                      if (!mounted) return;
+                      setState(() => temaCoresAtual = tema.id);
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -140,80 +205,12 @@ class _ConfigPageState extends State<ConfigPage> {
 
                 const SizedBox(height: 18),
                 const _SectionTitle('Preferências'),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Row(
-                    children: [
-                      const _LeadingIcon(icon: Icons.palette_outlined),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Tema do aplicativo',
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            DropdownButtonFormField<String>(
-                              initialValue: temaCoresAtual,
-                              dropdownColor: const Color(0xFF2A2527),
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Colors.black.withAlpha(20),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                              items: temasComprados.map((tema) {
-                                return DropdownMenuItem<String>(
-                                  value: tema.id,
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 16,
-                                        height: 16,
-                                        decoration: BoxDecoration(
-                                          color: tema.primary,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Flexible(
-                                        child: Text(
-                                          tema.nome,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (valor) async {
-                                if (valor == null) return;
-
-                                await AppThemeService.selecionarTema(valor);
-                                setState(() => temaCoresAtual = valor);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                _ThemePickerTile(
+                  tema: AppThemeService.temaPorId(temaCoresAtual),
+                  cardColor: cardColor,
+                  textoPrincipal: textoPrincipal,
+                  textoSecundario: textoSecundario,
+                  onTap: abrirSeletorDeTema,
                 ),
                 _SwitchTile(
                   icon: Icons.notifications_none_rounded,
@@ -225,7 +222,7 @@ class _ConfigPageState extends State<ConfigPage> {
                   textoSecundario: textoSecundario,
                   onChanged: (valor) async {
                     setState(() => notificacoes = valor);
-                    await salvarBool('notificacoes', valor);
+                    await salvarBool('notificações', valor);
 
                     if (valor) {
                       final ativado =
@@ -235,11 +232,11 @@ class _ConfigPageState extends State<ConfigPage> {
 
                       if (!ativado) {
                         setState(() => notificacoes = false);
-                        await salvarBool('notificacoes', false);
+                        await salvarBool('notificações', false);
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Permissao de notificacao negada.'),
+                            content: Text('Permissão de notificação negada.'),
                           ),
                         );
                       }
@@ -250,8 +247,8 @@ class _ConfigPageState extends State<ConfigPage> {
                 ),
                 _ActionTile(
                   icon: Icons.notification_add_outlined,
-                  titulo: 'Testar notificacao',
-                  subtitulo: 'Enviar uma notificacao agora',
+                  titulo: 'Testar notificação',
+                  subtitulo: 'Enviar uma notificação agora',
                   cardColor: cardColor,
                   textoPrincipal: textoPrincipal,
                   textoSecundario: textoSecundario,
@@ -260,7 +257,7 @@ class _ConfigPageState extends State<ConfigPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text(
-                            'Ative as notificacoes para enviar um teste.',
+                            'Ative as notificações para enviar um teste.',
                           ),
                         ),
                       );
@@ -275,8 +272,8 @@ class _ConfigPageState extends State<ConfigPage> {
                       SnackBar(
                         content: Text(
                           enviado
-                              ? 'Notificacao de teste enviada.'
-                              : 'Permissao de notificacao negada.',
+                              ? 'Notificação de teste enviada.'
+                              : 'Permissão de notificação negada.',
                         ),
                       ),
                     );
@@ -404,6 +401,159 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
+class _ThemePickerTile extends StatelessWidget {
+  final AppThemeOption tema;
+  final VoidCallback onTap;
+  final Color cardColor;
+  final Color textoPrincipal;
+  final Color textoSecundario;
+
+  const _ThemePickerTile({
+    required this.tema,
+    required this.onTap,
+    required this.cardColor,
+    required this.textoPrincipal,
+    required this.textoSecundario,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(18),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            child: Row(
+              children: [
+                _ThemeSwatch(tema: tema),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Tema do aplicativo',
+                        style: TextStyle(
+                          color: textoPrincipal,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        tema.nome,
+                        style: TextStyle(
+                          color: textoSecundario,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Colors.white54,
+                  size: 16,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeOptionTile extends StatelessWidget {
+  final AppThemeOption tema;
+  final bool selecionado;
+  final Color textoPrincipal;
+  final Color textoSecundario;
+  final VoidCallback onTap;
+
+  const _ThemeOptionTile({
+    required this.tema,
+    required this.selecionado,
+    required this.textoPrincipal,
+    required this.textoSecundario,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: selecionado ? tema.primary.withAlpha(42) : Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                _ThemeSwatch(tema: tema),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    tema.nome,
+                    style: TextStyle(
+                      color: textoPrincipal,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                if (selecionado)
+                  Icon(Icons.check_circle_rounded, color: tema.primary)
+                else
+                  Text(
+                    'Disponível',
+                    style: TextStyle(color: textoSecundario, fontSize: 12),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeSwatch extends StatelessWidget {
+  final AppThemeOption tema;
+
+  const _ThemeSwatch({required this.tema});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 46,
+      height: 46,
+      decoration: BoxDecoration(
+        color: const Color(0xFF171315),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: tema.primary, width: 2),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(11),
+        child: Row(
+          children: [
+            Expanded(child: ColoredBox(color: tema.primary)),
+            const Expanded(child: ColoredBox(color: Color(0xFF171315))),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _ActionTile extends StatelessWidget {
   final IconData icon;
   final String titulo;
@@ -461,7 +611,7 @@ class _ActionTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.arrow_forward_ios_rounded,
                   color: Colors.white54,
                   size: 16,
@@ -588,7 +738,7 @@ class _ContaPageState extends State<ContaPage> {
     final emailAtual = await AuthService.emailAtual();
 
     setState(() {
-      email = emailAtual ?? 'Email nao encontrado';
+      email = emailAtual ?? 'Email não encontrado';
     });
   }
 
@@ -605,8 +755,8 @@ class _ContaPageState extends State<ContaPage> {
     return Scaffold(
       backgroundColor: fundo,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFED23E),
-        title: const Text(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
           'Conta',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
@@ -642,7 +792,7 @@ class _ContaPageState extends State<ContaPage> {
                         const SizedBox(height: 4),
                         Text(
                           email,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white60,
                             fontSize: 14,
                           ),
@@ -670,8 +820,8 @@ class _ContaPageState extends State<ContaPage> {
 
                 Navigator.of(context).pop();
               },
-              icon: const Icon(Icons.logout_rounded),
-              label: const Text(
+              icon: Icon(Icons.logout_rounded),
+              label: Text(
                 'Sair da conta',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
@@ -696,8 +846,8 @@ class SobrePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: fundo,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFED23E),
-        title: const Text(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
           'Sobre',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
@@ -727,8 +877,8 @@ class AjudaPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: fundo,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFED23E),
-        title: const Text(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
           'Ajuda',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
@@ -737,7 +887,7 @@ class AjudaPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(18),
         child: Text(
-          'Aqui você pode colocar dúvidas frequentes, instruções de uso e contato de suporte.',
+          'Aqui você pode colocar dúvidas frequentes, instrucoes de uso e contato de suporte.',
           style: TextStyle(color: texto, fontSize: 16),
         ),
       ),

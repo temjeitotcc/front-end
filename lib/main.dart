@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'mainscreen.dart';
@@ -118,7 +118,7 @@ class _MyAppState extends State<MyApp> {
             appBarTheme: AppBarTheme(
               backgroundColor: temaCores.primary,
               centerTitle: true,
-              titleTextStyle: const TextStyle(
+              titleTextStyle: TextStyle(
                 color: Colors.black,
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
@@ -138,7 +138,7 @@ class _MyAppState extends State<MyApp> {
             appBarTheme: AppBarTheme(
               backgroundColor: temaCores.primary,
               centerTitle: true,
-              titleTextStyle: const TextStyle(
+              titleTextStyle: TextStyle(
                 color: Colors.black,
                 fontSize: 26,
                 fontWeight: FontWeight.bold,

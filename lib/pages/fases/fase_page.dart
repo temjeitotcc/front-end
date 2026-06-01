@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../services/conteudos_service.dart';
 import 'desafio_01/desafio_01_page.dart';
 import 'desafio_02/desafio_02_page.dart';
 import 'desafio_03/desafio_03_page.dart';
 import 'desafio_04/desafio_04_page.dart';
+import 'desafio_05/desafio_05_page.dart';
 
 class FasePage extends StatelessWidget {
   final String numero;
@@ -22,6 +23,7 @@ class FasePage extends StatelessWidget {
       '2' => const Desafio2Page(),
       '3' => const Desafio3Page(),
       '4' => const Desafio4Page(),
+      '5' => const Desafio5Page(),
       _ => _DesafioPlaceholderPage(numero: numero),
     };
   }
@@ -98,7 +100,7 @@ class _MissaoEspecialPageState extends State<MissaoEspecialPage> {
                           ),
                         ),
                         Text(
-                          'Uma lembranca da sua semana',
+                          'Uma lembrança da sua semana',
                           style: TextStyle(color: textoSecundario),
                         ),
                       ],
@@ -107,22 +109,22 @@ class _MissaoEspecialPageState extends State<MissaoEspecialPage> {
                   IconButton(
                     tooltip: 'Sair',
                     style: IconButton.styleFrom(
-                      backgroundColor: const Color(0xFFFED23E),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.black,
                     ),
                     onPressed: () => Navigator.of(context).pop(false),
-                    icon: const Icon(Icons.close_rounded),
+                    icon: Icon(Icons.close_rounded),
                   ),
                 ],
               ),
               const SizedBox(height: 18),
               ClipRRect(
                 borderRadius: BorderRadius.circular(999),
-                child: const LinearProgressIndicator(
+                child: LinearProgressIndicator(
                   value: 1,
                   minHeight: 10,
                   backgroundColor: Colors.white12,
-                  valueColor: AlwaysStoppedAnimation(Color(0xFFFED23E)),
+                  valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
                 ),
               ),
               const SizedBox(height: 22),
@@ -135,15 +137,15 @@ class _MissaoEspecialPageState extends State<MissaoEspecialPage> {
                         : Colors.white,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: const Color(0xFFFED23E).withAlpha(130),
+                      color: Theme.of(context).colorScheme.primary.withAlpha(130),
                     ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.auto_awesome_rounded,
-                        color: Color(0xFFFED23E),
+                        color: Theme.of(context).colorScheme.primary,
                         size: 42,
                       ),
                       const SizedBox(height: 14),
@@ -158,7 +160,7 @@ class _MissaoEspecialPageState extends State<MissaoEspecialPage> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'Depois essa mensagem vai aparecer numa caixinha propria do livrinho.',
+                        'Depois essa mensagem vai aparecer numa caixinha própria do livrinho.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: textoSecundario,
@@ -196,8 +198,8 @@ class _MissaoEspecialPageState extends State<MissaoEspecialPage> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(18),
-                              borderSide: const BorderSide(
-                                color: Color(0xFFFED23E),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.primary,
                                 width: 2,
                               ),
                             ),
@@ -215,25 +217,25 @@ class _MissaoEspecialPageState extends State<MissaoEspecialPage> {
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: textoPrincipal,
-                        side: const BorderSide(color: Color(0xFFFED23E)),
+                        side: BorderSide(color: Theme.of(context).colorScheme.primary),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: () => Navigator.of(context).pop(false),
-                      icon: const Icon(Icons.arrow_back_rounded),
-                      label: const Text('Voltar'),
+                      icon: Icon(Icons.arrow_back_rounded),
+                      label: Text('Voltar'),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFED23E),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _concluir,
-                      icon: const Icon(Icons.check_rounded),
-                      label: const Text('Concluir'),
+                      icon: Icon(Icons.check_rounded),
+                      label: Text('Concluir'),
                     ),
                   ),
                 ],
@@ -249,7 +251,7 @@ class _MissaoEspecialPageState extends State<MissaoEspecialPage> {
     if (controller.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Escreva sua lembranca antes de concluir.'),
+          content: Text('Escreva sua lembrança antes de concluir.'),
         ),
       );
       return;
@@ -311,7 +313,7 @@ class _DesafioPlaceholderPage extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'Em construcao',
+                          'Em construção',
                           style: TextStyle(color: textoSecundario),
                         ),
                       ],
@@ -320,22 +322,22 @@ class _DesafioPlaceholderPage extends StatelessWidget {
                   IconButton(
                     tooltip: 'Sair',
                     style: IconButton.styleFrom(
-                      backgroundColor: const Color(0xFFFED23E),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.black,
                     ),
                     onPressed: () => Navigator.of(context).pop(false),
-                    icon: const Icon(Icons.close_rounded),
+                    icon: Icon(Icons.close_rounded),
                   ),
                 ],
               ),
               const SizedBox(height: 18),
               ClipRRect(
                 borderRadius: BorderRadius.circular(999),
-                child: const LinearProgressIndicator(
+                child: LinearProgressIndicator(
                   value: 1,
                   minHeight: 10,
                   backgroundColor: Colors.white12,
-                  valueColor: AlwaysStoppedAnimation(Color(0xFFFED23E)),
+                  valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
                 ),
               ),
               const SizedBox(height: 22),
@@ -346,12 +348,12 @@ class _DesafioPlaceholderPage extends StatelessWidget {
                     color: cardColor,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: const Color(0xFFFED23E).withAlpha(110),
+                      color: Theme.of(context).colorScheme.primary.withAlpha(110),
                     ),
                   ),
                   child: Center(
                     child: Text(
-                      'A pasta deste desafio ja pode receber o codigo proprio depois.',
+                      'A pasta deste desafio já pode receber o código próprio depois.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: textoSecundario,
@@ -366,12 +368,12 @@ class _DesafioPlaceholderPage extends StatelessWidget {
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: textoPrincipal,
-                  side: const BorderSide(color: Color(0xFFFED23E)),
+                  side: BorderSide(color: Theme.of(context).colorScheme.primary),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 onPressed: () => Navigator.of(context).pop(false),
-                icon: const Icon(Icons.arrow_back_rounded),
-                label: const Text('Voltar'),
+                icon: Icon(Icons.arrow_back_rounded),
+                label: Text('Voltar'),
               ),
             ],
           ),

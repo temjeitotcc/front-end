@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PontosService {
-  static const String _pontosKey = 'pontos_usuario';
+  static const String _pontosKey = 'pontos_usuário';
   static const bool creditoInfinitoParaTeste = true;
   static const int pontosTeste = 999999;
 

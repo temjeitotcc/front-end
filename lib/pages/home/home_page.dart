@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../widgets/circulo_fase.dart';
 import '../../services/fases_service.dart';
 import '../../services/pontos_service.dart';
@@ -87,14 +87,14 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               Text(
                                 '$pontos',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               const SizedBox(width: 4),
-                              const Icon(
+                              Icon(
                                 Icons.star,
                                 color: Colors.white,
                                 size: 18,
@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> {
                                   color: corTema,
                                   borderRadius: BorderRadius.circular(999),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'Personagem',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
@@ -309,7 +309,7 @@ class _HomePageState extends State<HomePage> {
                           minimumSize: const Size(36, 36),
                         ),
                         onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close_rounded, size: 20),
+                        icon: Icon(Icons.close_rounded, size: 20),
                       ),
                     ),
                   ],
@@ -448,11 +448,11 @@ class _HomePageState extends State<HomePage> {
             Container(
               width: 34,
               height: 34,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFED23E),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.lock_rounded,
                 color: Colors.black,
                 size: 20,
@@ -462,7 +462,7 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: Text(
                 _mensagemFaseBloqueada(index),
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.bold,

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../../services/conteudos_service.dart';
 
@@ -31,8 +31,8 @@ class _Desafio2PageState extends State<Desafio2Page> {
     'assets/janelas/intelectual.png',
     'assets/janelas/profissional.png',
     'assets/janelas/social.png',
-    'assets/janelas/saude.png',
-    'assets/janelas/familiar.png',
+    'assets/janelas/saúde.png',
+    'assets/janelas/famíliar.png',
     'assets/janelas/relacional.png',
   ];
 
@@ -83,7 +83,7 @@ class _Desafio2PageState extends State<Desafio2Page> {
                           ),
                         ),
                         Text(
-                          etapaAtual == 0 ? 'Instrucoes' : 'Predio da vida',
+                          etapaAtual == 0 ? 'Instruções' : 'Prédio da vida',
                           style: TextStyle(color: textoSecundario),
                         ),
                       ],
@@ -92,11 +92,11 @@ class _Desafio2PageState extends State<Desafio2Page> {
                   IconButton(
                     tooltip: 'Sair',
                     style: IconButton.styleFrom(
-                      backgroundColor: const Color(0xFFFED23E),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.black,
                     ),
                     onPressed: () => Navigator.of(context).pop(false),
-                    icon: const Icon(Icons.close_rounded),
+                    icon: Icon(Icons.close_rounded),
                   ),
                 ],
               ),
@@ -107,7 +107,7 @@ class _Desafio2PageState extends State<Desafio2Page> {
                   value: (etapaAtual + 1) / 2,
                   minHeight: 10,
                   backgroundColor: Colors.white12,
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFFFED23E)),
+                  valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
                 ),
               ),
               const SizedBox(height: 22),
@@ -118,7 +118,7 @@ class _Desafio2PageState extends State<Desafio2Page> {
                     color: cardColor,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: const Color(0xFFFED23E).withAlpha(110),
+                      color: Theme.of(context).colorScheme.primary.withAlpha(110),
                     ),
                   ),
                   child: Column(
@@ -136,19 +136,19 @@ class _Desafio2PageState extends State<Desafio2Page> {
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: textoPrincipal,
-                        side: const BorderSide(color: Color(0xFFFED23E)),
+                        side: BorderSide(color: Theme.of(context).colorScheme.primary),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _voltar,
-                      icon: const Icon(Icons.arrow_back_rounded),
-                      label: const Text('Voltar'),
+                      icon: Icon(Icons.arrow_back_rounded),
+                      label: Text('Voltar'),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFED23E),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
@@ -158,7 +158,7 @@ class _Desafio2PageState extends State<Desafio2Page> {
                             ? Icons.check_rounded
                             : Icons.arrow_forward_rounded,
                       ),
-                      label: Text(etapaAtual == 1 ? 'Concluir' : 'Proximo'),
+                      label: Text(etapaAtual == 1 ? 'Concluir' : 'Próximo'),
                     ),
                   ),
                 ],
@@ -187,7 +187,7 @@ class _Desafio2PageState extends State<Desafio2Page> {
       Expanded(
         child: SingleChildScrollView(
           child: Text(
-            'Texto introdutorio do Dia 2.\n\nNa proxima pagina voce vai preencher as janelas do predio da sua vida.',
+            'Texto introdutorio do Dia 2.\n\nNa próxima pagina você vai preencher as janelas do prédio da sua vida.',
             style: TextStyle(
               color: textoSecundario,
               fontSize: 16,
@@ -200,14 +200,14 @@ class _Desafio2PageState extends State<Desafio2Page> {
       Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFFFED23E).withAlpha(38),
+          color: Theme.of(context).colorScheme.primary.withAlpha(38),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFFED23E)),
+          border: Border.all(color: Theme.of(context).colorScheme.primary),
         ),
-        child: const Text(
-          'Clique em cada janela para escrever sua reflexao.',
+        child: Text(
+          'Clique em cada janela para escrever sua reflexão.',
           style: TextStyle(
-            color: Color(0xFFFED23E),
+            color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -218,7 +218,7 @@ class _Desafio2PageState extends State<Desafio2Page> {
   List<Widget> _conteudoPredio(Color textoPrincipal, Color textoSecundario) {
     return [
       Text(
-        'Predio da vida',
+        'Prédio da vida',
         style: TextStyle(
           color: textoPrincipal,
           fontSize: 22,
@@ -227,7 +227,7 @@ class _Desafio2PageState extends State<Desafio2Page> {
       ),
       const SizedBox(height: 8),
       Text(
-        'Toque em uma janela para preencher uma area.',
+        'Toque em uma janela para preencher uma área.',
         style: TextStyle(color: textoSecundario, fontSize: 14),
       ),
       const SizedBox(height: 12),
@@ -348,7 +348,7 @@ class _JanelaTextoDialogState extends State<_JanelaTextoDialog> {
             decoration: BoxDecoration(
               color: const Color(0xFF2A2527),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFFED23E), width: 2),
+              border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withAlpha(90),
@@ -366,7 +366,7 @@ class _JanelaTextoDialogState extends State<_JanelaTextoDialog> {
                     Expanded(
                       child: Text(
                         widget.titulo,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -376,11 +376,11 @@ class _JanelaTextoDialogState extends State<_JanelaTextoDialog> {
                     IconButton(
                       tooltip: 'Fechar',
                       style: IconButton.styleFrom(
-                        backgroundColor: const Color(0xFFFED23E),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Colors.black,
                       ),
                       onPressed: _fechar,
-                      icon: const Icon(Icons.close_rounded),
+                      icon: Icon(Icons.close_rounded),
                     ),
                   ],
                 ),
@@ -392,10 +392,10 @@ class _JanelaTextoDialogState extends State<_JanelaTextoDialog> {
                   minLines: 5,
                   textInputAction: TextInputAction.newline,
                   enableInteractiveSelection: false,
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  style: TextStyle(color: Colors.white, fontSize: 16),
                   decoration: InputDecoration(
-                    hintText: 'Escreva sua reflexao aqui...',
-                    hintStyle: const TextStyle(color: Colors.white38),
+                    hintText: 'Escreva sua reflexão aqui...',
+                    hintStyle: TextStyle(color: Colors.white38),
                     filled: true,
                     fillColor: const Color(0xFF171315),
                     contentPadding: const EdgeInsets.all(16),
@@ -405,8 +405,8 @@ class _JanelaTextoDialogState extends State<_JanelaTextoDialog> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(18),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFFED23E),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
                         width: 2,
                       ),
                     ),
@@ -415,13 +415,13 @@ class _JanelaTextoDialogState extends State<_JanelaTextoDialog> {
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFED23E),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   onPressed: _salvar,
-                  icon: const Icon(Icons.check_rounded),
-                  label: const Text('Salvar'),
+                  icon: Icon(Icons.check_rounded),
+                  label: Text('Salvar'),
                 ),
               ],
             ),
@@ -478,7 +478,7 @@ class _PredioVida extends StatelessWidget {
                 width: predioLargura,
                 height: corpoAltura,
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Color(0xFF263238),
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(18),
@@ -492,7 +492,7 @@ class _PredioVida extends StatelessWidget {
                 width: predioLargura * 0.80,
                 height: altura * 0.055,
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Color(0xFF263238),
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(12),
@@ -516,7 +516,7 @@ class _PredioVida extends StatelessWidget {
                             top: Radius.circular(16),
                           ),
                           border: Border.all(
-                            color: const Color(0xFFFFD34D),
+                            color: Theme.of(context).colorScheme.primary,
                             width: 2,
                           ),
                         ),
@@ -528,7 +528,7 @@ class _PredioVida extends StatelessWidget {
                       top: altura * 0.018,
                       bottom: 0,
                       child: Container(
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: Color(0xFF6D4C41),
                           borderRadius: BorderRadius.vertical(
                             top: Radius.circular(12),
@@ -542,8 +542,8 @@ class _PredioVida extends StatelessWidget {
                       child: Container(
                         width: 7,
                         height: 7,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFFED23E),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -634,7 +634,7 @@ class _AreaLabel extends StatelessWidget {
         textAlign: alignRight ? TextAlign.right : TextAlign.left,
         maxLines: 2,
         softWrap: true,
-        style: const TextStyle(
+        style: TextStyle(
           color: Color(0xFF263238),
           fontSize: 10,
           height: 1.05,
@@ -663,7 +663,7 @@ class _JanelaPredio extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         decoration: BoxDecoration(
-          color: preenchida ? const Color(0xFFFFE58A) : const Color(0xFFFED23E),
+          color: preenchida ? Theme.of(context).colorScheme.secondary : Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: preenchida ? Colors.white : Colors.transparent,
@@ -747,7 +747,7 @@ class _DecoracaoJanela extends StatelessWidget {
                     color: const Color(0xFF263238).withAlpha(90),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'PNG',
                   style: TextStyle(
                     color: Color(0xFF263238),

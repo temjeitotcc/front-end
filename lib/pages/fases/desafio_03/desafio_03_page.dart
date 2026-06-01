@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
@@ -12,20 +12,20 @@ class Desafio3Page extends StatefulWidget {
 
 class _Desafio3PageState extends State<Desafio3Page> {
   static const String _texto =
-      'Oii {nome}, que bom ter voce aqui mais um dia!!!\n\n'
-      'Refletiu sobre nossas ultimas atividades? Quais decisoes voce quer tomar?\n\n'
-      'Voce vai continuar vivendo do jeito que ta ou vai buscar o conhecimento que te deixa mais seguro(a) e confiante nas suas escolhas?\n\n'
-      'Estamos aqui para te mostrar que seu medo nao pode decidir seu futuro por voce. Voce pode continuar vivendo da mesma forma ou escolher o conhecimento que te torna mais seguro, consciente e assertivo nas suas decisoes.\n\n'
-      'Pode deixar o medo decidir por voce ou finalmente enfrenta-lo para construir uma nova realidade.\n\n'
-      'Toda mudanca comeca quando voce assume suas escolhas, aprende com o passado e decide parar de alimentar ciclos que te prendem no mesmo lugar.\n\n'
-      'Se existe uma oportunidade de evoluir, crescer e transformar sua vida, por que continuar limitado pelas proprias certezas?\n\n'
-      'Faca uma reflexao sobre duas decisoes e quais comportamentos voce precisa mudar.\n\n'
-      'O primeiro passo para mudar o seu mundo e decidir que voce merece algo maior.\n\n'
-      '"Quando voce decide mudar o seu mundo, voce muda O mundo!"\n\n'
-      'Pense sobre isso e nos vemos amanha!!!';
+      'Oii {nome}, que bom ter você aqui mais um dia!!!\n\n'
+      'Refletiu sobre nossas últimas atividades? Quais decisões você quer tomar?\n\n'
+      'Você vai continuar vivendo do jeito que ta ou vai buscar o conhecimento que te deixa mais seguro(a) e confiante nas suas escolhas?\n\n'
+      'Estamos aqui para te mostrar que seu medo não pode decidir seu futuro por você. Você podé continuar vivendo da mesma forma ou escolher o conhecimento que te torna mais seguro, consciente e assertivo nas suas decisões.\n\n'
+      'Pode deixar o medo decidir por você ou finalmente enfrentá-lo para construir uma nova realidade.\n\n'
+      'Toda mudança comeca quando você assume suas escolhas, aprende com o passado e decide parar de alimentar ciclos que te prendem no mesmo lugar.\n\n'
+      'Se existe uma oportunidade de evoluir, crescer e transformar sua vida, por qué continuar limitado pelas próprias certezas?\n\n'
+      'Faça uma reflexão sobre duas decisões e quais comportamentos você precisa mudar.\n\n'
+      'O primeiro passo para mudar o seu mundo e decidir que você merece algo maior.\n\n'
+      '"Quando você decide mudar o seu mundo, você muda O mundo!"\n\n'
+      'Pense sobre isso e nos vemos amanhã!!!';
 
   final TextEditingController reflexaoController = TextEditingController();
-  String nomeUsuario = 'voce';
+  String nomeUsuario = 'você';
   int etapaAtual = 0;
 
   @override
@@ -87,7 +87,7 @@ class _Desafio3PageState extends State<Desafio3Page> {
                           ),
                         ),
                         Text(
-                          etapaAtual == 0 ? 'Texto inicial' : 'Reflexao',
+                          etapaAtual == 0 ? 'Texto inicial' : 'Reflexão',
                           style: TextStyle(color: textoSecundario),
                         ),
                       ],
@@ -96,11 +96,11 @@ class _Desafio3PageState extends State<Desafio3Page> {
                   IconButton(
                     tooltip: 'Sair',
                     style: IconButton.styleFrom(
-                      backgroundColor: const Color(0xFFFED23E),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.black,
                     ),
                     onPressed: () => Navigator.of(context).pop(false),
-                    icon: const Icon(Icons.close_rounded),
+                    icon: Icon(Icons.close_rounded),
                   ),
                 ],
               ),
@@ -111,7 +111,7 @@ class _Desafio3PageState extends State<Desafio3Page> {
                   value: (etapaAtual + 1) / 2,
                   minHeight: 10,
                   backgroundColor: Colors.white12,
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFFFED23E)),
+                  valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
                 ),
               ),
               const SizedBox(height: 22),
@@ -122,7 +122,7 @@ class _Desafio3PageState extends State<Desafio3Page> {
                     color: cardColor,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: const Color(0xFFFED23E).withAlpha(110),
+                      color: Theme.of(context).colorScheme.primary.withAlpha(110),
                     ),
                   ),
                   child: Column(
@@ -143,19 +143,19 @@ class _Desafio3PageState extends State<Desafio3Page> {
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: textoPrincipal,
-                        side: const BorderSide(color: Color(0xFFFED23E)),
+                        side: BorderSide(color: Theme.of(context).colorScheme.primary),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _voltar,
-                      icon: const Icon(Icons.arrow_back_rounded),
-                      label: const Text('Voltar'),
+                      icon: Icon(Icons.arrow_back_rounded),
+                      label: Text('Voltar'),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFED23E),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
@@ -165,7 +165,7 @@ class _Desafio3PageState extends State<Desafio3Page> {
                             ? Icons.arrow_forward_rounded
                             : Icons.check_rounded,
                       ),
-                      label: Text(etapaAtual == 0 ? 'Proximo' : 'Concluir'),
+                      label: Text(etapaAtual == 0 ? 'Próximo' : 'Concluir'),
                     ),
                   ),
                 ],
@@ -200,7 +200,7 @@ class _Desafio3PageState extends State<Desafio3Page> {
   ) {
     return [
       Text(
-        'Sua reflexao',
+        'Sua reflexão',
         style: TextStyle(
           color: textoPrincipal,
           fontSize: 22,
@@ -211,15 +211,15 @@ class _Desafio3PageState extends State<Desafio3Page> {
       Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0xFFFED23E).withAlpha(38),
+          color: Theme.of(context).colorScheme.primary.withAlpha(38),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFFED23E)),
+          border: Border.all(color: Theme.of(context).colorScheme.primary),
         ),
-        child: const Text(
-          '"Quando voce decide mudar o seu mundo, voce muda O mundo!"',
+        child: Text(
+          '"Quando você decide mudar o seu mundo, você muda O mundo!"',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: Color(0xFFFED23E),
+            color: Theme.of(context).colorScheme.primary,
             fontSize: 16,
             height: 1.3,
             fontWeight: FontWeight.bold,
@@ -228,7 +228,7 @@ class _Desafio3PageState extends State<Desafio3Page> {
       ),
       const SizedBox(height: 16),
       Text(
-        'Escreva sobre duas decisoes e quais comportamentos voce precisa mudar.',
+        'Escreva sobre duas decisões e quais comportamentos você precisa mudar.',
         style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
@@ -246,7 +246,7 @@ class _Desafio3PageState extends State<Desafio3Page> {
           ),
           decoration: InputDecoration(
             hintText:
-                'Escreva sobre duas decisoes e os comportamentos que voce precisa mudar...',
+                'Escreva sobre duas decisões e os comportamentos que você precisa mudar...',
             hintStyle: TextStyle(
               color: textoSecundario.withAlpha(140),
             ),
@@ -261,8 +261,8 @@ class _Desafio3PageState extends State<Desafio3Page> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(
-                color: Color(0xFFFED23E),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
                 width: 2,
               ),
             ),
@@ -292,7 +292,7 @@ class _Desafio3PageState extends State<Desafio3Page> {
   Future<void> _concluir() async {
     if (reflexaoController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Escreva sua reflexao antes de concluir.')),
+        const SnackBar(content: Text('Escreva sua reflexão antes de concluir.')),
       );
       return;
     }
@@ -301,7 +301,7 @@ class _Desafio3PageState extends State<Desafio3Page> {
       desafio: 3,
       itens: [
         ConteudoItem(
-          titulo: 'Reflexao sobre decisoes',
+          titulo: 'Reflexão sobre decisões',
           texto: reflexaoController.text.trim(),
         ),
       ],

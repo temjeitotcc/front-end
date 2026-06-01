@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../../main.dart';
 import '../../services/auth_service.dart';
 
@@ -95,10 +95,10 @@ class _AuthPageState extends State<AuthPage> {
                   const SizedBox(height: 8),
                   Text(
                     _criandoConta
-                        ? 'Crie sua conta para comecar sua jornada.'
+                        ? 'Crie sua conta para começar sua jornada.'
                         : 'Entre para continuar de onde parou.',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white60,
                       fontSize: 14,
                     ),
@@ -117,7 +117,7 @@ class _AuthPageState extends State<AuthPage> {
                             controller: _nomeUsuarioController,
                             textInputAction: TextInputAction.next,
                             decoration: const InputDecoration(
-                              labelText: 'Nome de usuario',
+                              labelText: 'Nome de usuário',
                               prefixIcon: Icon(Icons.person_outline_rounded),
                               border: OutlineInputBorder(),
                             ),
@@ -126,7 +126,7 @@ class _AuthPageState extends State<AuthPage> {
 
                               final nome = valor?.trim() ?? '';
                               if (nome.length < 2) {
-                                return 'Digite seu nome de usuario.';
+                                return 'Digite seu nome de usuário.';
                               }
                               return null;
                             },
@@ -144,7 +144,7 @@ class _AuthPageState extends State<AuthPage> {
                           validator: (valor) {
                             final email = valor?.trim() ?? '';
                             if (!email.contains('@') || !email.contains('.')) {
-                              return 'Digite um email valido.';
+                              return 'Digite um email válido.';
                             }
                             return null;
                           },
@@ -155,7 +155,7 @@ class _AuthPageState extends State<AuthPage> {
                           obscureText: _ocultarSenha,
                           decoration: InputDecoration(
                             labelText: 'Senha',
-                            prefixIcon: const Icon(Icons.lock_outline_rounded),
+                            prefixIcon: Icon(Icons.lock_outline_rounded),
                             border: const OutlineInputBorder(),
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -181,7 +181,7 @@ class _AuthPageState extends State<AuthPage> {
                           height: 52,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFED23E),
+                              backgroundColor: Theme.of(context).colorScheme.primary,
                               foregroundColor: Colors.black,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
@@ -199,7 +199,7 @@ class _AuthPageState extends State<AuthPage> {
                                   )
                                 : Text(
                                     _criandoConta ? 'Criar conta' : 'Entrar',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -217,8 +217,8 @@ class _AuthPageState extends State<AuthPage> {
                           },
                     child: Text(
                       _criandoConta
-                          ? 'Ja tenho uma conta'
-                          : 'Ainda nao tenho conta',
+                          ? 'Já tenho uma conta'
+                          : 'Ainda não tenho conta',
                     ),
                   ),
                 ],

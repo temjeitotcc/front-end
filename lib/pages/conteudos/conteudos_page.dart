@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../services/conteudos_service.dart';
 
@@ -7,7 +7,8 @@ String tituloDesafio(int numero) {
     1 => 'Dia 1 - Bem Vindo ao seu treinamento',
     2 => 'Dia 2 - Minha empresa, minha vida',
     3 => 'Dia 3 - Eu escolho',
-    4 => 'Dia 4 - Coraferido vírus',
+    4 => 'Dia 4 - O que me move',
+    5 => 'Dia 5 - Quem sou eu?',
     _ => 'Desafio $numero',
   };
 }
@@ -77,8 +78,8 @@ class _ConteudosPageState extends State<ConteudosPage> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFED23E),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(28),
                 ),
@@ -89,7 +90,7 @@ class _ConteudosPageState extends State<ConteudosPage> {
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
-                      'Conteudos',
+                      'Conteúdos',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 26,
@@ -138,7 +139,7 @@ class _ConteudosPageState extends State<ConteudosPage> {
                       },
                     ),
                     _ConteudoCard(
-                      titulo: 'Bloco de reflexoes',
+                      titulo: 'Bloco de reflexões',
                       subtitulo: '${blocosReflexao.length} bloco(s)',
                       icon: Icons.edit_note_rounded,
                       onTap: () async {
@@ -152,7 +153,7 @@ class _ConteudosPageState extends State<ConteudosPage> {
                     ),
                     for (int i = 4; i <= 6; i++)
                       _ConteudoCard(
-                        titulo: 'Espaco $i',
+                        titulo: 'Espaço $i',
                         subtitulo: 'Em breve',
                         icon: Icons.bookmark_rounded,
                         onTap: () {},
@@ -196,7 +197,7 @@ class _ConteudoCard extends StatelessWidget {
           border: Border.all(
             color: apagado
                 ? Colors.white.withAlpha(24)
-                : const Color(0xFFFED23E).withAlpha(170),
+                : Theme.of(context).colorScheme.primary.withAlpha(170),
           ),
           boxShadow: [
             BoxShadow(
@@ -212,8 +213,8 @@ class _ConteudoCard extends StatelessWidget {
             Container(
               width: 42,
               height: 42,
-              decoration: const BoxDecoration(
-                color: Color(0xFFFED23E),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: Colors.black),
@@ -223,7 +224,7 @@ class _ConteudoCard extends StatelessWidget {
               titulo,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
@@ -234,7 +235,7 @@ class _ConteudoCard extends StatelessWidget {
               subtitulo,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white60, fontSize: 12),
+              style: TextStyle(color: Colors.white60, fontSize: 12),
             ),
           ],
         ),
@@ -276,23 +277,23 @@ class _BlocosReflexaoPageState extends State<BlocosReflexaoPage> {
     return Scaffold(
       backgroundColor: fundo,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFED23E),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.black,
-        title: const Text('Bloco de reflexoes'),
+        title: Text('Bloco de reflexões'),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xFFFED23E),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.black,
         onPressed: () => abrirEditor(),
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('Criar bloco'),
+        icon: Icon(Icons.add_rounded),
+        label: Text('Criar bloco'),
       ),
       body: blocos.isEmpty
           ? const Center(
               child: Padding(
                 padding: EdgeInsets.all(24),
                 child: Text(
-                  'Crie seu primeiro bloco para guardar uma reflexao livre.',
+                  'Crie seu primeiro bloco para guardar uma reflexão livre.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white60, fontSize: 16),
                 ),
@@ -310,12 +311,12 @@ class _BlocosReflexaoPageState extends State<BlocosReflexaoPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                     side: BorderSide(
-                      color: const Color(0xFFFED23E).withAlpha(120),
+                      color: Theme.of(context).colorScheme.primary.withAlpha(120),
                     ),
                   ),
                   tileColor: const Color(0xFF2A2527),
-                  leading: const CircleAvatar(
-                    backgroundColor: Color(0xFFFED23E),
+                  leading: CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Colors.black,
                     child: Icon(Icons.edit_note_rounded),
                   ),
@@ -323,7 +324,7 @@ class _BlocosReflexaoPageState extends State<BlocosReflexaoPage> {
                     bloco.tema,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -332,11 +333,11 @@ class _BlocosReflexaoPageState extends State<BlocosReflexaoPage> {
                     bloco.texto.isEmpty ? 'Sem texto ainda' : bloco.texto,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white60),
+                    style: TextStyle(color: Colors.white60),
                   ),
-                  trailing: const Icon(
+                  trailing: Icon(
                     Icons.chevron_right_rounded,
-                    color: Color(0xFFFED23E),
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 );
               },
@@ -391,7 +392,7 @@ class _EditorBlocoReflexaoPageState extends State<EditorBlocoReflexaoPage> {
     return Scaffold(
       backgroundColor: fundo,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFED23E),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.black,
         title: Text(widget.bloco == null ? 'Novo bloco' : 'Editar bloco'),
       ),
@@ -405,13 +406,13 @@ class _EditorBlocoReflexaoPageState extends State<EditorBlocoReflexaoPage> {
               TextField(
                 controller: temaController,
                 textInputAction: TextInputAction.next,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(color: Colors.white, fontSize: 16),
                 decoration: InputDecoration(
-                  labelText: 'Tema da reflexao',
-                  labelStyle: const TextStyle(color: Colors.white60),
-                  prefixIcon: const Icon(
+                  labelText: 'Tema da reflexão',
+                  labelStyle: TextStyle(color: Colors.white60),
+                  prefixIcon: Icon(
                     Icons.bookmark_outline_rounded,
-                    color: Color(0xFFFED23E),
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                   filled: true,
                   fillColor: const Color(0xFF2A2527),
@@ -421,8 +422,8 @@ class _EditorBlocoReflexaoPageState extends State<EditorBlocoReflexaoPage> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(18),
-                    borderSide: const BorderSide(
-                      color: Color(0xFFFED23E),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
                       width: 2,
                     ),
                   ),
@@ -436,14 +437,14 @@ class _EditorBlocoReflexaoPageState extends State<EditorBlocoReflexaoPage> {
                   maxLines: null,
                   minLines: null,
                   textAlignVertical: TextAlignVertical.top,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     height: 1.35,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Escreva sua reflexao livremente...',
-                    hintStyle: const TextStyle(color: Colors.white38),
+                    hintText: 'Escreva sua reflexão livremente...',
+                    hintStyle: TextStyle(color: Colors.white38),
                     filled: true,
                     fillColor: const Color(0xFF2A2527),
                     contentPadding: const EdgeInsets.all(16),
@@ -453,8 +454,8 @@ class _EditorBlocoReflexaoPageState extends State<EditorBlocoReflexaoPage> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(18),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFFED23E),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
                         width: 2,
                       ),
                     ),
@@ -464,13 +465,13 @@ class _EditorBlocoReflexaoPageState extends State<EditorBlocoReflexaoPage> {
               const SizedBox(height: 14),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFED23E),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.black,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 onPressed: salvar,
-                icon: const Icon(Icons.save_rounded),
-                label: const Text('Salvar bloco'),
+                icon: Icon(Icons.save_rounded),
+                label: Text('Salvar bloco'),
               ),
             ],
           ),
@@ -485,7 +486,7 @@ class _EditorBlocoReflexaoPageState extends State<EditorBlocoReflexaoPage> {
 
     if (tema.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Coloque um tema para a reflexao.')),
+        const SnackBar(content: Text('Coloque um tema para a reflexão.')),
       );
       return;
     }
@@ -514,9 +515,9 @@ class DesafiosFeitosPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: fundo,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFED23E),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.black,
-        title: const Text('Desafios feitos'),
+        title: Text('Desafios feitos'),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(14, 16, 14, 24),
@@ -546,7 +547,7 @@ class DesafiosFeitosPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               side: BorderSide(
                 color: temConteudo
-                    ? const Color(0xFFFED23E)
+                    ? Theme.of(context).colorScheme.primary
                     : Colors.white.withAlpha(20),
               ),
             ),
@@ -555,29 +556,29 @@ class DesafiosFeitosPage extends StatelessWidget {
                 : const Color(0xFF211D1F),
             leading: CircleAvatar(
               backgroundColor: temConteudo
-                  ? const Color(0xFFFED23E)
+                  ? Theme.of(context).colorScheme.primary
                   : Colors.white24,
               foregroundColor: temConteudo ? Colors.black : Colors.white60,
               child: Text('$numero'),
             ),
             title: Text(
               tituloDesafio(numero),
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
             subtitle: Text(
               temConteudo
-                  ? '${conteudo.itens.length} lembranca(s) salva(s)'
+                  ? '${conteudo.itens.length} lembrança(s) salva(s)'
                   : 'Nada escrito ainda',
-              style: const TextStyle(color: Colors.white60),
+              style: TextStyle(color: Colors.white60),
             ),
             trailing: Icon(
               temConteudo
                   ? Icons.chevron_right_rounded
                   : Icons.lock_outline_rounded,
-              color: temConteudo ? const Color(0xFFFED23E) : Colors.white38,
+              color: temConteudo ? Theme.of(context).colorScheme.primary : Colors.white38,
             ),
           );
         },
@@ -599,9 +600,9 @@ class MissoesEspeciaisPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: fundo,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFED23E),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.black,
-        title: const Text('Reflexões da semana'),
+        title: Text('Reflexões da semana'),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(14, 16, 14, 24),
@@ -628,7 +629,7 @@ class MissoesEspeciaisPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               side: BorderSide(
                 color: temConteudo
-                    ? const Color(0xFFFED23E)
+                    ? Theme.of(context).colorScheme.primary
                     : Colors.white.withAlpha(20),
               ),
             ),
@@ -637,27 +638,27 @@ class MissoesEspeciaisPage extends StatelessWidget {
                 : const Color(0xFF211D1F),
             leading: CircleAvatar(
               backgroundColor: temConteudo
-                  ? const Color(0xFFFED23E)
+                  ? Theme.of(context).colorScheme.primary
                   : Colors.white24,
               foregroundColor: Colors.black,
-              child: const Icon(Icons.auto_awesome_rounded),
+              child: Icon(Icons.auto_awesome_rounded),
             ),
             title: Text(
               'Reflexão da semana $numeroSemana',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
             subtitle: Text(
-              temConteudo ? 'Lembranca salva' : 'Nada escrito ainda',
-              style: const TextStyle(color: Colors.white60),
+              temConteudo ? 'Lembrança salva' : 'Nada escrito ainda',
+              style: TextStyle(color: Colors.white60),
             ),
             trailing: Icon(
               temConteudo
                   ? Icons.chevron_right_rounded
                   : Icons.lock_outline_rounded,
-              color: temConteudo ? const Color(0xFFFED23E) : Colors.white38,
+              color: temConteudo ? Theme.of(context).colorScheme.primary : Colors.white38,
             ),
           );
         },
@@ -682,7 +683,7 @@ class ConteudoDesafioPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: fundo,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFED23E),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.black,
         title: Text(tituloDesafio(conteudo.desafio)),
       ),
@@ -698,15 +699,15 @@ class ConteudoDesafioPage extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF2A2527),
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFFFED23E).withAlpha(120)),
+              border: Border.all(color: Theme.of(context).colorScheme.primary.withAlpha(120)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   item.titulo,
-                  style: const TextStyle(
-                    color: Color(0xFFFED23E),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -714,7 +715,7 @@ class ConteudoDesafioPage extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text(
                   item.texto,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
                     height: 1.35,
@@ -726,7 +727,7 @@ class ConteudoDesafioPage extends StatelessWidget {
                     Icon(Icons.lock_rounded, color: Colors.white38, size: 15),
                     SizedBox(width: 6),
                     Text(
-                      'Lembranca salva',
+                      'Lembrança salva',
                       style: TextStyle(color: Colors.white38, fontSize: 12),
                     ),
                   ],
@@ -766,7 +767,7 @@ class ConteudoDesafio2Page extends StatelessWidget {
     return Scaffold(
       backgroundColor: fundo,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFFED23E),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.black,
         title: Text(tituloDesafio(2)),
       ),
@@ -777,8 +778,8 @@ class ConteudoDesafio2Page extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Predio da vida',
+              Text(
+                'Prédio da vida',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,
@@ -786,8 +787,8 @@ class ConteudoDesafio2Page extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              const Text(
-                'Toque em uma janela para rever a lembranca salva.',
+              Text(
+                'Toque em uma janela para rever a lembrança salva.',
                 style: TextStyle(color: Colors.white60, fontSize: 14),
               ),
               const SizedBox(height: 14),
@@ -822,7 +823,7 @@ class ConteudoDesafio2Page extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF2A2527),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFFED23E), width: 2),
+              border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -833,8 +834,8 @@ class ConteudoDesafio2Page extends StatelessWidget {
                     Expanded(
                       child: Text(
                         titulo,
-                        style: const TextStyle(
-                          color: Color(0xFFFED23E),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -843,11 +844,11 @@ class ConteudoDesafio2Page extends StatelessWidget {
                     IconButton(
                       tooltip: 'Fechar',
                       style: IconButton.styleFrom(
-                        backgroundColor: const Color(0xFFFED23E),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Colors.black,
                       ),
                       onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close_rounded),
+                      icon: Icon(Icons.close_rounded),
                     ),
                   ],
                 ),
@@ -862,9 +863,9 @@ class ConteudoDesafio2Page extends StatelessWidget {
                   child: SingleChildScrollView(
                     child: Text(
                       texto.trim().isEmpty
-                          ? 'Nenhuma lembranca foi escrita nessa janela.'
+                          ? 'Nenhuma lembrança foi escrita nessa janela.'
                           : texto,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 15,
                         height: 1.35,
@@ -936,7 +937,7 @@ class _PredioConteudo extends StatelessWidget {
                 width: predioLargura,
                 height: corpoAltura,
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Color(0xFF263238),
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(18),
@@ -950,7 +951,7 @@ class _PredioConteudo extends StatelessWidget {
                 width: predioLargura * 0.80,
                 height: altura * 0.055,
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Color(0xFF263238),
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(12),
@@ -970,7 +971,7 @@ class _PredioConteudo extends StatelessWidget {
                       top: Radius.circular(16),
                     ),
                     border: Border.all(
-                      color: const Color(0xFFFED23E),
+                      color: Theme.of(context).colorScheme.primary,
                       width: 2,
                     ),
                   ),
@@ -979,8 +980,8 @@ class _PredioConteudo extends StatelessWidget {
                     child: Container(
                       width: 7,
                       height: 7,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFED23E),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -1059,7 +1060,7 @@ class _AreaConteudoLabel extends StatelessWidget {
         textAlign: alignRight ? TextAlign.right : TextAlign.left,
         maxLines: 2,
         softWrap: true,
-        style: const TextStyle(
+        style: TextStyle(
           color: Color(0xFF263238),
           fontSize: 10,
           height: 1.05,
@@ -1082,7 +1083,7 @@ class _JanelaConteudo extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: preenchida ? const Color(0xFFFFE58A) : const Color(0xFFFED23E),
+          color: preenchida ? Theme.of(context).colorScheme.secondary : Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: preenchida ? Colors.white : Colors.transparent,

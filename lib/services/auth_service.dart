@@ -1,7 +1,7 @@
-import 'package:shared_preferences/shared_preferences.dart';
+﻿import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  static const String _nomeUsuarioKey = 'auth_nome_usuario';
+  static const String _nomeUsuarioKey = 'auth_nome_usuário';
   static const String _emailKey = 'auth_email';
   static const String _senhaKey = 'auth_senha';
   static const String _logadoKey = 'auth_logado';
@@ -18,7 +18,7 @@ class AuthService {
 
   static Future<String> nomeUsuarioAtual() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_nomeUsuarioKey) ?? 'voce';
+    return prefs.getString(_nomeUsuarioKey) ?? 'você';
   }
 
   static Future<bool> temContaCriada() async {
@@ -35,11 +35,11 @@ class AuthService {
     final emailNormalizado = email.trim().toLowerCase();
 
     if (nomeNormalizado.length < 2) {
-      return 'Digite seu nome de usuario.';
+      return 'Digite seu nome de usuário.';
     }
 
     if (!_emailValido(emailNormalizado)) {
-      return 'Digite um email valido.';
+      return 'Digite um email válido.';
     }
 
     if (senha.length < 6) {

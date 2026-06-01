@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'pages/conteudos/conteudos_page.dart';
 import 'pages/home/home_page.dart';
 import 'pages/menu/loja.dart';
@@ -106,6 +106,8 @@ class _MainScreenState extends State<MainScreen> {
           child: Image.asset(
             imagem,
             height: 28,
+            color: Colors.black.withAlpha(220),
+            colorBlendMode: BlendMode.srcIn,
           ),
         ),
       ),
@@ -141,6 +143,8 @@ class _MainScreenState extends State<MainScreen> {
               child: Image.asset(
                 imagem,
                 height: 35,
+                color: Colors.black.withAlpha(230),
+                colorBlendMode: BlendMode.srcIn,
               ),
             ),
           ),

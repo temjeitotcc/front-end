@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
@@ -12,7 +12,7 @@ class Desafio4Page extends StatefulWidget {
 
 class _Desafio4PageState extends State<Desafio4Page> {
   final TextEditingController reflexaoController = TextEditingController();
-  String nomeUsuario = 'voce';
+  String nomeUsuario = 'você';
   int etapaAtual = 0;
 
   @override
@@ -75,7 +75,7 @@ class _Desafio4PageState extends State<Desafio4Page> {
                           ),
                         ),
                         Text(
-                          etapaAtual == 0 ? 'Texto inicial' : 'Reflexao',
+                          etapaAtual == 0 ? 'Texto inicial' : 'Reflexão',
                           style: TextStyle(color: textoSecundario),
                         ),
                       ],
@@ -88,7 +88,7 @@ class _Desafio4PageState extends State<Desafio4Page> {
                       foregroundColor: Colors.black,
                     ),
                     onPressed: () => Navigator.of(context).pop(false),
-                    icon: const Icon(Icons.close_rounded),
+                    icon: Icon(Icons.close_rounded),
                   ),
                 ],
               ),
@@ -133,8 +133,8 @@ class _Desafio4PageState extends State<Desafio4Page> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _voltar,
-                      icon: const Icon(Icons.arrow_back_rounded),
-                      label: const Text('Voltar'),
+                      icon: Icon(Icons.arrow_back_rounded),
+                      label: Text('Voltar'),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -151,7 +151,7 @@ class _Desafio4PageState extends State<Desafio4Page> {
                             ? Icons.arrow_forward_rounded
                             : Icons.check_rounded,
                       ),
-                      label: Text(etapaAtual == 0 ? 'Proximo' : 'Concluir'),
+                      label: Text(etapaAtual == 0 ? 'Próximo' : 'Concluir'),
                     ),
                   ),
                 ],
@@ -195,22 +195,22 @@ class _Desafio4PageState extends State<Desafio4Page> {
               ),
               _ParagraphText(
                 text:
-                    'E o autoconhecimento e a sua benzetacil: se entender e entender o outro e a melhor maneira de se curar.',
+                    'E o autoconhecimento é a sua benzetacil: se entender e entender o outro é a melhor maneira de se curar.',
                 color: textoSecundario,
               ),
               _ParagraphText(
                 text:
-                    'Pare por um momento e reflita sobre quem voce e hoje, quais habitos tem alimentado, quais sonhos ja realizou e quais ainda deseja conquistar. Observe seus comportamentos, aquilo que te fortalece e tambem o que te limita. Pense no que faz seu coracao vibrar, no que voce faz com prazer e nas marcas que deseja deixar no mundo.',
+                    'Pare por um momento e reflita sobre quem você é hoje, quais hábitos tem alimentado, quais sonhos já realizou e quais ainda deseja conquistar. Observe seus comportamentos, aquilo que te fortalece e também o que te limita. Pense no que faz seu coração vibrar, no que você faz com prazer e nas marcas que deseja deixar no mundo.',
                 color: textoSecundario,
               ),
               _ParagraphText(
                 text:
-                    'Relembre os desafios que ja superou, reconheca suas qualidades e perceba que existe um proposito maior por tras da sua caminhada. Sua vida nao impacta apenas voce, mas tambem sua familia, as pessoas que ama e todas aquelas que ainda serao alcancadas pela sua historia.',
+                    'Relembre os desafios que já superou, reconheça suas qualidades e perceba que existe um propósito maior por trás da sua caminhada. Sua vida não impacta apenas você, mas também sua família, as pessoas que ama e todas aquelas que ainda serão alcançadas pela sua história.',
                 color: textoSecundario,
               ),
               _ParagraphText(
                 text:
-                    'Talvez alguem esteja esperando exatamente pela sua coragem, pela sua mudanca e pela sua decisao de nao desistir. Porque sempre tem jeito e sempre vale a pena continuar.',
+                    'Talvez alguém esteja esperando exatamente pela sua coragem, pela sua mudança e pela sua decisão de não desistir. Porque sempre tem jeito e sempre vale a pena continuar.',
                 color: textoSecundario,
               ),
             ],
@@ -228,7 +228,7 @@ class _Desafio4PageState extends State<Desafio4Page> {
 
     return [
       Text(
-        'Sua decisao',
+        'Sua decisão',
         style: TextStyle(
           color: textoPrincipal,
           fontSize: 22,
@@ -306,7 +306,7 @@ class _Desafio4PageState extends State<Desafio4Page> {
     final resposta = reflexaoController.text.trim();
     if (resposta.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Escreva sua decisao antes de concluir.')),
+        const SnackBar(content: Text('Escreva sua decisão antes de concluir.')),
       );
       return;
     }
@@ -315,7 +315,7 @@ class _Desafio4PageState extends State<Desafio4Page> {
       desafio: 4,
       itens: [
         ConteudoItem(
-          titulo: 'Decisao a partir de hoje',
+          titulo: 'Decisão a partir de hoje',
           texto: resposta,
         ),
       ],

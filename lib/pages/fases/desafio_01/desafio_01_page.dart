@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class Desafio1Page extends StatefulWidget {
   const Desafio1Page({super.key});
@@ -33,7 +33,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
   ];
 
   List<String> get instrucoes => const [
-    'Vamos dividir sua vida em 9 areas: familia, relacionamentos, vida social, saude, intelectual, profissional, emocional, solidariedade e futuro. Para cada uma delas, voce vai dar uma nota de 0 a 10 com base em como enxerga sua vida hoje.\n\nAntes de responder, imagine como seria cada area funcionando no seu melhor nivel possivel, essa sera sua "nota 10". Depois, compare com sua realidade atual e de notas sinceras, sem se cobrar demais.\n\nAreas que te causam ansiedade, estresse ou desconforto provavelmente terao notas mais baixas. Ja as que estao indo bem podem ficar entre 6 e 9, mesmo ainda podendo melhorar.\n\nPara ajudar na reflexao, havera perguntas especificas sobre cada area.',
+    'Vamos dividir sua vida em 9 areas: família, relacionamentos, vida social, saúde, intelectual, profissional, emocional, solidariedade e futuro. Para cada uma delas, você vai dar uma nota de 0 a 10 com base em como enxerga sua vida hoje.\n\nAntes de responder, imagine como seria cada área funcionando no seu melhor nível possivel, essa será sua "nota 10". Depois, compare com sua realidade atual e de notas sinceras, sem se cobrar demais.\n\nAreas que te causam ansiedade, estresse ou desconforto provavelmente terao notas mais baixas. Já as que estao indo bem podem ficar entre 6 e 9, mesmo ainda podendo melhorar.\n\nPara ajudar na reflexão, haverá perguntas especificas sobre cada área.',
   ];
 
   late final List<int?> respostas;
@@ -99,9 +99,9 @@ class _Desafio1PageState extends State<Desafio1Page> {
                         ),
                         Text(
                           mostrandoInstrucoes
-                              ? 'Instrucoes ${instrucaoAtual + 1} de ${instrucoes.length}'
+                              ? 'Instruções ${instrucaoAtual + 1} de ${instrucoes.length}'
                               : mostrandoReflexao
-                              ? 'Reflexao final'
+                              ? 'Reflexão final'
                               : 'Pergunta ${perguntaAtual + 1} de ${perguntas.length}',
                           style: TextStyle(color: textoSecundario),
                         ),
@@ -111,11 +111,11 @@ class _Desafio1PageState extends State<Desafio1Page> {
                   IconButton(
                     tooltip: 'Sair',
                     style: IconButton.styleFrom(
-                      backgroundColor: const Color(0xFFFED23E),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.black,
                     ),
                     onPressed: () => Navigator.of(context).pop(false),
-                    icon: const Icon(Icons.close_rounded),
+                    icon: Icon(Icons.close_rounded),
                   ),
                 ],
               ),
@@ -126,7 +126,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
                   value: progresso,
                   minHeight: 10,
                   backgroundColor: Colors.white12,
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFFFED23E)),
+                  valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
                 ),
               ),
               const SizedBox(height: 22),
@@ -137,7 +137,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
                     color: cardColor,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: const Color(0xFFFED23E).withAlpha(110),
+                      color: Theme.of(context).colorScheme.primary.withAlpha(110),
                     ),
                   ),
                   child: Column(
@@ -157,19 +157,19 @@ class _Desafio1PageState extends State<Desafio1Page> {
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: textoPrincipal,
-                        side: const BorderSide(color: Color(0xFFFED23E)),
+                        side: BorderSide(color: Theme.of(context).colorScheme.primary),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _voltarEtapa,
-                      icon: const Icon(Icons.arrow_back_rounded),
-                      label: const Text('Voltar'),
+                      icon: Icon(Icons.arrow_back_rounded),
+                      label: Text('Voltar'),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFED23E),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
@@ -179,7 +179,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
                             ? Icons.check_rounded
                             : Icons.arrow_forward_rounded,
                       ),
-                      label: Text(mostrandoReflexao ? 'Concluir' : 'Proximo'),
+                      label: Text(mostrandoReflexao ? 'Concluir' : 'Próximo'),
                     ),
                   ),
                 ],
@@ -194,7 +194,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
   List<Widget> _conteudoInstrucao(Color textoPrincipal, Color textoSecundario) {
     return [
       Text(
-        'Instrucoes do Desafio 1',
+        'Instruções do Desafio 1',
         style: TextStyle(
           color: textoPrincipal,
           fontSize: 22,
@@ -218,14 +218,14 @@ class _Desafio1PageState extends State<Desafio1Page> {
       Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFFFED23E).withAlpha(38),
+          color: Theme.of(context).colorScheme.primary.withAlpha(38),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFFED23E)),
+          border: Border.all(color: Theme.of(context).colorScheme.primary),
         ),
-        child: const Text(
-          'Evite colocar nota 10, porque a ideia e continuar evoluindo sempre.',
+        child: Text(
+          'Evite colocar nota 10, porque a ideia é continuar evoluindo sempre.',
           style: TextStyle(
-            color: Color(0xFFFED23E),
+            color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -277,7 +277,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
   List<Widget> _conteudoReflexao(Color textoPrincipal, Color textoSecundario) {
     return [
       Text(
-        'Reflexao final',
+        'Reflexão final',
         style: TextStyle(
           color: textoPrincipal,
           fontSize: 22,
@@ -299,7 +299,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
           textAlignVertical: TextAlignVertical.top,
           style: TextStyle(color: textoPrincipal, fontSize: 16, height: 1.35),
           decoration: InputDecoration(
-            hintText: 'Minha reflexao...',
+            hintText: 'Minha reflexão...',
             hintStyle: TextStyle(color: textoSecundario.withAlpha(140)),
             filled: true,
             fillColor: Theme.of(context).brightness == Brightness.dark
@@ -312,7 +312,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: Color(0xFFFED23E), width: 2),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
             ),
           ),
         ),
@@ -321,14 +321,14 @@ class _Desafio1PageState extends State<Desafio1Page> {
       Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFFFED23E).withAlpha(38),
+          color: Theme.of(context).colorScheme.primary.withAlpha(38),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFFED23E)),
+          border: Border.all(color: Theme.of(context).colorScheme.primary),
         ),
-        child: const Text(
+        child: Text(
           'Nenhum problema é tão grave que não tenha solução, e nada é tão bom que não possa melhorar.',
           style: TextStyle(
-            color: Color(0xFFFED23E),
+            color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -381,7 +381,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
       if (reflexaoController.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Escreva sua reflexao antes de concluir.'),
+            content: Text('Escreva sua reflexão antes de concluir.'),
           ),
         );
         return;
@@ -393,7 +393,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
 
     if (respostas[perguntaAtual] == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Escolha uma nota antes de continuar.')),
+        const SnackBar(content: Text('Escolha uma nota antes dé continuar.')),
       );
       return;
     }
@@ -454,7 +454,7 @@ class _BotaoNota extends StatelessWidget {
         ),
         child: Text(
           '$nota',
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,

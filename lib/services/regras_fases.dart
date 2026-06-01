@@ -1,9 +1,9 @@
-class RegrasFases {
+﻿class RegrasFases {
   // Para testar o app inteiro, deixe true: todas as fases ficam liberadas.
   // Para voltar ao comportamento real, troque para false.
   static const bool liberarTodasParaTeste = true;
 
-  // Para testar o app, deixe true: o proximo desafio libera na hora.
+  // Para testar o app, deixe true: o próximo desafio libera na hora.
   // Para voltar ao comportamento real, troque para false.
   static const bool liberarImediatamenteParaTeste = true;
 
