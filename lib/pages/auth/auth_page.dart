@@ -1,6 +1,6 @@
 ﻿import 'package:flutter/material.dart';
-import '../../main.dart';
-import '../../services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../mainscreen.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -11,6 +11,7 @@ class AuthPage extends StatefulWidget {
 
 class _AuthPageState extends State<AuthPage> {
   final _formKey = GlobalKey<FormState>();
+
   final _nomeUsuarioController = TextEditingController();
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
@@ -33,39 +34,73 @@ class _AuthPageState extends State<AuthPage> {
 
     setState(() => _carregando = true);
 
-    final erro = _criandoConta
-        ? await AuthService.criarConta(
-            nomeUsuario: _nomeUsuarioController.text,
-            email: _emailController.text,
-            senha: _senhaController.text,
-          )
-        : await AuthService.entrar(
-            email: _emailController.text,
-            senha: _senhaController.text,
-          );
+    try {
+      if (_criandoConta) {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _senhaController.text.trim(),
+        );
+      }
+
+      else {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _senhaController.text.trim(),
+        );
+      }
+
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => MainScreen()),
+        (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      String mensagem = 'Erro ao autenticar';
+
+      switch (e.code) {
+        case 'email-already-in-use':
+          mensagem = 'Esse email já está em uso';
+          break;
+        case 'user-not-found':
+          mensagem = 'Usuário não encontrado';
+          break;
+        case 'wrong-password':
+          mensagem = 'Senha incorreta';
+          break;
+        case 'invalid-email':
+          mensagem = 'Email inválido';
+          break;
+        case 'weak-password':
+          mensagem = 'Senha muito fraca';
+          break;
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(mensagem)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro inesperado: $e')),
+        );
+      }
+    }
 
     if (!mounted) return;
-
     setState(() => _carregando = false);
-
-    if (erro != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(erro)),
-      );
-      return;
-    }
-
-    final appState = MyApp.maybeOf(context);
-    if (appState != null) {
-      await appState.atualizarLogin();
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final fundo = Theme.of(context).scaffoldBackgroundColor;
-    final textoPrincipal =
-        Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black;
+
+    final texto =
+        Theme.of(context).brightness == Brightness.dark
+            ? Colors.white
+            : Colors.black;
+
     final cardColor = Theme.of(context).brightness == Brightness.dark
         ? const Color(0xFF2A2527)
         : Colors.white;
@@ -81,29 +116,30 @@ class _AuthPageState extends State<AuthPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Image.asset('assets/icon3.png', height: 86),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 20),
+
                   Text(
                     _criandoConta ? 'Criar conta' : 'Entrar',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: textoPrincipal,
-                      fontSize: 30,
+                      color: texto,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+
+                  const SizedBox(height: 6),
+
                   Text(
                     _criandoConta
-                        ? 'Crie sua conta para começar sua jornada.'
-                        : 'Entre para continuar de onde parou.',
+                        ? 'Crie sua conta para continuar'
+                        : 'Bem-vindo de volta',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white60,
-                      fontSize: 14,
-                    ),
+                    style: const TextStyle(color: Colors.grey),
                   ),
-                  const SizedBox(height: 28),
+
+                  const SizedBox(height: 30),
+
                   Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
@@ -115,110 +151,100 @@ class _AuthPageState extends State<AuthPage> {
                         if (_criandoConta) ...[
                           TextFormField(
                             controller: _nomeUsuarioController,
-                            textInputAction: TextInputAction.next,
                             decoration: const InputDecoration(
                               labelText: 'Nome de usuário',
-                              prefixIcon: Icon(Icons.person_outline_rounded),
                               border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.person),
                             ),
-                            validator: (valor) {
-                              if (!_criandoConta) return null;
-
-                              final nome = valor?.trim() ?? '';
-                              if (nome.length < 2) {
-                                return 'Digite seu nome de usuário.';
+                            validator: (v) {
+                              if ((v ?? '').trim().length < 2) {
+                                return 'Digite um nome válido';
                               }
                               return null;
                             },
                           ),
                           const SizedBox(height: 14),
                         ],
+
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: const InputDecoration(
                             labelText: 'Email',
-                            prefixIcon: Icon(Icons.email_outlined),
                             border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.email),
                           ),
-                          validator: (valor) {
-                            final email = valor?.trim() ?? '';
-                            if (!email.contains('@') || !email.contains('.')) {
-                              return 'Digite um email válido.';
+                          validator: (v) {
+                            if (!(v ?? '').contains('@')) {
+                              return 'Email inválido';
                             }
                             return null;
                           },
                         ),
+
                         const SizedBox(height: 14),
+
                         TextFormField(
                           controller: _senhaController,
                           obscureText: _ocultarSenha,
                           decoration: InputDecoration(
                             labelText: 'Senha',
-                            prefixIcon: Icon(Icons.lock_outline_rounded),
                             border: const OutlineInputBorder(),
+                            prefixIcon: const Icon(Icons.lock),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _ocultarSenha
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
                               ),
                               onPressed: () {
-                                setState(() => _ocultarSenha = !_ocultarSenha);
+                                setState(() {
+                                  _ocultarSenha = !_ocultarSenha;
+                                });
                               },
                             ),
                           ),
-                          validator: (valor) {
-                            if ((valor ?? '').length < 6) {
-                              return 'Use pelo menos 6 caracteres.';
+                          validator: (v) {
+                            if ((v ?? '').length < 6) {
+                              return 'Senha mínima de 6 caracteres';
                             }
                             return null;
                           },
                         ),
-                        const SizedBox(height: 18),
+
+                        const SizedBox(height: 20),
+
                         SizedBox(
                           width: double.infinity,
-                          height: 52,
+                          height: 50,
                           child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.primary,
-                              foregroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
                             onPressed: _carregando ? null : _enviar,
                             child: _carregando
-                                ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: Colors.black,
-                                    ),
+                                ? const CircularProgressIndicator(
+                                    color: Colors.black,
+                                    strokeWidth: 2,
                                   )
                                 : Text(
                                     _criandoConta ? 'Criar conta' : 'Entrar',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
                                   ),
                           ),
                         ),
                       ],
                     ),
                   ),
+
                   TextButton(
                     onPressed: _carregando
                         ? null
                         : () {
-                            setState(() => _criandoConta = !_criandoConta);
+                            setState(() {
+                              _criandoConta = !_criandoConta;
+                            });
                           },
                     child: Text(
                       _criandoConta
-                          ? 'Já tenho uma conta'
-                          : 'Ainda não tenho conta',
+                          ? 'Já tenho conta'
+                          : 'Criar nova conta',
                     ),
                   ),
                 ],

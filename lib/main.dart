@@ -1,35 +1,28 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'mainscreen.dart';
 import 'pages/auth/auth_page.dart';
 import 'services/app_theme_service.dart';
-import 'services/auth_service.dart';
 import 'services/notificacao_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   await SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.manual,
     overlays: [SystemUiOverlay.bottom],
   );
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
-  static _MyAppState of(BuildContext context) {
-    final state = maybeOf(context);
-    if (state == null) {
-      throw FlutterError('MyApp.of() called with a context that has no MyApp.');
-    }
-    return state;
-  }
-
-  static _MyAppState? maybeOf(BuildContext context) {
-    return context.findAncestorStateOfType<_MyAppState>();
-  }
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -37,15 +30,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool modoEscuro = true;
-  bool carregandoLogin = true;
-  bool usuarioLogado = false;
 
   @override
   void initState() {
     super.initState();
     carregarTema();
     AppThemeService.carregarTema();
-    carregarLogin();
     configurarNotificacoes();
   }
 
@@ -58,41 +48,6 @@ class _MyAppState extends State<MyApp> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       modoEscuro = prefs.getBool('modoEscuro') ?? true;
-    });
-  }
-
-  Future<void> carregarLogin() async {
-    final logado = await AuthService.estaLogado();
-
-    setState(() {
-      usuarioLogado = logado;
-      carregandoLogin = false;
-    });
-  }
-
-  Future<void> atualizarLogin() async {
-    final logado = await AuthService.estaLogado();
-
-    setState(() {
-      usuarioLogado = logado;
-      carregandoLogin = false;
-    });
-  }
-
-  Future<void> sairDaConta() async {
-    await AuthService.sair();
-
-    setState(() {
-      usuarioLogado = false;
-    });
-  }
-
-  Future<void> trocarTema(bool valor) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('modoEscuro', valor);
-
-    setState(() {
-      modoEscuro = valor;
     });
   }
 
@@ -115,15 +70,6 @@ class _MyAppState extends State<MyApp> {
               primary: temaCores.primary,
               secondary: temaCores.secondary,
             ),
-            appBarTheme: AppBarTheme(
-              backgroundColor: temaCores.primary,
-              centerTitle: true,
-              titleTextStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
           ),
 
           darkTheme: ThemeData(
@@ -135,26 +81,28 @@ class _MyAppState extends State<MyApp> {
               primary: temaCores.primary,
               secondary: temaCores.secondary,
             ),
-            appBarTheme: AppBarTheme(
-              backgroundColor: temaCores.primary,
-              centerTitle: true,
-              titleTextStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
           ),
 
-          home: carregandoLogin
-              ? Scaffold(
+          home: StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Scaffold(
                   body: Center(
-                    child: CircularProgressIndicator(color: temaCores.primary),
+                    child: CircularProgressIndicator(
+                      color: temaCores.primary,
+                    ),
                   ),
-                )
-              : usuarioLogado
-              ? const MainScreen()
-              : const AuthPage(),
+                );
+              }
+
+              if (snapshot.hasData) {
+                return const MainScreen();
+              } else {
+                return const AuthPage();
+              }
+            },
+          ),
         );
       },
     );
