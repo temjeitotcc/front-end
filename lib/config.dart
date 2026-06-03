@@ -1,9 +1,19 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+<<<<<<< HEAD
 import 'main.dart';
 import 'services/app_theme_service.dart';
 import 'services/auth_service.dart';
 import 'services/notificacao_service.dart';
+=======
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'main.dart';
+import 'services/app_theme_service.dart';
+import 'services/notificacao_service.dart';
+import 'pages/auth/auth_page.dart';
+import 'pages/conta_page.dart';
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
 
 class ConfigPage extends StatefulWidget {
   const ConfigPage({super.key});
@@ -17,8 +27,15 @@ class _ConfigPageState extends State<ConfigPage> {
   bool som = true;
   bool vibracao = true;
   bool modoEscuro = true;
+<<<<<<< HEAD
   String temaCoresAtual = AppThemeService.temaPadrao;
   List<AppThemeOption> temasComprados = [AppThemeService.temas.first];
+=======
+
+  String temaCoresAtual = AppThemeService.temaPadrao;
+  List<AppThemeOption> temasComprados = [AppThemeService.temas.first];
+
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
   double volume = 50;
 
   @override
@@ -41,6 +58,7 @@ class _ConfigPageState extends State<ConfigPage> {
 
     final comprados = await AppThemeService.temasComprados();
     final temaAtual = AppThemeService.temaAtual.value;
+<<<<<<< HEAD
     final temasDisponiveis = [...comprados];
     if (!temasDisponiveis.any(
       (tema) => tema.id == AppThemeService.temaPadrao,
@@ -48,10 +66,24 @@ class _ConfigPageState extends State<ConfigPage> {
       temasDisponiveis.insert(0, AppThemeService.temas.first);
     }
     if (!temasDisponiveis.any((tema) => tema.id == temaAtual.id)) {
+=======
+
+    final temasDisponiveis = [...comprados];
+
+    if (!temasDisponiveis.any((t) => t.id == AppThemeService.temaPadrao)) {
+      temasDisponiveis.insert(0, AppThemeService.temas.first);
+    }
+
+    if (!temasDisponiveis.any((t) => t.id == temaAtual.id)) {
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
       temasDisponiveis.add(temaAtual);
     }
 
     if (!mounted) return;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
     setState(() {
       temasComprados = temasDisponiveis;
       temaCoresAtual = temaAtual.id;
@@ -65,12 +97,21 @@ class _ConfigPageState extends State<ConfigPage> {
 
   Future<void> abrirSeletorDeTema() async {
     final comprados = await AppThemeService.temasComprados();
+<<<<<<< HEAD
     if (!mounted) return;
 
     setState(() {
       temasComprados = comprados.isEmpty
           ? [AppThemeService.temas.first]
           : comprados;
+=======
+
+    if (!mounted) return;
+
+    setState(() {
+      temasComprados =
+          comprados.isEmpty ? [AppThemeService.temas.first] : comprados;
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
       temaCoresAtual = AppThemeService.temaAtual.value.id;
     });
 
@@ -78,32 +119,57 @@ class _ConfigPageState extends State<ConfigPage> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) {
+<<<<<<< HEAD
         final modoEscuro = Theme.of(context).brightness == Brightness.dark;
         final fundoSheet =
             modoEscuro ? const Color(0xFF2A2527) : const Color(0xFFFFFBF0);
         final textoPrincipal = modoEscuro ? Colors.white : Colors.black;
         final textoSecundario = modoEscuro ? Colors.white70 : Colors.black54;
+=======
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+
+        final fundo = isDark
+            ? const Color(0xFF2A2527)
+            : const Color(0xFFFFFBF0);
+
+        final texto = isDark ? Colors.white : Colors.black;
+        final textoSec = isDark ? Colors.white70 : Colors.black54;
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
 
         return SafeArea(
           child: Container(
             margin: const EdgeInsets.all(14),
+<<<<<<< HEAD
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
             decoration: BoxDecoration(
               color: fundoSheet,
+=======
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: fundo,
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
               borderRadius: BorderRadius.circular(24),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+<<<<<<< HEAD
               crossAxisAlignment: CrossAxisAlignment.stretch,
+=======
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
               children: [
                 Text(
                   'Tema do aplicativo',
                   style: TextStyle(
+<<<<<<< HEAD
                     color: textoPrincipal,
+=======
+                    color: texto,
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+<<<<<<< HEAD
                 const SizedBox(height: 10),
                 for (final tema in temasComprados)
                   _ThemeOptionTile(
@@ -116,6 +182,32 @@ class _ConfigPageState extends State<ConfigPage> {
                       await AppThemeService.selecionarTema(tema.id);
                       if (!mounted) return;
                       setState(() => temaCoresAtual = tema.id);
+=======
+                const SizedBox(height: 12),
+
+                for (final tema in temasComprados)
+                  ListTile(
+                    title: Text(
+                      tema.nome,
+                      style: TextStyle(color: texto),
+                    ),
+                    subtitle: Text(
+                      tema.id,
+                      style: TextStyle(color: textoSec),
+                    ),
+                    trailing: tema.id == temaCoresAtual
+                        ? Icon(Icons.check, color: tema.primary)
+                        : null,
+                    onTap: () async {
+                      Navigator.pop(context);
+                      await AppThemeService.selecionarTema(tema.id);
+
+                      if (!mounted) return;
+
+                      setState(() {
+                        temaCoresAtual = tema.id;
+                      });
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
                     },
                   ),
               ],
@@ -129,6 +221,7 @@ class _ConfigPageState extends State<ConfigPage> {
   @override
   Widget build(BuildContext context) {
     final fundo = Theme.of(context).scaffoldBackgroundColor;
+<<<<<<< HEAD
     final textoPrincipal = Theme.of(context).brightness == Brightness.dark
         ? Colors.white
         : Colors.black;
@@ -138,6 +231,17 @@ class _ConfigPageState extends State<ConfigPage> {
     final cardColor = Theme.of(context).brightness == Brightness.dark
         ? const Color(0xFF2A2527)
         : Colors.white;
+=======
+
+    final texto = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
+    final card = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF2A2527)
+        : Colors.white;
+
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
     final corTema = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
@@ -146,7 +250,11 @@ class _ConfigPageState extends State<ConfigPage> {
         children: [
           Container(
             width: double.infinity,
+<<<<<<< HEAD
             padding: const EdgeInsets.only(top: 20, bottom: 24),
+=======
+            padding: const EdgeInsets.only(top: 40, bottom: 24),
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
             decoration: BoxDecoration(
               color: corTema,
               borderRadius: const BorderRadius.vertical(
@@ -155,13 +263,21 @@ class _ConfigPageState extends State<ConfigPage> {
             ),
             child: const Column(
               children: [
+<<<<<<< HEAD
                 Icon(Icons.settings_rounded, color: Colors.white, size: 34),
+=======
+                Icon(Icons.settings, color: Colors.white, size: 34),
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
                 SizedBox(height: 8),
                 Text(
                   'Configurações',
                   style: TextStyle(
                     color: Colors.white,
+<<<<<<< HEAD
                     fontSize: 26,
+=======
+                    fontSize: 24,
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -171,6 +287,7 @@ class _ConfigPageState extends State<ConfigPage> {
 
           Expanded(
             child: ListView(
+<<<<<<< HEAD
               padding: const EdgeInsets.fromLTRB(16, 18, 16, 20),
               children: [
                 const _SectionTitle('Conta'),
@@ -199,10 +316,25 @@ class _ConfigPageState extends State<ConfigPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const SobrePage()),
+=======
+              padding: const EdgeInsets.all(16),
+              children: [
+                const SizedBox(height: 10),
+
+                ListTile(
+                  tileColor: card,
+                  leading: const Icon(Icons.person),
+                  title: Text('Conta', style: TextStyle(color: texto)),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => ContaPage()),
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
                     );
                   },
                 ),
 
+<<<<<<< HEAD
                 const SizedBox(height: 18),
                 const _SectionTitle('Preferências'),
                 _ThemePickerTile(
@@ -240,11 +372,35 @@ class _ConfigPageState extends State<ConfigPage> {
                           ),
                         );
                       }
+=======
+                const SizedBox(height: 10),
+
+                ListTile(
+                  tileColor: card,
+                  leading: const Icon(Icons.palette),
+                  title: Text('Tema', style: TextStyle(color: texto)),
+                  onTap: abrirSeletorDeTema,
+                ),
+
+                const SizedBox(height: 10),
+
+                SwitchListTile(
+                  tileColor: card,
+                  value: notificacoes,
+                  title: Text('Notificações', style: TextStyle(color: texto)),
+                  onChanged: (v) async {
+                    setState(() => notificacoes = v);
+                    await salvarBool('notificações', v);
+
+                    if (v) {
+                      await NotificacaoService.ativarLembretes();
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
                     } else {
                       await NotificacaoService.desativarLembretes();
                     }
                   },
                 ),
+<<<<<<< HEAD
                 _ActionTile(
                   icon: Icons.notification_add_outlined,
                   titulo: 'Testar notificação',
@@ -366,6 +522,48 @@ class _ConfigPageState extends State<ConfigPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const AjudaPage()),
+=======
+
+                SwitchListTile(
+                  tileColor: card,
+                  value: vibracao,
+                  title: Text('Vibração', style: TextStyle(color: texto)),
+                  onChanged: (v) async {
+                    setState(() => vibracao = v);
+                    await salvarBool('vibracao', v);
+                  },
+                ),
+
+                SwitchListTile(
+                  tileColor: card,
+                  value: modoEscuro,
+                  title: Text('Modo escuro', style: TextStyle(color: texto)),
+                  onChanged: (v) async {
+                    setState(() => modoEscuro = v);
+                    await salvarBool('modoEscuro', v);
+                  },
+                ),
+
+                const SizedBox(height: 20),
+
+                ListTile(
+                  tileColor: card,
+                  leading: const Icon(Icons.logout, color: Colors.red),
+                  title: const Text(
+                    'Sair da conta',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  onTap: () async {
+                    await FirebaseAuth.instance.signOut();
+
+                    if (!context.mounted) return;
+
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (_) => const AuthPage(),
+                      ),
+                      (route) => false,
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
                     );
                   },
                 ),
@@ -376,6 +574,7 @@ class _ConfigPageState extends State<ConfigPage> {
       ),
     );
   }
+<<<<<<< HEAD
 }
 
 class _SectionTitle extends StatelessWidget {
@@ -894,3 +1093,6 @@ class AjudaPage extends StatelessWidget {
     );
   }
 }
+=======
+}
+>>>>>>> 389b1eacbab482f0d0e9afc27ecece2c796c0ffc
