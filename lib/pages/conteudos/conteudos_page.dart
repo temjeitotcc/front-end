@@ -9,6 +9,7 @@ String tituloDesafio(int numero) {
     3 => 'Dia 3 - Eu escolho',
     4 => 'Dia 4 - O que me move',
     5 => 'Dia 5 - Quem sou eu?',
+    8 => 'Dia 8 - Podcast',
     _ => 'Desafio $numero',
   };
 }

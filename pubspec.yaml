@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  audioplayers: ^6.5.1
   cupertino_icons: ^1.0.8
   firebase_auth: ^6.5.2
   firebase_core: ^4.10.0

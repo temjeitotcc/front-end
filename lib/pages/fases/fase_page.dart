@@ -5,6 +5,7 @@ import 'desafio_02/desafio_02_page.dart';
 import 'desafio_03/desafio_03_page.dart';
 import 'desafio_04/desafio_04_page.dart';
 import 'desafio_05/desafio_05_page.dart';
+import 'desafio_08/desafio_08_page.dart';
 
 class FasePage extends StatelessWidget {
   final String numero;
@@ -24,6 +25,7 @@ class FasePage extends StatelessWidget {
       '3' => const Desafio3Page(),
       '4' => const Desafio4Page(),
       '5' => const Desafio5Page(),
+      '8' => const Desafio8Page(),
       _ => _DesafioPlaceholderPage(numero: numero),
     };
   }
