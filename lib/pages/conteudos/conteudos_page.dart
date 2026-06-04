@@ -18,6 +18,11 @@ String tituloDesafio(int numero) {
     12 => 'Dia 12 - Podcast',
     13 => 'Dia 13 - Troca de Óculos',
     14 => 'Dia 14 - Reflexão Semanal',
+    15 => 'Dia 15 - Podcast',
+    16 => 'Dia 16 - 7 Passos',
+    26 => 'Dia 26 - Mural dos Sonhos',
+    27 => 'Dia 27 - Visão Positiva do Futuro',
+    28 => 'Dia 28 - Encerramento',
     _ => 'Desafio $numero',
   };
 }

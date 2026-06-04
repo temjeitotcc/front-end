@@ -14,6 +14,11 @@ import 'desafio_11/desafio_11_page.dart';
 import 'desafio_12/desafio_12_page.dart';
 import 'desafio_13/desafio_13_page.dart';
 import 'desafio_14/desafio_14_page.dart';
+import 'desafio_15/desafio_15_page.dart';
+import 'desafio_16/desafio_16_page.dart';
+import 'desafio_26/desafio_26_page.dart';
+import 'desafio_27/desafio_27_page.dart';
+import 'desafio_28/desafio_28_page.dart';
 
 class FasePage extends StatelessWidget {
   final String numero;
@@ -42,12 +47,17 @@ class FasePage extends StatelessWidget {
       '12' => const Desafio12Page(),
       '13' => const Desafio13Page(),
       '14' => const Desafio14Page(),
+      '15' => const Desafio15Page(),
+      '16' => const Desafio16Page(),
+      '26' => const Desafio26Page(),
+      '27' => const Desafio27Page(),
+      '28' => const Desafio28Page(),
       _ => _DesafioPlaceholderPage(numero: numero),
     };
   }
 
   bool _missaoEspecial(int numero) {
-    return numero == 21 || numero == 28;
+    return numero == 21;
   }
 }
 
