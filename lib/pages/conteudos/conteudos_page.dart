@@ -9,7 +9,15 @@ String tituloDesafio(int numero) {
     3 => 'Dia 3 - Eu escolho',
     4 => 'Dia 4 - O que me move',
     5 => 'Dia 5 - Quem sou eu?',
+    6 => 'Dia 6 - Exercitando a Sabedoria',
+    7 => 'Dia 7 - Reflexão Semanal',
     8 => 'Dia 8 - Podcast',
+    9 => 'Dia 9 - Coraferido Vírus',
+    10 => 'Dia 10 - Podcast',
+    11 => 'Dia 11 - Suicida Emocional',
+    12 => 'Dia 12 - Podcast',
+    13 => 'Dia 13 - Troca de Óculos',
+    14 => 'Dia 14 - Reflexão Semanal',
     _ => 'Desafio $numero',
   };
 }
