@@ -16,6 +16,8 @@ import 'desafio_13/desafio_13_page.dart';
 import 'desafio_14/desafio_14_page.dart';
 import 'desafio_15/desafio_15_page.dart';
 import 'desafio_16/desafio_16_page.dart';
+import 'desafio_17/desafio_17_page.dart';
+import 'desafio_18/desafio_18_page.dart';
 import 'desafio_26/desafio_26_page.dart';
 import 'desafio_27/desafio_27_page.dart';
 import 'desafio_28/desafio_28_page.dart';
@@ -49,6 +51,8 @@ class FasePage extends StatelessWidget {
       '14' => const Desafio14Page(),
       '15' => const Desafio15Page(),
       '16' => const Desafio16Page(),
+      '17' => const Desafio17Page(),
+      '18' => const Desafio18Page(),
       '26' => const Desafio26Page(),
       '27' => const Desafio27Page(),
       '28' => const Desafio28Page(),

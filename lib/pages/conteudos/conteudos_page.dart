@@ -20,6 +20,8 @@ String tituloDesafio(int numero) {
     14 => 'Dia 14 - Reflexão Semanal',
     15 => 'Dia 15 - Podcast',
     16 => 'Dia 16 - 7 Passos',
+    17 => 'Dia 17 - Trocando de Óculos',
+    18 => 'Dia 18 - Nossa essência é servir',
     26 => 'Dia 26 - Mural dos Sonhos',
     27 => 'Dia 27 - Visão Positiva do Futuro',
     28 => 'Dia 28 - Encerramento',
