@@ -1,5 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../../mainscreen.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -43,22 +44,33 @@ class _AuthPageState extends State<AuthPage> {
         await credencial.user?.updateDisplayName(
           _nomeUsuarioController.text.trim(),
         );
+
+        await FirebaseAuth.instance.currentUser?.reload();
       } else {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _senhaController.text.trim(),
         );
+
+        print("Login realizado");
+        print(FirebaseAuth.instance.currentUser?.email);
       }
+
+      if (!mounted) return;
+
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const MainScreen()));
     } on FirebaseAuthException catch (erro) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_mensagemErroFirebase(erro.code))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_mensagemErroFirebase(erro.code))));
     } catch (erro) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro inesperado: $erro')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro inesperado: $erro')));
     } finally {
       if (mounted) {
         setState(() => _carregando = false);
@@ -206,8 +218,9 @@ class _AuthPageState extends State<AuthPage> {
                           height: 52,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
                               foregroundColor: Colors.black,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),

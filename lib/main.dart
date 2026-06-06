@@ -13,9 +13,7 @@ import 'services/notificacao_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.manual,
@@ -129,7 +127,7 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
           home: StreamBuilder<User?>(
-            stream: FirebaseAuth.instance.authStateChanges(),
+            stream: FirebaseAuth.instance.userChanges(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Scaffold(
