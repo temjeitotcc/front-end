@@ -5,6 +5,22 @@ import 'desafio_02/desafio_02_page.dart';
 import 'desafio_03/desafio_03_page.dart';
 import 'desafio_04/desafio_04_page.dart';
 import 'desafio_05/desafio_05_page.dart';
+import 'desafio_06/desafio_06_page.dart';
+import 'desafio_07/desafio_07_page.dart';
+import 'desafio_08/desafio_08_page.dart';
+import 'desafio_09/desafio_09_page.dart';
+import 'desafio_10/desafio_10_page.dart';
+import 'desafio_11/desafio_11_page.dart';
+import 'desafio_12/desafio_12_page.dart';
+import 'desafio_13/desafio_13_page.dart';
+import 'desafio_14/desafio_14_page.dart';
+import 'desafio_15/desafio_15_page.dart';
+import 'desafio_16/desafio_16_page.dart';
+import 'desafio_17/desafio_17_page.dart';
+import 'desafio_18/desafio_18_page.dart';
+import 'desafio_26/desafio_26_page.dart';
+import 'desafio_27/desafio_27_page.dart';
+import 'desafio_28/desafio_28_page.dart';
 
 class FasePage extends StatelessWidget {
   final String numero;
@@ -24,12 +40,28 @@ class FasePage extends StatelessWidget {
       '3' => const Desafio3Page(),
       '4' => const Desafio4Page(),
       '5' => const Desafio5Page(),
+      '6' => const Desafio6Page(),
+      '7' => const Desafio7Page(),
+      '8' => const Desafio8Page(),
+      '9' => const Desafio9Page(),
+      '10' => const Desafio10Page(),
+      '11' => const Desafio11Page(),
+      '12' => const Desafio12Page(),
+      '13' => const Desafio13Page(),
+      '14' => const Desafio14Page(),
+      '15' => const Desafio15Page(),
+      '16' => const Desafio16Page(),
+      '17' => const Desafio17Page(),
+      '18' => const Desafio18Page(),
+      '26' => const Desafio26Page(),
+      '27' => const Desafio27Page(),
+      '28' => const Desafio28Page(),
       _ => _DesafioPlaceholderPage(numero: numero),
     };
   }
 
   bool _missaoEspecial(int numero) {
-    return numero == 7 || numero == 14 || numero == 21 || numero == 28;
+    return numero == 21;
   }
 }
 
