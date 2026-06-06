@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../mainscreen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
 
@@ -29,15 +28,20 @@ class _AuthPageState extends State<AuthPage> {
     super.dispose();
   }
 
-  Future<void> _loginComGoogle() async {
+Future<void> _loginComGoogle() async {
   try {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final googleSignIn = GoogleSignIn(
+      signInOption: SignInOption.standard,
+    );
 
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    // força reset da sessão
+    await googleSignIn.disconnect().catchError((_) {});
+    await googleSignIn.signOut();
+
+    final googleUser = await googleSignIn.signIn();
     if (googleUser == null) return;
 
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+    final googleAuth = await googleUser.authentication;
 
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
@@ -45,6 +49,7 @@ class _AuthPageState extends State<AuthPage> {
     );
 
     await FirebaseAuth.instance.signInWithCredential(credential);
+
   } catch (e) {
     debugPrint("Erro Google login: $e");
   }
@@ -80,10 +85,6 @@ class _AuthPageState extends State<AuthPage> {
       }
 
       if (!mounted) return;
-
-      Navigator.of(
-        context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const MainScreen()));
     } on FirebaseAuthException catch (erro) {
       if (!mounted) return;
       ScaffoldMessenger.of(
