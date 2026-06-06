@@ -1,6 +1,8 @@
 ﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../mainscreen.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -26,6 +28,27 @@ class _AuthPageState extends State<AuthPage> {
     _senhaController.dispose();
     super.dispose();
   }
+
+  Future<void> _loginComGoogle() async {
+  try {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    if (googleUser == null) return;
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
+  } catch (e) {
+    debugPrint("Erro Google login: $e");
+  }
+}
 
   Future<void> _enviar() async {
     final formState = _formKey.currentState;
@@ -212,6 +235,7 @@ class _AuthPageState extends State<AuthPage> {
                             return null;
                           },
                         ),
+                        //BOTÃO DE LOGIN
                         const SizedBox(height: 18),
                         SizedBox(
                           width: double.infinity,
@@ -243,6 +267,29 @@ class _AuthPageState extends State<AuthPage> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
+                          ),
+                        ),
+                        //BOTÃO DO GOOGLE
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: OutlinedButton.icon(
+                            onPressed: _carregando ? null : _loginComGoogle,
+                            icon: const Icon(Icons.login),
+                            label: const Text(
+                              "Continuar com Google",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              side: const BorderSide(color: Colors.grey),
+                            ),
                           ),
                         ),
                       ],
