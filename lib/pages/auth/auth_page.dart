@@ -2,10 +2,6 @@
 import 'package:flutter/material.dart';
 import '../../mainscreen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-<<<<<<< HEAD
-=======
-
->>>>>>> 42904518955b3310ab5be4da399be699e9bac026
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -32,7 +28,6 @@ class _AuthPageState extends State<AuthPage> {
     super.dispose();
   }
 
-<<<<<<< HEAD
 Future<void> _loginComGoogle() async {
   try {
     final googleSignIn = GoogleSignIn(
@@ -47,17 +42,6 @@ Future<void> _loginComGoogle() async {
     if (googleUser == null) return;
 
     final googleAuth = await googleUser.authentication;
-=======
-  Future<void> _loginComGoogle() async {
-  try {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-    if (googleUser == null) return;
-
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
->>>>>>> 42904518955b3310ab5be4da399be699e9bac026
 
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
@@ -65,10 +49,6 @@ Future<void> _loginComGoogle() async {
     );
 
     await FirebaseAuth.instance.signInWithCredential(credential);
-<<<<<<< HEAD
-
-=======
->>>>>>> 42904518955b3310ab5be4da399be699e9bac026
   } catch (e) {
     debugPrint("Erro Google login: $e");
   }
