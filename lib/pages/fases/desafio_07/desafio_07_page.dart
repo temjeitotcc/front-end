@@ -398,7 +398,7 @@ class _Desafio7PageState extends State<Desafio7Page> {
 
     // 1. Salvar/atualizar dados do usuário
     await firestore.collection('usuarios').doc(user.uid).set({
-      'nome': user.displayName ?? 'Usuário',
+      'Nome:': user.displayName ?? 'usuário',
       'email': user.email,
     }, SetOptions(merge: true));
 
@@ -406,13 +406,13 @@ class _Desafio7PageState extends State<Desafio7Page> {
     await firestore
         .collection('usuarios')
         .doc(user.uid)
-        .collection('Semanas')
-        .doc('01')
-        .collection('reflexoes')
+        .collection('desafios')
+        .doc('Dia 7')
+        .collection('reflexões')
         .add({
-          'texto': resposta,
-          'nome': user.displayName ?? 'Usuário',
-          'criadoEm': FieldValue.serverTimestamp(),
+          'Resposta': resposta,
+          'Nome': user.displayName ?? 'Usuário',
+          'Criado em': FieldValue.serverTimestamp(),
         });
 
     if (!mounted) return;

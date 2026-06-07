@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio28Page extends StatefulWidget {
   const Desafio28Page({super.key});
 
@@ -119,7 +122,10 @@ class _Desafio28PageState extends State<Desafio28Page> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: switch (etapaAtual) {
                       0 => _conteudoAbertura(textoPrincipal, textoSecundario),
-                      1 => _conteudoRetrospectiva(textoPrincipal, textoSecundario),
+                      1 => _conteudoRetrospectiva(
+                        textoPrincipal,
+                        textoSecundario,
+                      ),
                       2 => _conteudoReflexao(textoPrincipal, textoSecundario),
                       _ => _conteudoCelebracao(textoPrincipal, textoSecundario),
                     },
@@ -287,10 +293,7 @@ class _Desafio28PageState extends State<Desafio28Page> {
     ];
   }
 
-  List<Widget> _conteudoReflexao(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _conteudoReflexao(Color textoPrincipal, Color textoSecundario) {
     return [
       Text(
         'Agora queremos saber',
@@ -434,23 +437,45 @@ class _Desafio28PageState extends State<Desafio28Page> {
   }
 
   Future<void> _concluir() async {
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 28,
-      itens: [
-        ConteudoItem(
-          titulo: 'Principais aprendizados',
-          texto: aprendizadosController.text.trim(),
+    final user = FirebaseAuth.instance.currentUser;
+
+    final aprendizados = aprendizadosController.text.trim();
+    final marcou = marcouController.text.trim();
+    final mudanca = mudancaController.text.trim();
+
+    if (user == null) return;
+
+    // TODOS obrigatórios
+    if (aprendizados.isEmpty || marcou.isEmpty || mudanca.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Preencha todos os campos antes de concluir.'),
         ),
-        ConteudoItem(
-          titulo: 'O que mais marcou',
-          texto: marcouController.text.trim(),
-        ),
-        ConteudoItem(
-          titulo: 'Mudança para continuar',
-          texto: mudancaController.text.trim(),
-        ),
-      ],
-    );
+      );
+      return;
+    }
+
+    final firestore = FirebaseFirestore.instance;
+    // 1. Salvar/atualizar dados do usuário
+    await firestore.collection('usuarios').doc(user.uid).set({
+      'Nome:': user.displayName ?? 'usuário',
+      'email': user.email,
+    }, SetOptions(merge: true));
+
+    // Respostas do desafio
+    await firestore
+        .collection('usuarios')
+        .doc(user.uid)
+        .collection('desafios')
+        .doc('Dia 21')
+        .collection('reflexões')
+        .add({
+          'principais_aprendizados': aprendizados,
+          'o_que_marcou': marcou,
+          'mudanca_para_continuar': mudanca,
+          'nome': user.displayName ?? 'Usuário',
+          'criado_em': FieldValue.serverTimestamp(),
+        });
 
     if (!mounted) return;
     Navigator.of(context).pop(true);
@@ -817,10 +842,7 @@ class _FinalMessageCard extends StatelessWidget {
   final String text;
   final Color cor;
 
-  const _FinalMessageCard({
-    required this.text,
-    required this.cor,
-  });
+  const _FinalMessageCard({required this.text, required this.cor});
 
   @override
   Widget build(BuildContext context) {

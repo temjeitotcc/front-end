@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio14Page extends StatefulWidget {
   const Desafio14Page({super.key});
 
@@ -114,9 +117,9 @@ class _Desafio14PageState extends State<Desafio14Page> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: switch (etapaAtual) {
                       0 => _conteudoPrimeiraPagina(
-                          textoPrincipal,
-                          textoSecundario,
-                        ),
+                        textoPrincipal,
+                        textoSecundario,
+                      ),
                       1 => _conteudoFinal(textoPrincipal, textoSecundario),
                       _ => _conteudoEscrita(textoPrincipal, textoSecundario),
                     },
@@ -330,11 +333,7 @@ class _Desafio14PageState extends State<Desafio14Page> {
           maxLines: null,
           minLines: null,
           textAlignVertical: TextAlignVertical.top,
-          style: TextStyle(
-            color: textoPrincipal,
-            fontSize: 16,
-            height: 1.35,
-          ),
+          style: TextStyle(color: textoPrincipal, fontSize: 16, height: 1.35),
           decoration: InputDecoration(
             hintText: 'A decisão que tomo para a minha vida é...',
             hintStyle: TextStyle(color: textoSecundario.withAlpha(140)),
@@ -371,6 +370,7 @@ class _Desafio14PageState extends State<Desafio14Page> {
 
   Future<void> _concluir() async {
     final resposta = reflexaoController.text.trim();
+
     if (resposta.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -380,15 +380,30 @@ class _Desafio14PageState extends State<Desafio14Page> {
       return;
     }
 
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 14,
-      itens: [
-        ConteudoItem(
-          titulo: 'Reflexão semanal 2',
-          texto: resposta,
-        ),
-      ],
-    );
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // 1. Salvar/atualizar dados do usuário
+    await firestore.collection('usuarios').doc(user.uid).set({
+      'Nome:': user.displayName ?? 'usuário',
+      'email': user.email,
+    }, SetOptions(merge: true));
+
+    // 2. Salvar reflexão
+   await firestore
+        .collection('usuarios')
+        .doc(user.uid)
+        .collection('desafios')
+        .doc('Dia 14')
+        .collection('reflexões')
+        .add({
+          'Resposta': resposta,
+          'Nome': user.displayName ?? 'Usuário',
+          'Criado em': FieldValue.serverTimestamp(),
+        });
 
     if (!mounted) return;
     Navigator.of(context).pop(true);
@@ -494,10 +509,7 @@ class _FinalReflectionCard extends StatelessWidget {
   final String text;
   final Color cor;
 
-  const _FinalReflectionCard({
-    required this.text,
-    required this.cor,
-  });
+  const _FinalReflectionCard({required this.text, required this.cor});
 
   @override
   Widget build(BuildContext context) {
@@ -526,10 +538,7 @@ class _ParagraphText extends StatelessWidget {
   final String text;
   final Color color;
 
-  const _ParagraphText({
-    required this.text,
-    required this.color,
-  });
+  const _ParagraphText({required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {
