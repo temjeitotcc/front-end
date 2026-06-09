@@ -22,7 +22,6 @@ class _ConfigPageState extends State<ConfigPage> {
   bool modoEscuro = true;
   String temaCoresAtual = AppThemeService.temaPadrao;
   List<AppThemeOption> temasComprados = [AppThemeService.temas.first];
-  double volume = 50;
 
   @override
   void initState() {
@@ -51,7 +50,6 @@ class _ConfigPageState extends State<ConfigPage> {
       som = prefs.getBool('som') ?? true;
       vibracao = prefs.getBool('vibracao') ?? true;
       modoEscuro = prefs.getBool('modoEscuro') ?? true;
-      volume = prefs.getDouble('volume') ?? 50;
       temasComprados = temasDisponiveis;
       temaCoresAtual = temaAtual.id;
     });
@@ -288,50 +286,6 @@ class _ConfigPageState extends State<ConfigPage> {
                       ),
                     );
                   },
-                ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const _LeadingIcon(icon: Icons.volume_up_outlined),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Text(
-                              'Volume: ${volume.round()}%',
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Slider(
-                        value: volume,
-                        min: 0,
-                        max: 100,
-                        divisions: 100,
-                        activeColor: corTema,
-                        inactiveColor: textoSecundario.withAlpha(60),
-                        label: '${volume.round()}%',
-                        onChanged: (valor) async {
-                          setState(() => volume = valor);
-
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.setDouble('volume', valor);
-                        },
-                      ),
-                    ],
-                  ),
                 ),
                 _SwitchTile(
                   icon: Icons.vibration_rounded,

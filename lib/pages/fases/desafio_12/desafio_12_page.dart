@@ -4,6 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import '../../../services/auth_service.dart';
+import '../../../widgets/podcast_volume_control.dart';
 
 class Desafio12Page extends StatefulWidget {
   const Desafio12Page({super.key});
@@ -386,6 +387,8 @@ class _Desafio12PageState extends State<Desafio12Page> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 10),
+                    PodcastVolumeControl(player: _audioPlayer),
                   ],
                 ),
               ),

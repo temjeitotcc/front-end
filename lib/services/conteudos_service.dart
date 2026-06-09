@@ -4,11 +4,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ConteudoDesafio {
   final int desafio;
+  final bool concluido;
   final DateTime atualizadoEm;
   final List<ConteudoItem> itens;
 
   const ConteudoDesafio({
     required this.desafio,
+    required this.concluido,
     required this.atualizadoEm,
     required this.itens,
   });
@@ -16,6 +18,7 @@ class ConteudoDesafio {
   Map<String, dynamic> toJson() {
     return {
       'desafio': desafio,
+      'concluido': concluido,
       'atualizadoEm': atualizadoEm.toIso8601String(),
       'itens': itens.map((item) => item.toJson()).toList(),
     };
@@ -26,6 +29,7 @@ class ConteudoDesafio {
 
     return ConteudoDesafio(
       desafio: json['desafio'] as int? ?? 0,
+      concluido: json['concluido'] as bool? ?? true,
       atualizadoEm:
           DateTime.tryParse(json['atualizadoEm'] as String? ?? '') ??
               DateTime.now(),
@@ -104,12 +108,14 @@ class ConteudosService {
   Future<void> salvarConteudosDoDesafio({
     required int desafio,
     required List<ConteudoItem> itens,
+    bool concluido = true,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     final conteudos = await carregarConteudos();
 
     conteudos[desafio] = ConteudoDesafio(
       desafio: desafio,
+      concluido: concluido,
       atualizadoEm: DateTime.now(),
       itens: itens.where((item) => item.texto.trim().isNotEmpty).toList(),
     );

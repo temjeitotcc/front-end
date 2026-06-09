@@ -22,6 +22,10 @@ String tituloDesafio(int numero) {
     16 => 'Dia 16 - 7 Passos',
     17 => 'Dia 17 - Trocando de Óculos',
     18 => 'Dia 18 - Nossa essência é servir',
+    19 => 'Dia 19 - Revisitando Minha Empresa, Minha Vida',
+    20 => 'Dia 20 - Identidade, Utilidade e Pertencimento',
+    21 => 'Dia 21 - Reflexão Semanal',
+    22 => 'Dia 22 - Responsabilidade e Propósito',
     26 => 'Dia 26 - Mural dos Sonhos',
     27 => 'Dia 27 - Visão Positiva do Futuro',
     28 => 'Dia 28 - Encerramento',
@@ -88,99 +92,97 @@ class _ConteudosPageState extends State<ConteudosPage> {
 
     return Scaffold(
       backgroundColor: fundo,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(28),
-                ),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(28),
               ),
-              child: Row(
-                children: [
-                  Image.asset('assets/icon2.png', height: 42),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: Text(
-                      'Conteúdos',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                      ),
+            ),
+            child: Row(
+              children: [
+                Image.asset('assets/icon2.png', height: 42),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Conteúdos',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 18, 14, 18),
+              child: GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 1.06,
+                children: [
+                  _ConteudoCard(
+                    titulo: 'Desafios feitos',
+                    subtitulo: '$desafiosSalvos salvos',
+                    icon: Icons.menu_book_rounded,
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              DesafiosFeitosPage(conteudos: conteudos),
+                        ),
+                      );
+                      carregarConteudos();
+                    },
+                  ),
+                  _ConteudoCard(
+                    titulo: 'Reflexão da semana',
+                    subtitulo: '$especiaisSalvas salvas',
+                    icon: Icons.auto_awesome_rounded,
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              MissoesEspeciaisPage(conteudos: conteudos),
+                        ),
+                      );
+                      carregarConteudos();
+                    },
+                  ),
+                  _ConteudoCard(
+                    titulo: 'Bloco de reflexões',
+                    subtitulo: '${blocosReflexao.length} bloco(s)',
+                    icon: Icons.edit_note_rounded,
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const BlocosReflexaoPage(),
+                        ),
+                      );
+                      carregarConteudos();
+                    },
+                  ),
+                  for (int i = 4; i <= 6; i++)
+                    _ConteudoCard(
+                      titulo: 'Espaço $i',
+                      subtitulo: 'Em breve',
+                      icon: Icons.bookmark_rounded,
+                      onTap: () {},
+                      apagado: true,
+                    ),
                 ],
               ),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 18, 14, 18),
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 1.06,
-                  children: [
-                    _ConteudoCard(
-                      titulo: 'Desafios feitos',
-                      subtitulo: '$desafiosSalvos salvos',
-                      icon: Icons.menu_book_rounded,
-                      onTap: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                DesafiosFeitosPage(conteudos: conteudos),
-                          ),
-                        );
-                        carregarConteudos();
-                      },
-                    ),
-                    _ConteudoCard(
-                      titulo: 'Reflexão da semana',
-                      subtitulo: '$especiaisSalvas salvas',
-                      icon: Icons.auto_awesome_rounded,
-                      onTap: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                MissoesEspeciaisPage(conteudos: conteudos),
-                          ),
-                        );
-                        carregarConteudos();
-                      },
-                    ),
-                    _ConteudoCard(
-                      titulo: 'Bloco de reflexões',
-                      subtitulo: '${blocosReflexao.length} bloco(s)',
-                      icon: Icons.edit_note_rounded,
-                      onTap: () async {
-                        await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const BlocosReflexaoPage(),
-                          ),
-                        );
-                        carregarConteudos();
-                      },
-                    ),
-                    for (int i = 4; i <= 6; i++)
-                      _ConteudoCard(
-                        titulo: 'Espaço $i',
-                        subtitulo: 'Em breve',
-                        icon: Icons.bookmark_rounded,
-                        onTap: () {},
-                        apagado: true,
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

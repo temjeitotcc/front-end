@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
+import '../../../widgets/podcast_volume_control.dart';
 
 class Desafio8Page extends StatefulWidget {
   const Desafio8Page({super.key});
@@ -399,6 +400,8 @@ class _Desafio8PageState extends State<Desafio8Page> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
+                  PodcastVolumeControl(player: _audioPlayer),
                   const SizedBox(height: 16),
                   Text(
                     'Arraste a barra para voltar ou avançar para outro momento do podcast.',

@@ -18,6 +18,10 @@ import 'desafio_15/desafio_15_page.dart';
 import 'desafio_16/desafio_16_page.dart';
 import 'desafio_17/desafio_17_page.dart';
 import 'desafio_18/desafio_18_page.dart';
+import 'desafio_19/desafio_19_page.dart';
+import 'desafio_20/desafio_20_page.dart';
+import 'desafio_21/desafio_21_page.dart';
+import 'desafio_22/desafio_22_page.dart';
 import 'desafio_26/desafio_26_page.dart';
 import 'desafio_27/desafio_27_page.dart';
 import 'desafio_28/desafio_28_page.dart';
@@ -29,11 +33,6 @@ class FasePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final numeroInt = int.tryParse(numero) ?? 0;
-    if (_missaoEspecial(numeroInt)) {
-      return MissaoEspecialPage(numero: numeroInt);
-    }
-
     return switch (numero) {
       '1' => const Desafio1Page(),
       '2' => const Desafio2Page(),
@@ -53,6 +52,10 @@ class FasePage extends StatelessWidget {
       '16' => const Desafio16Page(),
       '17' => const Desafio17Page(),
       '18' => const Desafio18Page(),
+      '19' => const Desafio19Page(),
+      '20' => const Desafio20Page(),
+      '21' => const Desafio21Page(),
+      '22' => const Desafio22Page(),
       '26' => const Desafio26Page(),
       '27' => const Desafio27Page(),
       '28' => const Desafio28Page(),
@@ -60,9 +63,6 @@ class FasePage extends StatelessWidget {
     };
   }
 
-  bool _missaoEspecial(int numero) {
-    return numero == 21;
-  }
 }
 
 class MissaoEspecialPage extends StatefulWidget {

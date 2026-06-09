@@ -30,6 +30,11 @@ class FasesService {
     });
   }
 
+  Future<List<bool>> carregarDesafiosConcluidos(int totalFases) async {
+    final fases = await carregarFases(totalFases);
+    return fases.map((dataConclusao) => dataConclusao != null).toList();
+  }
+
   bool faseLiberada(List<DateTime?> fasesConcluidas, int index) {
     return RegrasFases.faseLiberada(fasesConcluidas, index);
   }

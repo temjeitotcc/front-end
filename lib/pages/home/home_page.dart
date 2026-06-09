@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../widgets/circulo_fase.dart';
+import '../../services/auth_service.dart';
 import '../../services/fases_service.dart';
 import '../../services/pontos_service.dart';
 import '../fases/fase_page.dart';
@@ -18,13 +19,21 @@ class _HomePageState extends State<HomePage> {
 
   late List<DateTime?> fasesConcluidas;
   final service = FasesService();
+  String nomeUsuario = 'você';
 
   @override
   void initState() {
     super.initState();
     fasesConcluidas = List.generate(totalFases, (_) => null);
     carregarFases();
+    carregarNomeUsuario();
     PontosService.carregarPontos();
+  }
+
+  Future<void> carregarNomeUsuario() async {
+    final nome = await AuthService.nomeUsuarioAtual();
+    if (!mounted) return;
+    setState(() => nomeUsuario = nome);
   }
 
   Future<void> carregarFases() async {
@@ -41,6 +50,16 @@ class _HomePageState extends State<HomePage> {
   bool faseLiberada(int index) {
     return service.faseLiberada(fasesConcluidas, index);
   }
+
+  int get diaAtual {
+    final primeiroPendente =
+        fasesConcluidas.indexWhere((concluida) => concluida == null);
+    return primeiroPendente < 0 ? totalFases : primeiroPendente + 1;
+  }
+
+  bool get jornadaConcluida =>
+      fasesConcluidas.isNotEmpty &&
+      fasesConcluidas.every((concluida) => concluida != null);
 
   @override
   Widget build(BuildContext context) {
@@ -151,10 +170,10 @@ class _HomePageState extends State<HomePage> {
             child: Material(
               color: Colors.transparent,
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.62,
+                width: MediaQuery.of(context).size.width * 0.72,
                 height: MediaQuery.of(context).size.height * 0.55,
                 margin: const EdgeInsets.only(left: 0),
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
                 decoration: BoxDecoration(
                   color: modoEscuro
                       ? const Color(0xFF2A2527)
@@ -180,117 +199,211 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Image.asset(
                               'assets/imagem_esquerda.png',
-                              height: 72,
+                              height: 64,
                               fit: BoxFit.contain,
                             ),
                             const SizedBox(width: 10),
                             Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: corTema,
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Text(
-                                  'Personagem',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    nomeUsuario,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: modoEscuro
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w900,
+                                    ),
                                   ),
-                                ),
+                                  const SizedBox(height: 5),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 9,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: corTema,
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: Text(
+                                      jornadaConcluida
+                                          ? 'Dia 28 concluído'
+                                          : 'Você está no Dia $diaAtual',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
+                            ),
+                            const SizedBox(width: 6),
+                            IconButton(
+                              tooltip: 'Fechar',
+                              style: IconButton.styleFrom(
+                                backgroundColor: corTema,
+                                foregroundColor: Colors.black,
+                                minimumSize: const Size(38, 38),
+                                maximumSize: const Size(38, 38),
+                                padding: EdgeInsets.zero,
+                              ),
+                              onPressed: () => Navigator.of(context).pop(),
+                              icon: const Icon(Icons.close_rounded, size: 21),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 14),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: corCardInterno,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: ValueListenableBuilder<int>(
+                            valueListenable: PontosService.pontos,
+                            builder: (context, pontos, _) {
+                              return Row(
+                                children: [
+                                  Container(
+                                    width: 38,
+                                    height: 38,
+                                    decoration: BoxDecoration(
+                                      color: corTema.withAlpha(40),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.star_rounded,
+                                      color: corTema,
+                                      size: 23,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'PONTOS',
+                                          style: TextStyle(
+                                            color: corTextoSuave,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          '$pontos',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: corTema,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    'usar na loja',
+                                    style: TextStyle(
+                                      color: corTextoSuave,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: corCardInterno,
-                              borderRadius: BorderRadius.circular(22),
+                              color: modoEscuro
+                                  ? const Color(0xFF211D1F)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(18),
                             ),
-                            child: ValueListenableBuilder<int>(
-                              valueListenable: PontosService.pontos,
-                              builder: (context, pontos, _) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'PONTOS',
-                                      style: TextStyle(
-                                        color: corTextoSuave,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            '$pontos',
-                                            style: TextStyle(
-                                              color: corTema,
-                                              fontSize: 52,
-                                              fontWeight: FontWeight.w900,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Icon(
-                                            Icons.star_rounded,
-                                            color: corTema,
-                                            size: 36,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Text(
-                                      'Use na lojinha para comprar itens.',
-                                      style: TextStyle(
-                                        color: corTextoSuave,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.flag_rounded,
+                                  color: corTema,
+                                  size: 34,
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  jornadaConcluida
+                                      ? 'Jornada concluída'
+                                      : 'Próximo passo: Dia $diaAtual',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: modoEscuro
+                                        ? Colors.white
+                                        : Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  jornadaConcluida
+                                      ? 'Você completou todos os desafios.'
+                                      : 'Continue avançando no seu ritmo.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: corTextoSuave,
+                                    fontSize: 12,
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                         const SizedBox(height: 12),
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
-                            color: modoEscuro
-                                ? const Color(0xFF211D1F)
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(18),
+                            color: corTema.withAlpha(24),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: corTema.withAlpha(80)),
                           ),
                           child: Row(
                             children: [
                               Icon(
                                 Icons.swipe_right_alt_rounded,
                                 color: corTema,
+                                size: 21,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Puxe o personagem para abrir.',
+                                  'Toque ou puxe o personagem para abrir.',
                                   style: TextStyle(
                                     color: corTextoSuave,
-                                    fontSize: 12,
+                                    fontSize: 11,
                                   ),
                                 ),
                               ),
@@ -298,19 +411,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ],
-                    ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: IconButton(
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
-                          minimumSize: const Size(36, 36),
-                        ),
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: Icon(Icons.close_rounded, size: 20),
-                      ),
                     ),
                   ],
                 ),
