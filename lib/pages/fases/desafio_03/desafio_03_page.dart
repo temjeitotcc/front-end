@@ -3,6 +3,8 @@
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import '../../../widgets/challenge_intro_decoration.dart';
+
 class Desafio3Page extends StatefulWidget {
   const Desafio3Page({super.key});
 
@@ -181,13 +183,27 @@ class _Desafio3PageState extends State<Desafio3Page> {
     return [
       Expanded(
         child: SingleChildScrollView(
-          child: Text(
-            _texto.replaceAll('{nome}', nomeUsuario),
-            style: TextStyle(
-              color: textoSecundario,
-              fontSize: 16,
-              height: 1.35,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const ChallengeIntroDecoration(
+                mainIcon: Icons.alt_route_rounded,
+                leftIcon: Icons.balance_rounded,
+                rightIcon: Icons.check_circle_outline_rounded,
+                title: 'Toda escolha cria um caminho',
+                subtitle:
+                    'Reconheça seu poder de decisão e assuma sua direção.',
+              ),
+              const SizedBox(height: 16),
+              Text(
+                _texto.replaceAll('{nome}', nomeUsuario),
+                style: TextStyle(
+                  color: textoSecundario,
+                  fontSize: 16,
+                  height: 1.35,
+                ),
+              ),
+            ],
           ),
         ),
       ),

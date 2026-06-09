@@ -2,6 +2,8 @@
 
 import '../../../services/conteudos_service.dart';
 
+import '../../../widgets/challenge_intro_decoration.dart';
+
 class Desafio2Page extends StatefulWidget {
   const Desafio2Page({super.key});
 
@@ -175,6 +177,14 @@ class _Desafio2PageState extends State<Desafio2Page> {
     Color textoSecundario,
   ) {
     return [
+      const ChallengeIntroDecoration(
+        mainIcon: Icons.apartment_rounded,
+        leftIcon: Icons.business_center_rounded,
+        rightIcon: Icons.insights_rounded,
+        title: 'Você é o CEO da sua vida',
+        subtitle: 'Cada departamento merece atenção, cuidado e direção.',
+      ),
+      const SizedBox(height: 14),
       Text(
         'Dia 2 - Minha empresa, minha vida',
         style: TextStyle(

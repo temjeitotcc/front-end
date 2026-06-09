@@ -1,5 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 
+import '../../../widgets/challenge_intro_decoration.dart';
+
 class Desafio1Page extends StatefulWidget {
   const Desafio1Page({super.key});
 
@@ -193,6 +195,14 @@ class _Desafio1PageState extends State<Desafio1Page> {
 
   List<Widget> _conteudoInstrucao(Color textoPrincipal, Color textoSecundario) {
     return [
+      const ChallengeIntroDecoration(
+        mainIcon: Icons.explore_rounded,
+        leftIcon: Icons.flag_rounded,
+        rightIcon: Icons.auto_awesome_rounded,
+        title: 'O começo da sua jornada',
+        subtitle: 'Observe sua vida com sinceridade e vontade de evoluir.',
+      ),
+      const SizedBox(height: 14),
       Text(
         'Instruções do Desafio 1',
         style: TextStyle(

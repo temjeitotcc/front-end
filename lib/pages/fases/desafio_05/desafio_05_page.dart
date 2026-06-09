@@ -178,10 +178,6 @@ class _Desafio5PageState extends State<Desafio5Page> {
               ),
               const SizedBox(height: 14),
               _FocusAgreementCard(cor: Theme.of(context).colorScheme.primary),
-              const SizedBox(height: 12),
-              _FlowerDecoration(
-                cor: Theme.of(context).colorScheme.primary,
-              ),
               const SizedBox(height: 16),
               _ParagraphText(
                 text:
@@ -223,7 +219,9 @@ class _Desafio5PageState extends State<Desafio5Page> {
                     'Pense sobre o seu pântano, aquele sentimento que não deseja mais visitar, aquelas memórias que não quer reviver. Guarde tudo isso no pântano, sem revisitar mais. E cultive o seu jardim repleto de memórias lindas, felizes e cheia de amor sempre que puder.',
                 color: textoSecundario,
               ),
-              _LilyPadDecoration(cor: Theme.of(context).colorScheme.primary),
+              _SwampClosingCard(
+                cor: Theme.of(context).colorScheme.primary,
+              ),
             ],
           ),
         ),
@@ -362,69 +360,106 @@ class _FocusAgreementCard extends StatelessWidget {
   }
 }
 
-class _FlowerDecoration extends StatelessWidget {
+class _SwampClosingCard extends StatelessWidget {
   final Color cor;
 
-  const _FlowerDecoration({
-    required this.cor,
-  });
+  const _SwampClosingCard({required this.cor});
 
   @override
   Widget build(BuildContext context) {
+    final textoPrincipal = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+    final textoSecundario = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white70
+        : Colors.black54;
+
     return Container(
-      height: 100,
+      margin: const EdgeInsets.only(top: 4, bottom: 14),
+      padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
       decoration: BoxDecoration(
-        color: const Color(0xFF243D2A),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: cor.withAlpha(120)),
+        color: cor.withAlpha(24),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: cor.withAlpha(105)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Para finalizar, escolha cultivar aquilo que fortalece suas raízes e faz seu jardim florescer.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: textoPrincipal,
+              fontSize: 15,
+              height: 1.35,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            'Deixe no pântano o que não precisa mais acompanhar você.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: textoSecundario,
+              fontSize: 13,
+              height: 1.3,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FlowerDecoration extends StatelessWidget {
+  const _FlowerDecoration();
+
+  @override
+  Widget build(BuildContext context) {
+    final escuro = Theme.of(context).brightness == Brightness.dark;
+    final linha = escuro ? Colors.white70 : Colors.black54;
+    final linhaSuave = escuro ? Colors.white38 : Colors.black26;
+
+    return Container(
+      height: 92,
+      decoration: BoxDecoration(
+        color: escuro ? Colors.white.withAlpha(7) : Colors.black.withAlpha(5),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: linhaSuave),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(23),
+        borderRadius: BorderRadius.circular(17),
         child: Stack(
           children: [
-            Positioned.fill(
-              child: ColoredBox(color: const Color(0xFF243D2A)),
+            Positioned.fill(child: CustomPaint(painter: _GardenLinePainter(linhaSuave))),
+            Positioned(
+              left: 24,
+              top: 18,
+              child: _DecorFlower(size: 30, color: linha),
+            ),
+            Positioned(
+              left: 92,
+              top: 38,
+              child: _DecorFlower(size: 20, color: linhaSuave),
+            ),
+            Positioned(
+              right: 26,
+              top: 16,
+              child: _DecorFlower(size: 32, color: linha),
+            ),
+            Positioned(
+              right: 102,
+              top: 38,
+              child: _DecorFlower(size: 19, color: linhaSuave),
             ),
             Positioned(
               left: 0,
               right: 0,
-              top: 0,
-              bottom: 0,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2E5A36).withAlpha(150),
-                ),
+              top: 19,
+              child: Icon(
+                Icons.spa_outlined,
+                color: linha,
+                size: 42,
               ),
-            ),
-            Positioned(
-              left: 18,
-              top: 16,
-              child: _DecorFlower(size: 32, color: cor),
-            ),
-            Positioned(
-              left: 88,
-              top: 34,
-              child: _DecorFlower(size: 24, color: Theme.of(context).colorScheme.secondary),
-            ),
-            Positioned(
-              right: 24,
-              top: 18,
-              child: _DecorFlower(size: 36, color: const Color(0xFFFFC7D7)),
-            ),
-            Positioned(
-              right: 102,
-              top: 10,
-              child: _DecorFlower(size: 20, color: const Color(0xFFE7B9FF)),
-            ),
-            Positioned(
-              left: 152,
-              bottom: 16,
-              child: _DecorFlower(size: 28, color: const Color(0xFFFFFFFF)),
-            ),
-            Positioned(
-              left: 36,
-              bottom: 14,
-              child: _DecorFlower(size: 22, color: Theme.of(context).colorScheme.secondary),
             ),
           ],
         ),
@@ -433,63 +468,128 @@ class _FlowerDecoration extends StatelessWidget {
   }
 }
 
-class _LilyPadDecoration extends StatelessWidget {
-  final Color cor;
+class _GardenLinePainter extends CustomPainter {
+  final Color color;
 
-  const _LilyPadDecoration({required this.cor});
+  const _GardenLinePainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path()
+      ..moveTo(0, size.height * 0.78)
+      ..quadraticBezierTo(
+        size.width * 0.22,
+        size.height * 0.60,
+        size.width * 0.42,
+        size.height * 0.76,
+      )
+      ..quadraticBezierTo(
+        size.width * 0.68,
+        size.height * 0.94,
+        size.width,
+        size.height * 0.70,
+      );
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _GardenLinePainter oldDelegate) {
+    return oldDelegate.color != color;
+  }
+}
+
+class _LilyPadDecoration extends StatelessWidget {
+  const _LilyPadDecoration();
 
   @override
   Widget build(BuildContext context) {
+    final escuro = Theme.of(context).brightness == Brightness.dark;
+    final linha = escuro ? Colors.white70 : Colors.black54;
+    final linhaSuave = escuro ? Colors.white30 : Colors.black26;
+
     return Padding(
       padding: const EdgeInsets.only(top: 2, bottom: 14),
       child: Container(
-        height: 112,
+        height: 104,
         decoration: BoxDecoration(
-          color: const Color(0xFF173735),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: cor.withAlpha(110)),
+          color: escuro ? Colors.white.withAlpha(7) : Colors.black.withAlpha(5),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: linhaSuave),
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(23),
+          borderRadius: BorderRadius.circular(17),
           child: Stack(
             children: [
-              Positioned.fill(
-                child: ColoredBox(color: const Color(0xFF0E2F35)),
-              ),
+              Positioned.fill(child: CustomPaint(painter: _WaterLinePainter(linhaSuave))),
               Positioned(
-                left: 20,
-                bottom: 12,
-                child: _LilyPad(size: 54, color: const Color(0xFF8FD6B4)),
+                left: 22,
+                bottom: 10,
+                child: _LilyPad(size: 54, color: linha),
               ),
               Positioned(
                 left: 116,
-                bottom: 26,
-                child: _LilyPad(size: 36, color: const Color(0xFF6EBFA4)),
+                bottom: 27,
+                child: _LilyPad(size: 34, color: linhaSuave),
               ),
-            Positioned(
-              right: 26,
+              Positioned(
+                right: 24,
                 bottom: 10,
-              child: _LilyPad(size: 62, color: const Color(0xFF99E0C1)),
-            ),
-            Positioned(
-              right: 122,
-                bottom: 34,
-              child: _LilyPad(size: 28, color: const Color(0xFF5EA88D)),
-            ),
-            Positioned(
-              left: 14,
-                top: 28,
-              right: 14,
-              child: Container(
-                height: 1,
-                  color: Colors.white.withAlpha(24),
+                child: _LilyPad(size: 60, color: linha),
               ),
-            ),
-          ],
-        ),
+              Positioned(
+                right: 122,
+                bottom: 36,
+                child: _LilyPad(size: 27, color: linhaSuave),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+}
+
+class _WaterLinePainter extends CustomPainter {
+  final Color color;
+
+  const _WaterLinePainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.1
+      ..strokeCap = StrokeCap.round;
+
+    for (final y in [0.25, 0.50, 0.75]) {
+      final path = Path()
+        ..moveTo(size.width * 0.06, size.height * y)
+        ..quadraticBezierTo(
+          size.width * 0.25,
+          size.height * (y - 0.08),
+          size.width * 0.44,
+          size.height * y,
+        )
+        ..quadraticBezierTo(
+          size.width * 0.68,
+          size.height * (y + 0.08),
+          size.width * 0.94,
+          size.height * y,
+        );
+      canvas.drawPath(path, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _WaterLinePainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }
 
@@ -522,8 +622,9 @@ class _DecorFlower extends StatelessWidget {
                 width: size * 0.42,
                 height: size * 0.42,
                 decoration: BoxDecoration(
-                  color: color.withAlpha(220),
+                  color: Colors.transparent,
                   shape: BoxShape.circle,
+                  border: Border.all(color: color, width: 1.4),
                 ),
               ),
             ),
@@ -531,7 +632,7 @@ class _DecorFlower extends StatelessWidget {
             width: size * 0.28,
             height: size * 0.28,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
+              color: color,
               shape: BoxShape.circle,
             ),
           ),
@@ -562,7 +663,9 @@ class _LilyPad extends StatelessWidget {
             child: CustomPaint(
               painter: _LilyPadPainter(
                 color: color,
-                waterColor: const Color(0xFF0E2F35),
+                waterColor: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF2A2527)
+                    : Colors.white,
               ),
             ),
           ),
@@ -589,17 +692,17 @@ class _LilyPadPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final leaf = Paint()
-      ..color = color.withAlpha(215)
+      ..color = color.withAlpha(18)
       ..style = PaintingStyle.fill;
     final edge = Paint()
-      ..color = Colors.white.withAlpha(42)
+      ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2;
+      ..strokeWidth = 1.5;
     final water = Paint()
       ..color = waterColor
       ..style = PaintingStyle.fill;
     final vein = Paint()
-      ..color = const Color(0xFF1F6B58).withAlpha(150)
+      ..color = color.withAlpha(115)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2
       ..strokeCap = StrokeCap.round;
@@ -644,6 +747,10 @@ class _TinyWaterFlower extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white70
+        : Colors.black54;
+
     return SizedBox(
       width: size,
       height: size,
@@ -662,8 +769,9 @@ class _TinyWaterFlower extends StatelessWidget {
                 width: size * 0.42,
                 height: size * 0.42,
                 decoration: BoxDecoration(
-                  color: Color(0xFFFFC7D7),
+                  color: Colors.transparent,
                   shape: BoxShape.circle,
+                  border: Border.all(color: color, width: 1),
                 ),
               ),
             ),
@@ -671,7 +779,7 @@ class _TinyWaterFlower extends StatelessWidget {
             width: size * 0.24,
             height: size * 0.24,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
+              color: color,
               shape: BoxShape.circle,
             ),
           ),

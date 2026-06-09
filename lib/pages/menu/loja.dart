@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../../services/app_theme_service.dart';
 import '../../services/pontos_service.dart';
+import '../../widgets/main_tab_header.dart';
 
 class Page1 extends StatefulWidget {
   const Page1({super.key});
@@ -61,30 +62,10 @@ class _Page1State extends State<Page1> {
       backgroundColor: fundo,
       body: Column(
         children: [
-          // 🔥 TOPO (COM IMAGEM)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.only(top: 20, bottom: 24),
-            decoration: BoxDecoration(
-              color: corTema,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(28),
-              ),
-            ),
-            child: Column(
-              children: [
-                Image.asset('assets/iconloja.png', height: 34),
-                const SizedBox(height: 8),
-                Text(
-                  'Lojinha',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+          const MainTabHeader(
+            title: 'Lojinha',
+            subtitle: 'Troque seus pontos por novos temas',
+            asset: 'assets/iconloja.png',
           ),
 
           // CONTEÚDO

@@ -3,6 +3,8 @@
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import '../../../widgets/challenge_intro_decoration.dart';
+
 class Desafio4Page extends StatefulWidget {
   const Desafio4Page({super.key});
 
@@ -170,6 +172,15 @@ class _Desafio4PageState extends State<Desafio4Page> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const ChallengeIntroDecoration(
+                mainIcon: Icons.favorite_rounded,
+                leftIcon: Icons.bolt_rounded,
+                rightIcon: Icons.track_changes_rounded,
+                title: 'O que faz seu coração se mover?',
+                subtitle:
+                    'Motivações, hábitos e sonhos revelam muito sobre você.',
+              ),
+              const SizedBox(height: 16),
               Text(
                 'Oii $nomeUsuario, seja bem-vindo(a) a mais uma etapa da sua jornada!!!',
                 style: TextStyle(

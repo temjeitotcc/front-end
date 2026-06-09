@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 
 import '../../services/conteudos_service.dart';
+import '../../widgets/main_tab_header.dart';
 
 String tituloDesafio(int numero) {
   return switch (numero) {
@@ -94,31 +95,10 @@ class _ConteudosPageState extends State<ConteudosPage> {
       backgroundColor: fundo,
       body: Column(
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 22),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(28),
-              ),
-            ),
-            child: Row(
-              children: [
-                Image.asset('assets/icon2.png', height: 42),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Text(
-                    'Conteúdos',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          const MainTabHeader(
+            title: 'Conteúdos',
+            subtitle: 'Releia suas respostas e reflexões',
+            asset: 'assets/icon2.png',
           ),
           Expanded(
             child: Padding(

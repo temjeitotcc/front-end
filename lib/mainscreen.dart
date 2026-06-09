@@ -2,6 +2,7 @@
 import 'pages/conteudos/conteudos_page.dart';
 import 'pages/home/home_page.dart';
 import 'pages/menu/loja.dart';
+import 'pages/pet/pet_page.dart';
 import 'config.dart';
 
 class MainScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _MainScreenState extends State<MainScreen> {
           const Page1(),
           ConteudosPage(refreshKey: conteudosRefreshKey),
           const HomePage(),
-          const Center(child: Text("Ranking")),
+          const PetPage(),
           const ConfigPage(),
         ],
       ),

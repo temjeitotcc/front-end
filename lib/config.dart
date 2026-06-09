@@ -7,6 +7,7 @@ import 'pages/auth/auth_page.dart';
 import 'pages/conta_page.dart';
 import 'services/app_theme_service.dart';
 import 'services/notificacao_service.dart';
+import 'widgets/main_tab_header.dart';
 
 class ConfigPage extends StatefulWidget {
   const ConfigPage({super.key});
@@ -154,29 +155,10 @@ class _ConfigPageState extends State<ConfigPage> {
       backgroundColor: fundo,
       body: Column(
         children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.only(top: 20, bottom: 24),
-            decoration: BoxDecoration(
-              color: corTema,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(28),
-              ),
-            ),
-            child: const Column(
-              children: [
-                Icon(Icons.settings_rounded, color: Colors.white, size: 34),
-                SizedBox(height: 8),
-                Text(
-                  'Configurações',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+          const MainTabHeader(
+            title: 'Configurações',
+            subtitle: 'Personalize sua experiência',
+            icon: Icons.settings_rounded,
           ),
           Expanded(
             child: ListView(

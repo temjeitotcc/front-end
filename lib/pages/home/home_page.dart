@@ -3,6 +3,7 @@ import '../../widgets/circulo_fase.dart';
 import '../../services/auth_service.dart';
 import '../../services/fases_service.dart';
 import '../../services/pontos_service.dart';
+import '../../widgets/main_tab_header.dart';
 import '../fases/fase_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -70,64 +71,54 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: fundo,
       body: Column(
         children: [
-          Container(
-            width: double.infinity,
-            height: 60,
-            color: corTema,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: _abrirPainelPersonagem,
-                  onHorizontalDragEnd: (details) {
-                    final velocidade = details.primaryVelocity ?? 0;
-                    if (velocidade > 120) {
-                      _abrirPainelPersonagem();
-                    }
-                  },
-                  child: Image.asset('assets/imagem_esquerda.png', height: 50),
-                ),
-                Row(
-                  children: [
-                    ValueListenableBuilder<int>(
-                      valueListenable: PontosService.pontos,
-                      builder: (context, pontos, _) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withAlpha(28),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                '$pontos',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(
-                                Icons.star,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    Image.asset('assets/imagem_direita.png', height: 70),
-                  ],
-                ),
-              ],
+          MainTabHeader(
+            title: 'Jornada',
+            subtitle: jornadaConcluida
+                ? 'Todos os desafios concluídos'
+                : 'Continue pelo Dia $diaAtual',
+            onLeadingTap: _abrirPainelPersonagem,
+            onLeadingHorizontalDragEnd: (details) {
+              final velocidade = details.primaryVelocity ?? 0;
+              if (velocidade > 120) {
+                _abrirPainelPersonagem();
+              }
+            },
+            leading: Image.asset(
+              'assets/imagem_esquerda.png',
+              height: 52,
+              fit: BoxFit.contain,
+            ),
+            trailing: ValueListenableBuilder<int>(
+              valueListenable: PontosService.pontos,
+              builder: (context, pontos, _) {
+                return Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withAlpha(28),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '$pontos',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 3),
+                      const Icon(
+                        Icons.star_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
 
