@@ -457,24 +457,24 @@ class _Desafio28PageState extends State<Desafio28Page> {
 
     final firestore = FirebaseFirestore.instance;
     // 1. Salvar/atualizar dados do usuário
-    await firestore.collection('usuarios').doc(user.uid).set({
-      'Nome:': user.displayName ?? 'usuário',
-      'email': user.email,
+    await firestore.collection('Usuários').doc(user.email).set({
+      'Nome': user.displayName ?? 'Usuários',
+      'ID': user.uid,
     }, SetOptions(merge: true));
 
-    // Respostas do desafio
+    // 2. Salvar reflexão
     await firestore
-        .collection('usuarios')
-        .doc(user.uid)
-        .collection('desafios')
-        .doc('Dia 21')
-        .collection('reflexões')
+        .collection('Usuários')
+        .doc(user.email)
+        .collection('Desafios')
+        .doc('Dia 28')
+        .collection('Respostas')
         .add({
-          'principais_aprendizados': aprendizados,
-          'o_que_marcou': marcou,
-          'mudanca_para_continuar': mudanca,
+          'Principais Aprendizados': aprendizados,
+          'O que marcou': marcou,
+          'Mudanca para Continuar': mudanca,
           'nome': user.displayName ?? 'Usuário',
-          'criado_em': FieldValue.serverTimestamp(),
+          'Respondido em': FieldValue.serverTimestamp(),
         });
 
     if (!mounted) return;

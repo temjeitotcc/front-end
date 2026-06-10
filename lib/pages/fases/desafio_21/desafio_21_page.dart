@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio21Page extends StatefulWidget {
   const Desafio21Page({super.key});
 
@@ -39,8 +42,9 @@ class _Desafio21PageState extends State<Desafio21Page> {
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final corTema = tema.colorScheme.primary;
-    final textoPrincipal =
-        tema.brightness == Brightness.dark ? Colors.white : Colors.black;
+    final textoPrincipal = tema.brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
     final textoSecundario = tema.brightness == Brightness.dark
         ? Colors.white70
         : Colors.black54;
@@ -166,10 +170,7 @@ class _Desafio21PageState extends State<Desafio21Page> {
     };
   }
 
-  List<Widget> _primeiraPagina(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _primeiraPagina(Color textoPrincipal, Color textoSecundario) {
     final corTema = Theme.of(context).colorScheme.primary;
     return [
       Expanded(
@@ -362,22 +363,40 @@ class _Desafio21PageState extends State<Desafio21Page> {
 
   Future<void> _concluir() async {
     final resposta = reflexaoController.text.trim();
+
     if (resposta.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Escreva sua reflexão antes de concluir.')),
+        const SnackBar(
+          content: Text('Escreva sua reflexão antes de concluir.'),
+        ),
       );
       return;
     }
 
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 21,
-      itens: [
-        ConteudoItem(
-          titulo: 'Reflexão da semana 3',
-          texto: resposta,
-        ),
-      ],
-    );
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // 1. Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.email).set({
+      'Nome': user.displayName ?? 'Usuários',
+      'ID': user.uid,
+    }, SetOptions(merge: true));
+
+    // 2. Salvar reflexão
+    await firestore
+        .collection('Usuários')
+        .doc(user.email)
+        .collection('Desafios')
+        .doc('Dia 21')
+        .collection('Respostas')
+        .add({
+          'Resposta': resposta,
+          'Nome': user.displayName ?? 'Usuário',
+          'Respondido em': FieldValue.serverTimestamp(),
+        });
 
     if (!mounted) return;
     Navigator.of(context).pop(true);
