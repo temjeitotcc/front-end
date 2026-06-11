@@ -462,6 +462,7 @@ class _HomePageState extends State<HomePage> {
                   child: CirculoFase(
                     numero: '${inicio + i + 1}',
                     liberado: faseLiberada(inicio + i),
+                    concluido: fasesConcluidas[inicio + i] != null,
                     onTap: () => abrirFase(inicio + i),
                   ),
                 ),
@@ -474,6 +475,7 @@ class _HomePageState extends State<HomePage> {
                   numero: '${grupo + 1}',
                   especial: true,
                   liberado: faseLiberada(indexEspecial),
+                  concluido: fasesConcluidas[indexEspecial] != null,
                   onTap: () => abrirFase(indexEspecial),
                 ),
               ),
@@ -501,6 +503,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> abrirFase(int index) async {
+    if (fasesConcluidas[index] != null) {
+      _mostrarMensagemFaseConcluida(index);
+      return;
+    }
+
     if (!faseLiberada(index)) {
       _mostrarMensagemFaseBloqueada(index);
       return;
@@ -518,6 +525,50 @@ class _HomePageState extends State<HomePage> {
     });
 
     salvarFases();
+  }
+
+  void _mostrarMensagemFaseConcluida(int index) {
+    final corTema = Theme.of(context).colorScheme.primary;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF2A2527),
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        margin: const EdgeInsets.fromLTRB(18, 0, 18, 96),
+        duration: const Duration(seconds: 3),
+        content: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: Color.lerp(corTema, Colors.black, 0.42),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white.withAlpha(75)),
+              ),
+              child: const Icon(
+                Icons.done_all_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Dia ${index + 1} concluído. Essa etapa já faz parte da sua jornada.',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   String _mensagemFaseBloqueada(int index) {

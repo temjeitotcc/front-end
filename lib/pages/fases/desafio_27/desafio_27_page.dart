@@ -357,10 +357,12 @@ class _Desafio27PageState extends State<Desafio27Page> {
         ConteudoItem(
           titulo: 'Carta do futuro',
           texto: cartaController.text.trim(),
+          reflexao: true,
         ),
         ConteudoItem(
           titulo: 'Decisão para construir o futuro',
           texto: decisao,
+          reflexao: true,
         ),
       ],
     );

@@ -453,6 +453,7 @@ class _Desafio26PageState extends State<Desafio26Page> {
       ConteudoItem(
         titulo: 'Decisão para construir o futuro',
         texto: resposta,
+        reflexao: true,
       ),
     ];
 

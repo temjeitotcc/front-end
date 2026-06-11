@@ -440,7 +440,7 @@ class _Desafio8PageState extends State<Desafio8Page> {
       ),
       const SizedBox(height: 10),
       Text(
-        'Compartilhe o que ficou mais forte para você depois desse podcast.',
+        'O que você reconheceu sobre o Coraferido Vírus em sua vida e como o autoconhecimento pode ajudar na sua cura?',
         style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
@@ -566,6 +566,7 @@ class _Desafio8PageState extends State<Desafio8Page> {
         ConteudoItem(
           titulo: 'Aprendizados do podcast',
           texto: resposta,
+          reflexao: true,
         ),
       ],
     );

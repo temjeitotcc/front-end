@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'main.dart';
 import 'pages/auth/auth_page.dart';
-import 'pages/conta_page.dart';
+import 'pages/login/conta_page.dart';
 import 'services/app_theme_service.dart';
 import 'services/notificacao_service.dart';
 import 'widgets/main_tab_header.dart';

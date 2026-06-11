@@ -543,6 +543,7 @@ class _Desafio6PageState extends State<Desafio6Page> {
         ConteudoItem(
           titulo: 'Decisão a partir de hoje',
           texto: resposta,
+          reflexao: true,
         ),
       ],
     );

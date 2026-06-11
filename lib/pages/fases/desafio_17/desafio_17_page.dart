@@ -497,6 +497,7 @@ class _Desafio17PageState extends State<Desafio17Page> {
             titulo: '${par.antiga} -> ${par.nova}',
             texto:
                 'Situação: ${par.situacaoController.text.trim()}\n\nNova perspectiva: ${par.ressignificacaoController.text.trim()}',
+            reflexao: true,
           ),
       ],
     );

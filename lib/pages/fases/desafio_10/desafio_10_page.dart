@@ -4,6 +4,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 import '../../../services/auth_service.dart';
+import '../../../services/conteudos_service.dart';
 import '../../../widgets/podcast_volume_control.dart';
 
 class Desafio10Page extends StatefulWidget {
@@ -17,6 +18,7 @@ class _Desafio10PageState extends State<Desafio10Page> {
   static const String _audioAsset = 'podcast_desafio_10.m4a';
 
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final TextEditingController reflexaoController = TextEditingController();
   final List<StreamSubscription<dynamic>> _subscriptions = [];
 
   String nomeUsuario = 'você';
@@ -59,6 +61,7 @@ class _Desafio10PageState extends State<Desafio10Page> {
       subscription.cancel();
     }
     _audioPlayer.dispose();
+    reflexaoController.dispose();
     super.dispose();
   }
 
@@ -110,9 +113,11 @@ class _Desafio10PageState extends State<Desafio10Page> {
                           ),
                         ),
                         Text(
-                          etapaAtual == 0
-                              ? 'Suicida e assassino emocional'
-                              : 'Ouça com atenção',
+                          switch (etapaAtual) {
+                            0 => 'Suicida e assassino emocional',
+                            1 => 'Ouça com atenção',
+                            _ => 'Reflita sobre seus padrões',
+                          },
                           style: TextStyle(color: textoSecundario),
                         ),
                       ],
@@ -133,7 +138,7 @@ class _Desafio10PageState extends State<Desafio10Page> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(999),
                 child: LinearProgressIndicator(
-                  value: (etapaAtual + 1) / 2,
+                  value: (etapaAtual + 1) / 3,
                   minHeight: 10,
                   backgroundColor: Colors.white12,
                   valueColor: AlwaysStoppedAnimation(corTema),
@@ -150,9 +155,11 @@ class _Desafio10PageState extends State<Desafio10Page> {
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: etapaAtual == 0
-                        ? _conteudoTexto(textoPrincipal, textoSecundario)
-                        : _conteudoPodcast(textoPrincipal, textoSecundario),
+                    children: switch (etapaAtual) {
+                      0 => _conteudoTexto(textoPrincipal, textoSecundario),
+                      1 => _conteudoPodcast(textoPrincipal, textoSecundario),
+                      _ => _conteudoReflexao(textoPrincipal, textoSecundario),
+                    },
                   ),
                 ),
               ),
@@ -179,13 +186,13 @@ class _Desafio10PageState extends State<Desafio10Page> {
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      onPressed: etapaAtual == 0 ? _proximo : _concluir,
+                      onPressed: etapaAtual < 2 ? _proximo : _concluir,
                       icon: Icon(
-                        etapaAtual == 0
+                        etapaAtual < 2
                             ? Icons.arrow_forward_rounded
                             : Icons.check_rounded,
                       ),
-                      label: Text(etapaAtual == 0 ? 'Próximo' : 'Concluir'),
+                      label: Text(etapaAtual < 2 ? 'Próximo' : 'Concluir'),
                     ),
                   ),
                 ],
@@ -402,6 +409,72 @@ class _Desafio10PageState extends State<Desafio10Page> {
     ];
   }
 
+  List<Widget> _conteudoReflexao(
+    Color textoPrincipal,
+    Color textoSecundario,
+  ) {
+    return _campoReflexao(
+      textoPrincipal: textoPrincipal,
+      textoSecundario: textoSecundario,
+      titulo: 'Transforme reconhecimento em mudança',
+      pergunta:
+          'Em quais momentos você percebe atitudes de suicídio emocional ou de assassino emocional em sua vida, e o que escolhe mudar a partir de agora?',
+    );
+  }
+
+  List<Widget> _campoReflexao({
+    required Color textoPrincipal,
+    required Color textoSecundario,
+    required String titulo,
+    required String pergunta,
+  }) {
+    final corTema = Theme.of(context).colorScheme.primary;
+
+    return [
+      Text(
+        titulo,
+        style: TextStyle(
+          color: textoPrincipal,
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      const SizedBox(height: 10),
+      Text(
+        pergunta,
+        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
+      ),
+      const SizedBox(height: 14),
+      Expanded(
+        child: TextField(
+          controller: reflexaoController,
+          expands: true,
+          maxLines: null,
+          minLines: null,
+          textAlignVertical: TextAlignVertical.top,
+          style: TextStyle(color: textoPrincipal, fontSize: 16, height: 1.35),
+          decoration: InputDecoration(
+            hintText: 'Escreva sua reflexão...',
+            hintStyle: TextStyle(color: textoSecundario.withAlpha(140)),
+            filled: true,
+            fillColor: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF171315)
+                : const Color(0xFFF6F1E7),
+            contentPadding: const EdgeInsets.all(16),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(color: corTema, width: 2),
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
   Future<void> _alternarAudio() async {
     if (tocando) {
       await _audioPlayer.pause();
@@ -473,7 +546,27 @@ class _Desafio10PageState extends State<Desafio10Page> {
     });
   }
 
-  void _concluir() {
+  Future<void> _concluir() async {
+    final resposta = reflexaoController.text.trim();
+    if (resposta.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Escreva sua reflexão antes de concluir.')),
+      );
+      return;
+    }
+
+    await ConteudosService().salvarConteudosDoDesafio(
+      desafio: 10,
+      itens: [
+        ConteudoItem(
+          titulo: 'Reflexão sobre padrões emocionais',
+          texto: resposta,
+          reflexao: true,
+        ),
+      ],
+    );
+
+    if (!mounted) return;
     Navigator.of(context).pop(true);
   }
 }

@@ -15,6 +15,20 @@ class ConteudoDesafio {
     required this.itens,
   });
 
+  List<ConteudoItem> get reflexoes =>
+      itens.where((item) => item.reflexao).toList();
+
+  bool get temReflexao => reflexoes.isNotEmpty;
+
+  ConteudoDesafio somenteReflexoes() {
+    return ConteudoDesafio(
+      desafio: desafio,
+      concluido: concluido,
+      atualizadoEm: atualizadoEm,
+      itens: reflexoes,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'desafio': desafio,
@@ -46,25 +60,54 @@ class ConteudoDesafio {
 class ConteudoItem {
   final String titulo;
   final String texto;
+  final bool reflexao;
 
   const ConteudoItem({
     required this.titulo,
     required this.texto,
+    this.reflexao = false,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'titulo': titulo,
       'texto': texto,
+      'reflexao': reflexao,
     };
   }
 
   factory ConteudoItem.fromJson(Map<String, dynamic> json) {
+    final titulo = json['titulo'] as String? ?? '';
+
     return ConteudoItem(
-      titulo: json['titulo'] as String? ?? '',
+      titulo: titulo,
       texto: json['texto'] as String? ?? '',
+      reflexao: json['reflexao'] as bool? ?? _eraReflexaoLegada(titulo),
     );
   }
+}
+
+bool _eraReflexaoLegada(String titulo) {
+  final normalizado = titulo.toLowerCase();
+  const termos = [
+    'reflex',
+    'decisão',
+    'decisao',
+    'aprendizados do podcast',
+    'meu pântano e meu jardim',
+    'meu pantano e meu jardim',
+    'óculos e futuro',
+    'oculos e futuro',
+    'como posso fazer a diferença',
+    'minha história e meus padrões',
+    'minha historia e meus padroes',
+    'minha forma de servir',
+    'quem escolho ser',
+    'carta do futuro',
+    ' -> ',
+  ];
+
+  return termos.any(normalizado.contains);
 }
 
 class BlocoReflexao {

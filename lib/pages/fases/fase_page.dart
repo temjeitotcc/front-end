@@ -295,6 +295,7 @@ class _MissaoEspecialPageState extends State<MissaoEspecialPage> {
         ConteudoItem(
           titulo: 'Reflexão da semana $reflexaoSemanaNumero',
           texto: controller.text.trim(),
+          reflexao: true,
         ),
       ],
     );

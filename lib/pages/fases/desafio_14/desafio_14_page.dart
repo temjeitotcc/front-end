@@ -405,6 +405,17 @@ class _Desafio14PageState extends State<Desafio14Page> {
           'Respondido em': FieldValue.serverTimestamp(),
         });
 
+    await ConteudosService().salvarConteudosDoDesafio(
+      desafio: 14,
+      itens: [
+        ConteudoItem(
+          titulo: 'Reflexão da semana 2',
+          texto: resposta,
+          reflexao: true,
+        ),
+      ],
+    );
+
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }

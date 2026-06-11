@@ -328,6 +328,7 @@ class _Desafio4PageState extends State<Desafio4Page> {
         ConteudoItem(
           titulo: 'Decisão a partir de hoje',
           texto: resposta,
+          reflexao: true,
         ),
       ],
     );

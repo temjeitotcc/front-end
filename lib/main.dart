@@ -105,6 +105,26 @@ class _MyAppState extends State<MyApp> {
               ),
               iconTheme: const IconThemeData(color: Colors.black),
             ),
+            snackBarTheme: SnackBarThemeData(
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: const Color(0xFF2A2527),
+              elevation: 10,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: temaCores.primary.withAlpha(150),
+                  width: 1.5,
+                ),
+              ),
+              contentTextStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1.3,
+                fontWeight: FontWeight.w600,
+              ),
+              actionTextColor: temaCores.primary,
+              disabledActionTextColor: Colors.white38,
+            ),
           ),
           darkTheme: ThemeData(
             brightness: Brightness.dark,
@@ -124,6 +144,26 @@ class _MyAppState extends State<MyApp> {
                 fontWeight: FontWeight.bold,
               ),
               iconTheme: const IconThemeData(color: Colors.black),
+            ),
+            snackBarTheme: SnackBarThemeData(
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: const Color(0xFF2A2527),
+              elevation: 10,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: temaCores.primary.withAlpha(150),
+                  width: 1.5,
+                ),
+              ),
+              contentTextStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1.3,
+                fontWeight: FontWeight.w600,
+              ),
+              actionTextColor: temaCores.primary,
+              disabledActionTextColor: Colors.white38,
             ),
           ),
           home: StreamBuilder<User?>(

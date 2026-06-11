@@ -509,6 +509,7 @@ class _Desafio13PageState extends State<Desafio13Page> {
         ConteudoItem(
           titulo: 'Óculos e futuro',
           texto: reflexao,
+          reflexao: true,
         ),
       ],
     );

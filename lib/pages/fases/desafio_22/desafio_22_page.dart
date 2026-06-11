@@ -424,14 +424,17 @@ class _Desafio22PageState extends State<Desafio22Page> {
         ConteudoItem(
           titulo: 'Minha história e meus padrões',
           texto: padroesController.text.trim(),
+          reflexao: true,
         ),
         ConteudoItem(
           titulo: 'Minha forma de servir',
           texto: servirController.text.trim(),
+          reflexao: true,
         ),
         ConteudoItem(
           titulo: 'Quem escolho ser e meu legado',
           texto: legadoController.text.trim(),
+          reflexao: true,
         ),
       ],
     );

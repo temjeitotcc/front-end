@@ -398,6 +398,17 @@ class _Desafio21PageState extends State<Desafio21Page> {
           'Respondido em': FieldValue.serverTimestamp(),
         });
 
+    await ConteudosService().salvarConteudosDoDesafio(
+      desafio: 21,
+      itens: [
+        ConteudoItem(
+          titulo: 'Reflexão da semana 3',
+          texto: resposta,
+          reflexao: true,
+        ),
+      ],
+    );
+
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }

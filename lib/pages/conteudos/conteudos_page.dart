@@ -3,6 +3,10 @@
 import '../../services/conteudos_service.dart';
 import '../../widgets/main_tab_header.dart';
 
+// Desative antes de gerar a versão de lançamento.
+const bool visualizarTodosDesafiosFeitos = true;
+const Set<int> questionariosDePodcast = {9, 11, 13, 16};
+
 String tituloDesafio(int numero) {
   return switch (numero) {
     1 => 'Dia 1 - Bem Vindo ao seu treinamento',
@@ -46,6 +50,7 @@ class ConteudosPage extends StatefulWidget {
 class _ConteudosPageState extends State<ConteudosPage> {
   final ConteudosService service = ConteudosService();
   static const List<int> missoesEspeciais = [7, 14, 21, 28];
+  static const Set<int> desafiosComAtividadeSalva = {2, 22, 26};
   Map<int, ConteudoDesafio> conteudos = {};
   List<BlocoReflexao> blocosReflexao = [];
 
@@ -84,11 +89,21 @@ class _ConteudosPageState extends State<ConteudosPage> {
     final textoSecundario = Theme.of(context).brightness == Brightness.dark
         ? Colors.white70
         : Colors.black54;
-    final desafiosSalvos = conteudos.keys
-        .where((numero) => !missoesEspeciais.contains(numero))
+    final desafiosSalvos = conteudos.entries
+        .where(
+          (entry) =>
+              !missoesEspeciais.contains(entry.key) &&
+              !questionariosDePodcast.contains(entry.key) &&
+              (entry.value.temReflexao ||
+                  desafiosComAtividadeSalva.contains(entry.key)),
+        )
         .length;
-    final especiaisSalvas = conteudos.keys
-        .where((numero) => missoesEspeciais.contains(numero))
+    final especiaisSalvas = conteudos.entries
+        .where(
+          (entry) =>
+              missoesEspeciais.contains(entry.key) &&
+              entry.value.temReflexao,
+        )
         .length;
 
     return Scaffold(
@@ -503,12 +518,31 @@ class _EditorBlocoReflexaoPageState extends State<EditorBlocoReflexaoPage> {
 class DesafiosFeitosPage extends StatelessWidget {
   final Map<int, ConteudoDesafio> conteudos;
   static const List<int> missoesEspeciais = [7, 14, 21, 28];
+  static const Set<int> desafiosComAtividadeSalva = {2, 22, 26};
 
   const DesafiosFeitosPage({super.key, required this.conteudos});
 
   @override
   Widget build(BuildContext context) {
     final fundo = Theme.of(context).scaffoldBackgroundColor;
+    final numeros = visualizarTodosDesafiosFeitos
+        ? [
+            for (int numero = 1; numero <= 28; numero++)
+              if (!missoesEspeciais.contains(numero) &&
+                  !questionariosDePodcast.contains(numero))
+                numero,
+          ]
+        : (conteudos.entries
+              .where(
+                (entry) =>
+                    !missoesEspeciais.contains(entry.key) &&
+                    !questionariosDePodcast.contains(entry.key) &&
+                    (entry.value.temReflexao ||
+                        desafiosComAtividadeSalva.contains(entry.key)),
+              )
+              .map((entry) => entry.key)
+              .toList()
+          ..sort());
 
     return Scaffold(
       backgroundColor: fundo,
@@ -517,17 +551,31 @@ class DesafiosFeitosPage extends StatelessWidget {
         foregroundColor: Colors.black,
         title: Text('Desafios feitos'),
       ),
-      body: ListView.separated(
+      body: numeros.isEmpty
+          ? const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'Suas reflexões dos desafios aparecerão aqui.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white60, fontSize: 16),
+                ),
+              ),
+            )
+          : ListView.separated(
         padding: const EdgeInsets.fromLTRB(14, 16, 14, 24),
-        itemCount: 24,
+        itemCount: numeros.length,
         separatorBuilder: (_, _) => const SizedBox(height: 10),
         itemBuilder: (context, index) {
-          final numeros = [
-            for (int numero = 1; numero <= 28; numero++)
-              if (!missoesEspeciais.contains(numero)) numero,
-          ];
           final numero = numeros[index];
-          final conteudo = conteudos[numero];
+          final conteudoCompleto = conteudos[numero];
+          final mostraAtividadeCompleta =
+              desafiosComAtividadeSalva.contains(numero);
+          final conteudo = conteudoCompleto == null
+              ? null
+              : mostraAtividadeCompleta
+                  ? conteudoCompleto
+                  : conteudoCompleto.somenteReflexoes();
           final temConteudo = conteudo != null && conteudo.itens.isNotEmpty;
 
           return ListTile(
@@ -536,7 +584,7 @@ class DesafiosFeitosPage extends StatelessWidget {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) =>
-                            ConteudoDesafioPage(conteudo: conteudo),
+                            ConteudoDesafioPage(conteudo: conteudo!),
                       ),
                     );
                   }
@@ -546,7 +594,7 @@ class DesafiosFeitosPage extends StatelessWidget {
               side: BorderSide(
                 color: temConteudo
                     ? Theme.of(context).colorScheme.primary
-                    : Colors.white.withAlpha(20),
+                    : Colors.white.withAlpha(26),
               ),
             ),
             tileColor: temConteudo
@@ -555,28 +603,32 @@ class DesafiosFeitosPage extends StatelessWidget {
             leading: CircleAvatar(
               backgroundColor: temConteudo
                   ? Theme.of(context).colorScheme.primary
-                  : Colors.white24,
-              foregroundColor: temConteudo ? Colors.black : Colors.white60,
+                  : Colors.white12,
+              foregroundColor: temConteudo ? Colors.black : Colors.white54,
               child: Text('$numero'),
             ),
             title: Text(
               tituloDesafio(numero),
               style: TextStyle(
-                color: Colors.white,
+                color: temConteudo ? Colors.white : Colors.white54,
                 fontWeight: FontWeight.bold,
               ),
             ),
             subtitle: Text(
               temConteudo
-                  ? '${conteudo.itens.length} lembrança(s) salva(s)'
-                  : 'Nada escrito ainda',
+                  ? mostraAtividadeCompleta
+                      ? '${conteudo.itens.length} resposta(s) salva(s)'
+                      : '${conteudo.itens.length} reflexão(ões) salva(s)'
+                  : 'Prévia do espaço',
               style: TextStyle(color: Colors.white60),
             ),
             trailing: Icon(
               temConteudo
                   ? Icons.chevron_right_rounded
-                  : Icons.lock_outline_rounded,
-              color: temConteudo ? Theme.of(context).colorScheme.primary : Colors.white38,
+                  : Icons.visibility_outlined,
+              color: temConteudo
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.white38,
             ),
           );
         },
@@ -609,7 +661,7 @@ class MissoesEspeciaisPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final numero = missoesEspeciais[index];
           final numeroSemana = index + 1;
-          final conteudo = conteudos[numero];
+          final conteudo = conteudos[numero]?.somenteReflexoes();
           final temConteudo = conteudo != null && conteudo.itens.isNotEmpty;
 
           return ListTile(

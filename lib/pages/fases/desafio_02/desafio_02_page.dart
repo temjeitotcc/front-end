@@ -291,6 +291,26 @@ class _Desafio2PageState extends State<Desafio2Page> {
       return;
     }
 
+    final areasPendentes = <String>[
+      for (int i = 0; i < areasPredio.length; i++)
+        if (respostasPredio[i].trim().isEmpty) areasPredio[i],
+    ];
+
+    if (areasPendentes.isNotEmpty) {
+      final exibidas = areasPendentes.take(3).join(', ');
+      final restantes = areasPendentes.length - 3;
+      final complemento = restantes > 0 ? ' e mais $restantes' : '';
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Preencha todas as janelas antes de concluir. Faltam: $exibidas$complemento.',
+          ),
+        ),
+      );
+      return;
+    }
+
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 2,
       itens: [

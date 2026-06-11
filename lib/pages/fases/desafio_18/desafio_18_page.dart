@@ -452,6 +452,7 @@ class _Desafio18PageState extends State<Desafio18Page> {
         ConteudoItem(
           titulo: 'Como posso fazer a diferença hoje',
           texto: reflexao,
+          reflexao: true,
         ),
       ],
     );

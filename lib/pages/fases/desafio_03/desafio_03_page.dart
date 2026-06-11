@@ -319,6 +319,7 @@ class _Desafio3PageState extends State<Desafio3Page> {
         ConteudoItem(
           titulo: 'Reflexão sobre decisões',
           texto: reflexaoController.text.trim(),
+          reflexao: true,
         ),
       ],
     );

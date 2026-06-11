@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 
+import '../../../services/conteudos_service.dart';
 import '../../../widgets/challenge_intro_decoration.dart';
 
 class Desafio1Page extends StatefulWidget {
@@ -379,7 +380,7 @@ class _Desafio1PageState extends State<Desafio1Page> {
     });
   }
 
-  void _proximaEtapa() {
+  Future<void> _proximaEtapa() async {
     if (instrucaoAtual < instrucoes.length) {
       setState(() {
         instrucaoAtual++;
@@ -397,6 +398,23 @@ class _Desafio1PageState extends State<Desafio1Page> {
         return;
       }
 
+      await ConteudosService().salvarConteudosDoDesafio(
+        desafio: 1,
+        itens: [
+          for (int i = 0; i < perguntas.length; i++)
+            ConteudoItem(
+              titulo: perguntas[i],
+              texto: 'Nota: ${respostas[i]}',
+            ),
+          ConteudoItem(
+            titulo: 'Reflexão final',
+            texto: reflexaoController.text.trim(),
+            reflexao: true,
+          ),
+        ],
+      );
+
+      if (!mounted) return;
       Navigator.of(context).pop(true);
       return;
     }
