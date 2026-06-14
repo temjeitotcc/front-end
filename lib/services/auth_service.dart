@@ -1,5 +1,7 @@
 ﻿import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 class AuthService {
   static const String _nomeUsuarioKey = 'auth_nome_usuário';
   static const String _emailKey = 'auth_email';
@@ -18,7 +20,38 @@ class AuthService {
 
   static Future<String> nomeUsuarioAtual() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_nomeUsuarioKey) ?? 'você';
+    final nomeSalvo = prefs.getString(_nomeUsuarioKey)?.trim();
+    final usuarioFirebase = FirebaseAuth.instance.currentUser;
+    final nomeFirebase = usuarioFirebase?.displayName?.trim();
+
+    if (nomeFirebase != null && nomeFirebase.isNotEmpty) {
+      if (nomeFirebase != nomeSalvo) {
+        await prefs.setString(_nomeUsuarioKey, nomeFirebase);
+      }
+      return nomeFirebase;
+    }
+
+    final email = usuarioFirebase?.email?.trim();
+    if (email != null && email.contains('@')) {
+      final nomePeloEmail = email.split('@').first.trim();
+      if (nomePeloEmail.isNotEmpty) return nomePeloEmail;
+    }
+
+    if (nomeSalvo != null &&
+        nomeSalvo.isNotEmpty &&
+        nomeSalvo.toLowerCase() != 'você') {
+      return nomeSalvo;
+    }
+
+    return 'Usuário';
+  }
+
+  static Future<void> salvarNomeUsuario(String nomeUsuario) async {
+    final nome = nomeUsuario.trim();
+    if (nome.isEmpty) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_nomeUsuarioKey, nome);
   }
 
   static Future<bool> temContaCriada() async {

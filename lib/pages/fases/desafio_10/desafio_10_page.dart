@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
+import '../../../widgets/challenge_header_surface.dart';
+
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 import '../../../widgets/podcast_volume_control.dart';
@@ -96,52 +98,58 @@ class _Desafio10PageState extends State<Desafio10Page> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Dia 10 - Podcast',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: textoPrincipal,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+              ChallengeHeaderSurface(
+                child: Column(
+                  children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Dia 10 - Podcast',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: textoPrincipal,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              switch (etapaAtual) {
+                                0 => 'Suicida e assassino emocional',
+                                1 => 'Ouça com atenção',
+                                _ => 'Reflita sobre seus padrões',
+                              },
+                              style: TextStyle(color: textoSecundario),
+                            ),
+                          ],
                         ),
-                        Text(
-                          switch (etapaAtual) {
-                            0 => 'Suicida e assassino emocional',
-                            1 => 'Ouça com atenção',
-                            _ => 'Reflita sobre seus padrões',
-                          },
-                          style: TextStyle(color: textoSecundario),
+                      ),
+                      IconButton(
+                        tooltip: 'Sair',
+                        style: IconButton.styleFrom(
+                          backgroundColor: corTema,
+                          foregroundColor: Colors.black,
                         ),
+                        onPressed: () => Navigator.of(context).pop(false),
+                        icon: const Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: (etapaAtual + 1) / 3,
+                      minHeight: 10,
+                      backgroundColor: Colors.white12,
+                      valueColor: AlwaysStoppedAnimation(corTema),
+                    ),
+                  ),
                       ],
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: 'Sair',
-                    style: IconButton.styleFrom(
-                      backgroundColor: corTema,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(false),
-                    icon: const Icon(Icons.close_rounded),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: (etapaAtual + 1) / 3,
-                  minHeight: 10,
-                  backgroundColor: Colors.white12,
-                  valueColor: AlwaysStoppedAnimation(corTema),
                 ),
               ),
               const SizedBox(height: 22),

@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import '../../widgets/circulo_fase.dart';
 import '../../services/auth_service.dart';
+import '../../services/conteudos_service.dart';
 import '../../services/fases_service.dart';
 import '../../services/pontos_service.dart';
 import '../../widgets/main_tab_header.dart';
@@ -144,264 +145,245 @@ class _HomePageState extends State<HomePage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Fechar',
-      barrierColor: Colors.black.withAlpha(90),
-      transitionDuration: const Duration(milliseconds: 320),
+      barrierColor: Colors.black.withAlpha(125),
+      transitionDuration: const Duration(milliseconds: 280),
       pageBuilder: (context, animation, secondaryAnimation) {
         final modoEscuro = Theme.of(context).brightness == Brightness.dark;
-        final corTextoSuave = modoEscuro ? Colors.white70 : Colors.black54;
-        final corCardInterno = modoEscuro
-            ? Colors.black.withAlpha(24)
-            : const Color(0xFFFFF2B8);
         final corTema = Theme.of(context).colorScheme.primary;
+        final fundoPainel =
+            modoEscuro ? const Color(0xFF211D1F) : const Color(0xFFF8F7F3);
+        final fundoCard =
+            modoEscuro ? const Color(0xFF2A2527) : Colors.white;
+        final textoPrincipal = modoEscuro ? Colors.white : Colors.black;
+        final textoSecundario = modoEscuro ? Colors.white60 : Colors.black54;
+        final concluidos =
+            fasesConcluidas.where((data) => data != null).length;
+        final progresso = concluidos / totalFases;
+        final largura = MediaQuery.of(context).size.width;
 
         return Align(
           alignment: Alignment.centerLeft,
           child: SafeArea(
-            top: false,
             child: Material(
               color: Colors.transparent,
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.72,
-                height: MediaQuery.of(context).size.height * 0.55,
-                margin: const EdgeInsets.only(left: 0),
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                width: (largura * 0.82).clamp(300.0, 380.0),
+                margin: const EdgeInsets.only(right: 18),
                 decoration: BoxDecoration(
-                  color: modoEscuro
-                      ? const Color(0xFF2A2527)
-                      : const Color(0xFFFFFBF0),
+                  color: fundoPainel,
                   borderRadius: const BorderRadius.horizontal(
-                    right: Radius.circular(34),
-                  ),
-                  border: Border.all(
-                    color: corTema,
-                    width: 3,
+                    right: Radius.circular(28),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withAlpha(100),
-                      blurRadius: 30,
-                      offset: const Offset(14, 0),
+                      color: Colors.black.withAlpha(115),
+                      blurRadius: 32,
+                      offset: const Offset(12, 0),
                     ),
                   ],
                 ),
-                child: Stack(
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Image.asset(
+                    Container(
+                      color: corTema,
+                      padding: const EdgeInsets.fromLTRB(18, 18, 12, 18),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 66,
+                            height: 66,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withAlpha(38),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white.withAlpha(90),
+                              ),
+                            ),
+                            padding: const EdgeInsets.all(5),
+                            child: Image.asset(
                               'assets/imagem_esquerda.png',
-                              height: 64,
                               fit: BoxFit.contain,
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    nomeUsuario,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: modoEscuro
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 9,
-                                      vertical: 5,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: corTema,
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    child: Text(
-                                      jornadaConcluida
-                                          ? 'Dia 28 concluído'
-                                          : 'Você está no Dia $diaAtual',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            IconButton(
-                              tooltip: 'Fechar',
-                              style: IconButton.styleFrom(
-                                backgroundColor: corTema,
-                                foregroundColor: Colors.black,
-                                minimumSize: const Size(38, 38),
-                                maximumSize: const Size(38, 38),
-                                padding: EdgeInsets.zero,
-                              ),
-                              onPressed: () => Navigator.of(context).pop(),
-                              icon: const Icon(Icons.close_rounded, size: 21),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 14),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 12,
                           ),
-                          decoration: BoxDecoration(
-                            color: corCardInterno,
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                          child: ValueListenableBuilder<int>(
-                            valueListenable: PontosService.pontos,
-                            builder: (context, pontos, _) {
-                              return Row(
-                                children: [
-                                  Container(
-                                    width: 38,
-                                    height: 38,
-                                    decoration: BoxDecoration(
-                                      color: corTema.withAlpha(40),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.star_rounded,
-                                      color: corTema,
-                                      size: 23,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'PONTOS',
-                                          style: TextStyle(
-                                            color: corTextoSuave,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Text(
-                                          '$pontos',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            color: corTema,
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.w900,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(
-                                    'usar na loja',
-                                    style: TextStyle(
-                                      color: corTextoSuave,
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: modoEscuro
-                                  ? const Color(0xFF211D1F)
-                                  : Colors.white,
-                              borderRadius: BorderRadius.circular(18),
-                            ),
+                          const SizedBox(width: 13),
+                          Expanded(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(
-                                  Icons.flag_rounded,
-                                  color: corTema,
-                                  size: 34,
-                                ),
-                                const SizedBox(height: 10),
                                 Text(
-                                  jornadaConcluida
-                                      ? 'Jornada concluída'
-                                      : 'Próximo passo: Dia $diaAtual',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: modoEscuro
-                                        ? Colors.white
-                                        : Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                  nomeUsuario,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.w900,
                                   ),
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
                                   jornadaConcluida
-                                      ? 'Você completou todos os desafios.'
-                                      : 'Continue avançando no seu ritmo.',
-                                  textAlign: TextAlign.center,
+                                      ? 'Jornada concluída'
+                                      : 'Sua jornada continua',
                                   style: TextStyle(
-                                    color: corTextoSuave,
+                                    color: Colors.white.withAlpha(205),
                                     fontSize: 12,
-                                    height: 1.3,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
+                          IconButton(
+                            tooltip: 'Fechar',
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.white.withAlpha(35),
+                              foregroundColor: Colors.white,
+                              minimumSize: const Size(40, 40),
+                              maximumSize: const Size(40, 40),
+                              padding: EdgeInsets.zero,
+                            ),
+                            onPressed: () => Navigator.of(context).pop(),
+                            icon: const Icon(Icons.close_rounded, size: 22),
                           ),
-                          decoration: BoxDecoration(
-                            color: corTema.withAlpha(24),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: corTema.withAlpha(80)),
-                          ),
-                          child: Row(
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
                             children: [
-                              Icon(
-                                Icons.swipe_right_alt_rounded,
-                                color: corTema,
-                                size: 21,
-                              ),
-                              const SizedBox(width: 8),
                               Expanded(
-                                child: Text(
-                                  'Toque ou puxe o personagem para abrir.',
-                                  style: TextStyle(
-                                    color: corTextoSuave,
-                                    fontSize: 11,
-                                  ),
+                                child: _ResumoJornadaCard(
+                                  icon: Icons.calendar_today_rounded,
+                                  rotulo: 'DIA ATUAL',
+                                  valor: jornadaConcluida ? '28' : '$diaAtual',
+                                  cor: corTema,
+                                  fundo: fundoCard,
+                                  textoPrincipal: textoPrincipal,
+                                  textoSecundario: textoSecundario,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: ValueListenableBuilder<int>(
+                                  valueListenable: PontosService.pontos,
+                                  builder: (context, pontos, _) {
+                                    return _ResumoJornadaCard(
+                                      icon: Icons.star_rounded,
+                                      rotulo: 'PONTOS',
+                                      valor: '$pontos',
+                                      cor: corTema,
+                                      fundo: fundoCard,
+                                      textoPrincipal: textoPrincipal,
+                                      textoSecundario: textoSecundario,
+                                    );
+                                  },
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: fundoCard,
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(
+                                color: corTema.withAlpha(75),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 38,
+                                      height: 38,
+                                      decoration: BoxDecoration(
+                                        color: corTema.withAlpha(35),
+                                        borderRadius:
+                                            BorderRadius.circular(11),
+                                      ),
+                                      child: Icon(
+                                        jornadaConcluida
+                                            ? Icons.emoji_events_rounded
+                                            : Icons.route_rounded,
+                                        color: corTema,
+                                        size: 22,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 11),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            jornadaConcluida
+                                                ? 'Caminho completo'
+                                                : 'Progresso da jornada',
+                                            style: TextStyle(
+                                              color: textoPrincipal,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            '$concluidos de $totalFases desafios',
+                                            style: TextStyle(
+                                              color: textoSecundario,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Text(
+                                      '${(progresso * 100).round()}%',
+                                      style: TextStyle(
+                                        color: corTema,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 14),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(999),
+                                  child: LinearProgressIndicator(
+                                    value: progresso,
+                                    minHeight: 8,
+                                    backgroundColor: corTema.withAlpha(28),
+                                    valueColor:
+                                        AlwaysStoppedAnimation(corTema),
+                                  ),
+                                ),
+                                const SizedBox(height: 13),
+                                Text(
+                                  jornadaConcluida
+                                      ? 'Você concluiu todos os desafios desta jornada.'
+                                      : 'Próximo passo: concluir o Dia $diaAtual.',
+                                  style: TextStyle(
+                                    color: textoSecundario,
+                                    fontSize: 13,
+                                    height: 1.35,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -504,6 +486,13 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> abrirFase(int index) async {
     if (fasesConcluidas[index] != null) {
+      final numero = index + 1;
+      if (await _precisaRecuperarConteudo(numero)) {
+        if (!mounted) return;
+        await _abrirFaseParaRecuperarConteudo(index);
+        return;
+      }
+
       _mostrarMensagemFaseConcluida(index);
       return;
     }
@@ -525,6 +514,34 @@ class _HomePageState extends State<HomePage> {
     });
 
     salvarFases();
+  }
+
+  Future<bool> _precisaRecuperarConteudo(int numero) async {
+    if (numero != 2) return false;
+
+    final conteudos = await ConteudosService().carregarConteudos();
+    final conteudo = conteudos[numero];
+    if (conteudo == null) return true;
+
+    return conteudo.itens.length < 10 ||
+        conteudo.itens.any((item) => item.texto.trim().isEmpty);
+  }
+
+  Future<void> _abrirFaseParaRecuperarConteudo(int index) async {
+    final concluida = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (context) => FasePage(numero: '${index + 1}')),
+    );
+
+    if (concluida != true || !mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Respostas recuperadas. O Dia 2 já está disponível em Desafios feitos.',
+        ),
+      ),
+    );
   }
 
   void _mostrarMensagemFaseConcluida(int index) {
@@ -613,6 +630,67 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ResumoJornadaCard extends StatelessWidget {
+  final IconData icon;
+  final String rotulo;
+  final String valor;
+  final Color cor;
+  final Color fundo;
+  final Color textoPrincipal;
+  final Color textoSecundario;
+
+  const _ResumoJornadaCard({
+    required this.icon,
+    required this.rotulo,
+    required this.valor,
+    required this.cor,
+    required this.fundo,
+    required this.textoPrincipal,
+    required this.textoSecundario,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 94),
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: fundo,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: cor.withAlpha(70)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: cor, size: 21),
+          const SizedBox(height: 12),
+          Text(
+            rotulo,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: textoSecundario,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            valor,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: textoPrincipal,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,11 +1,39 @@
 ﻿import 'package:flutter/material.dart';
 
+import 'dart:async';
+
+import 'package:audioplayers/audioplayers.dart';
+
 import '../../services/conteudos_service.dart';
+import '../../services/feedback_service.dart';
 import '../../widgets/main_tab_header.dart';
+import '../../widgets/podcast_volume_control.dart';
+import 'feedbacks_page.dart';
+import 'livro_page.dart';
 
 // Desative antes de gerar a versão de lançamento.
 const bool visualizarTodosDesafiosFeitos = true;
 const Set<int> questionariosDePodcast = {9, 11, 13, 16};
+
+bool conteudoDisponivelParaExibicao(
+  int numero,
+  ConteudoDesafio conteudo,
+) {
+  if (numero == 2) {
+    return conteudo.itens.length >= 10 &&
+        conteudo.itens.every((item) => item.texto.trim().isNotEmpty);
+  }
+
+  if (numero == 22) {
+    return conteudo.itens.length >= 3;
+  }
+
+  if (numero == 26) {
+    return conteudo.itens.length >= 7;
+  }
+
+  return conteudo.temReflexao;
+}
 
 String tituloDesafio(int numero) {
   return switch (numero) {
@@ -31,11 +59,18 @@ String tituloDesafio(int numero) {
     20 => 'Dia 20 - Identidade, Utilidade e Pertencimento',
     21 => 'Dia 21 - Reflexão Semanal',
     22 => 'Dia 22 - Responsabilidade e Propósito',
+    25 => 'Dia 25 - Revisitando os Aprendizados',
     26 => 'Dia 26 - Mural dos Sonhos',
     27 => 'Dia 27 - Visão Positiva do Futuro',
     28 => 'Dia 28 - Encerramento',
     _ => 'Desafio $numero',
   };
+}
+
+String temaDesafio(int numero) {
+  final titulo = tituloDesafio(numero);
+  final separador = titulo.indexOf(' - ');
+  return separador >= 0 ? titulo.substring(separador + 3) : titulo;
 }
 
 class ConteudosPage extends StatefulWidget {
@@ -94,8 +129,7 @@ class _ConteudosPageState extends State<ConteudosPage> {
           (entry) =>
               !missoesEspeciais.contains(entry.key) &&
               !questionariosDePodcast.contains(entry.key) &&
-              (entry.value.temReflexao ||
-                  desafiosComAtividadeSalva.contains(entry.key)),
+              conteudoDisponivelParaExibicao(entry.key, entry.value),
         )
         .length;
     final especiaisSalvas = conteudos.entries
@@ -113,7 +147,7 @@ class _ConteudosPageState extends State<ConteudosPage> {
           const MainTabHeader(
             title: 'Conteúdos',
             subtitle: 'Releia suas respostas e reflexões',
-            asset: 'assets/icon2.png',
+            icon: Icons.menu_book_rounded,
           ),
           Expanded(
             child: Padding(
@@ -129,10 +163,12 @@ class _ConteudosPageState extends State<ConteudosPage> {
                     subtitulo: '$desafiosSalvos salvos',
                     icon: Icons.menu_book_rounded,
                     onTap: () async {
+                      await carregarConteudos();
+                      if (!context.mounted) return;
                       await Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) =>
-                              DesafiosFeitosPage(conteudos: conteudos),
+                              const DesafiosFeitosPage(),
                         ),
                       );
                       carregarConteudos();
@@ -165,14 +201,57 @@ class _ConteudosPageState extends State<ConteudosPage> {
                       carregarConteudos();
                     },
                   ),
-                  for (int i = 4; i <= 6; i++)
-                    _ConteudoCard(
-                      titulo: 'Espaço $i',
-                      subtitulo: 'Em breve',
-                      icon: Icons.bookmark_rounded,
-                      onTap: () {},
-                      apagado: true,
-                    ),
+                  _ConteudoCard(
+                    titulo: 'Podcasts',
+                    subtitulo: '4 episódios',
+                    icon: Icons.headphones_rounded,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const PodcastsConteudoPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  _ConteudoCard(
+                    titulo: 'Livro',
+                    subtitulo: 'Leia ou baixe o PDF',
+                    icon: Icons.auto_stories_rounded,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const LivroConteudoPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  StreamBuilder<List<FeedbackMensagem>>(
+                    stream: FeedbackService().observarFeedbacks(),
+                    builder: (context, snapshot) {
+                      final naoLidas = (snapshot.data ?? const [])
+                          .where((feedback) => !feedback.lido)
+                          .length;
+
+                      return _ConteudoCard(
+                        titulo: 'Notificações',
+                        subtitulo: naoLidas == 0
+                            ? 'Nenhuma mensagem nova'
+                            : naoLidas == 1
+                                ? '1 mensagem nova'
+                                : '$naoLidas mensagens novas',
+                        icon: naoLidas > 0
+                            ? Icons.mark_email_unread_rounded
+                            : Icons.mail_outline_rounded,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const FeedbacksPage(),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -180,6 +259,529 @@ class _ConteudosPageState extends State<ConteudosPage> {
         ],
       ),
     );
+  }
+}
+
+class _PodcastInfo {
+  final int dia;
+  final String titulo;
+  final String descricao;
+  final String asset;
+  final IconData icon;
+  final bool disponivel;
+
+  const _PodcastInfo({
+    required this.dia,
+    required this.titulo,
+    required this.descricao,
+    required this.asset,
+    required this.icon,
+    this.disponivel = true,
+  });
+}
+
+const List<_PodcastInfo> _podcastsDisponiveis = [
+  _PodcastInfo(
+    dia: 8,
+    titulo: 'Coraferido Vírus e Injeção de Benzetacil',
+    descricao: 'Feridas emocionais, autoconhecimento e transformação.',
+    asset: 'podcast_desafio_08.m4a',
+    icon: Icons.healing_rounded,
+  ),
+  _PodcastInfo(
+    dia: 10,
+    titulo: 'Suicida Emocional e Assassino Emocional',
+    descricao: 'Reconheça padrões que ferem você e quem está ao seu redor.',
+    asset: 'podcast_desafio_10.m4a',
+    icon: Icons.favorite_rounded,
+  ),
+  _PodcastInfo(
+    dia: 12,
+    titulo: 'Troca de Óculos e Visualização Positiva',
+    descricao: 'Novas perspectivas para enxergar sua história e seu futuro.',
+    asset: 'podcast_desafio_12.m4a',
+    icon: Icons.visibility_rounded,
+  ),
+  _PodcastInfo(
+    dia: 15,
+    titulo: '7 Passos da Sobrevivência',
+    descricao: 'Conhecimento, estratégia e prática para transformar sua vida.',
+    asset: 'podcast_desafio_15.m4a',
+    icon: Icons.route_rounded,
+    disponivel: false,
+  ),
+];
+
+class PodcastsConteudoPage extends StatelessWidget {
+  const PodcastsConteudoPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final fundo = Theme.of(context).scaffoldBackgroundColor;
+
+    return Scaffold(
+      backgroundColor: fundo,
+      body: Column(
+        children: [
+          MainTabHeader(
+            title: 'Podcasts',
+            subtitle: 'Ouça novamente os episódios da sua jornada',
+            leading: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
+            onLeadingTap: () => Navigator.of(context).pop(),
+            trailing: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(35),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.podcasts_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.fromLTRB(14, 20, 14, 28),
+              itemCount: _podcastsDisponiveis.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 14),
+              itemBuilder: (context, index) {
+                final podcast = _podcastsDisponiveis[index];
+                return _PodcastLibraryCard(podcast: podcast, index: index);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PodcastLibraryCard extends StatelessWidget {
+  final _PodcastInfo podcast;
+  final int index;
+
+  const _PodcastLibraryCard({
+    required this.podcast,
+    required this.index,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final escuro = Theme.of(context).brightness == Brightness.dark;
+    final corTema = Theme.of(context).colorScheme.primary;
+    final textoPrincipal = escuro ? Colors.white : Colors.black;
+    final textoSecundario = escuro ? Colors.white60 : Colors.black54;
+    final cardColor = escuro ? const Color(0xFF2A2527) : Colors.white;
+
+    return Material(
+      color: cardColor,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: podcast.disponivel
+            ? () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PodcastPlayerConteudoPage(podcast: podcast),
+                  ),
+                );
+              }
+            : null,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 154),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: podcast.disponivel
+                  ? corTema.withAlpha(135)
+                  : Colors.white.withAlpha(24),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(28),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 92,
+                height: 122,
+                decoration: BoxDecoration(
+                  color: podcast.disponivel
+                      ? corTema.withAlpha(34 + (index * 8))
+                      : Colors.white.withAlpha(12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      podcast.icon,
+                      color: podcast.disponivel ? corTema : Colors.white38,
+                      size: 38,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'DIA ${podcast.dia}',
+                      style: TextStyle(
+                        color:
+                            podcast.disponivel ? corTema : Colors.white38,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            podcast.titulo,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: podcast.disponivel
+                                  ? textoPrincipal
+                                  : textoSecundario,
+                              fontSize: 17,
+                              height: 1.2,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          podcast.disponivel
+                              ? Icons.play_circle_fill_rounded
+                              : Icons.schedule_rounded,
+                          color: podcast.disponivel ? corTema : Colors.white38,
+                          size: 29,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 9),
+                    Text(
+                      podcast.descricao,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: textoSecundario,
+                        fontSize: 13,
+                        height: 1.35,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      podcast.disponivel ? 'OUVIR EPISÓDIO' : 'ÁUDIO EM BREVE',
+                      style: TextStyle(
+                        color: podcast.disponivel ? corTema : Colors.white38,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class PodcastPlayerConteudoPage extends StatefulWidget {
+  final _PodcastInfo podcast;
+
+  const PodcastPlayerConteudoPage({
+    super.key,
+    required this.podcast,
+  });
+
+  @override
+  State<PodcastPlayerConteudoPage> createState() =>
+      _PodcastPlayerConteudoPageState();
+}
+
+class _PodcastPlayerConteudoPageState
+    extends State<PodcastPlayerConteudoPage> {
+  final AudioPlayer player = AudioPlayer();
+  final List<StreamSubscription<dynamic>> subscriptions = [];
+
+  Duration posicao = Duration.zero;
+  Duration duracao = Duration.zero;
+  PlayerState estado = PlayerState.stopped;
+  bool carregando = false;
+  bool preparado = false;
+
+  bool get tocando => estado == PlayerState.playing;
+
+  @override
+  void initState() {
+    super.initState();
+    subscriptions.add(
+      player.onDurationChanged.listen((valor) {
+        if (mounted) setState(() => duracao = valor);
+      }),
+    );
+    subscriptions.add(
+      player.onPositionChanged.listen((valor) {
+        if (mounted) setState(() => posicao = valor);
+      }),
+    );
+    subscriptions.add(
+      player.onPlayerStateChanged.listen((valor) {
+        if (mounted) setState(() => estado = valor);
+      }),
+    );
+  }
+
+  @override
+  void dispose() {
+    for (final subscription in subscriptions) {
+      subscription.cancel();
+    }
+    player.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final escuro = Theme.of(context).brightness == Brightness.dark;
+    final fundo = Theme.of(context).scaffoldBackgroundColor;
+    final corTema = Theme.of(context).colorScheme.primary;
+    final textoPrincipal = escuro ? Colors.white : Colors.black;
+    final textoSecundario = escuro ? Colors.white60 : Colors.black54;
+    final cardColor = escuro ? const Color(0xFF2A2527) : Colors.white;
+    final maximo =
+        duracao.inMilliseconds > 0 ? duracao.inMilliseconds.toDouble() : 1.0;
+    final valor = posicao.inMilliseconds.clamp(0, maximo.toInt()).toDouble();
+
+    return Scaffold(
+      backgroundColor: fundo,
+      body: Column(
+        children: [
+          MainTabHeader(
+            title: 'Podcast do Dia ${widget.podcast.dia}',
+            subtitle: widget.podcast.titulo,
+            leading: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
+            onLeadingTap: () => Navigator.of(context).pop(),
+            trailing: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(35),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.graphic_eq_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 28),
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: corTema.withAlpha(120)),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 94,
+                        height: 94,
+                        decoration: BoxDecoration(
+                          color: corTema.withAlpha(38),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: corTema.withAlpha(120)),
+                        ),
+                        child: Icon(
+                          widget.podcast.icon,
+                          color: corTema,
+                          size: 44,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        widget.podcast.titulo,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: textoPrincipal,
+                          fontSize: 21,
+                          height: 1.2,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        widget.podcast.descricao,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: textoSecundario,
+                          fontSize: 14,
+                          height: 1.35,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Slider(
+                        value: valor,
+                        min: 0,
+                        max: maximo,
+                        activeColor: corTema,
+                        inactiveColor: textoSecundario.withAlpha(45),
+                        onChanged: duracao == Duration.zero
+                            ? null
+                            : (novoValor) {
+                                player.seek(
+                                  Duration(milliseconds: novoValor.round()),
+                                );
+                              },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _formatarDuracao(posicao),
+                              style: TextStyle(color: textoSecundario),
+                            ),
+                            Text(
+                              duracao == Duration.zero
+                                  ? '--:--'
+                                  : _formatarDuracao(duracao),
+                              style: TextStyle(color: textoSecundario),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            tooltip: 'Voltar 10 segundos',
+                            onPressed: () =>
+                                _pular(const Duration(seconds: -10)),
+                            icon: const Icon(Icons.replay_10_rounded),
+                            color: corTema,
+                          ),
+                          const SizedBox(width: 14),
+                          SizedBox(
+                            width: 70,
+                            height: 70,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: corTema,
+                                foregroundColor: Colors.black,
+                                shape: const CircleBorder(),
+                                padding: EdgeInsets.zero,
+                              ),
+                              onPressed: carregando ? null : _alternar,
+                              child: carregando
+                                  ? const SizedBox(
+                                      width: 25,
+                                      height: 25,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.black,
+                                        strokeWidth: 2.5,
+                                      ),
+                                    )
+                                  : Icon(
+                                      tocando
+                                          ? Icons.pause_rounded
+                                          : Icons.play_arrow_rounded,
+                                      size: 40,
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          IconButton(
+                            tooltip: 'Avançar 30 segundos',
+                            onPressed: () =>
+                                _pular(const Duration(seconds: 30)),
+                            icon: const Icon(Icons.forward_30_rounded),
+                            color: corTema,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      PodcastVolumeControl(player: player),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _alternar() async {
+    if (tocando) {
+      await player.pause();
+      return;
+    }
+
+    setState(() => carregando = true);
+    try {
+      if (!preparado) {
+        await player.setSource(AssetSource(widget.podcast.asset));
+        preparado = true;
+      }
+      await player.resume();
+    } finally {
+      if (mounted) setState(() => carregando = false);
+    }
+  }
+
+  Future<void> _pular(Duration deslocamento) async {
+    if (duracao == Duration.zero) return;
+    final destino = posicao + deslocamento;
+    await player.seek(
+      destino < Duration.zero
+          ? Duration.zero
+          : destino > duracao
+              ? duracao
+              : destino,
+    );
+  }
+
+  String _formatarDuracao(Duration valor) {
+    final minutos = valor.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final segundos = valor.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$minutos:$segundos';
   }
 }
 
@@ -289,11 +891,6 @@ class _BlocosReflexaoPageState extends State<BlocosReflexaoPage> {
 
     return Scaffold(
       backgroundColor: fundo,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.black,
-        title: Text('Bloco de reflexões'),
-      ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.black,
@@ -301,60 +898,93 @@ class _BlocosReflexaoPageState extends State<BlocosReflexaoPage> {
         icon: Icon(Icons.add_rounded),
         label: Text('Criar bloco'),
       ),
-      body: blocos.isEmpty
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  'Crie seu primeiro bloco para guardar uma reflexão livre.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white60, fontSize: 16),
-                ),
-              ),
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.fromLTRB(14, 16, 14, 96),
-              itemCount: blocos.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 10),
-              itemBuilder: (context, index) {
-                final bloco = blocos[index];
-
-                return ListTile(
-                  onTap: () => abrirEditor(bloco: bloco),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.primary.withAlpha(120),
-                    ),
-                  ),
-                  tileColor: const Color(0xFF2A2527),
-                  leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.black,
-                    child: Icon(Icons.edit_note_rounded),
-                  ),
-                  title: Text(
-                    bloco.tema,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Text(
-                    bloco.texto.isEmpty ? 'Sem texto ainda' : bloco.texto,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.white60),
-                  ),
-                  trailing: Icon(
-                    Icons.chevron_right_rounded,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                );
-              },
+      body: Column(
+        children: [
+          MainTabHeader(
+            title: 'Bloco de reflexões',
+            subtitle: 'Um espaço livre para guardar seus pensamentos',
+            leading: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 30,
             ),
+            onLeadingTap: () => Navigator.of(context).pop(),
+            trailing: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(35),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.edit_note_rounded,
+                color: Colors.white,
+                size: 25,
+              ),
+            ),
+          ),
+          Expanded(
+            child: blocos.isEmpty
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text(
+                        'Crie seu primeiro bloco para guardar uma reflexão livre.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white60, fontSize: 16),
+                      ),
+                    ),
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(14, 18, 14, 96),
+                    itemCount: blocos.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final bloco = blocos[index];
+
+                      return ListTile(
+                        onTap: () => abrirEditor(bloco: bloco),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withAlpha(120),
+                          ),
+                        ),
+                        tileColor: const Color(0xFF2A2527),
+                        leading: CircleAvatar(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.black,
+                          child: const Icon(Icons.edit_note_rounded),
+                        ),
+                        title: Text(
+                          bloco.tema,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(
+                          bloco.texto.isEmpty ? 'Sem texto ainda' : bloco.texto,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.white60),
+                        ),
+                        trailing: Icon(
+                          Icons.chevron_right_rounded,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -515,12 +1145,36 @@ class _EditorBlocoReflexaoPageState extends State<EditorBlocoReflexaoPage> {
   }
 }
 
-class DesafiosFeitosPage extends StatelessWidget {
-  final Map<int, ConteudoDesafio> conteudos;
+class DesafiosFeitosPage extends StatefulWidget {
   static const List<int> missoesEspeciais = [7, 14, 21, 28];
   static const Set<int> desafiosComAtividadeSalva = {2, 22, 26};
 
-  const DesafiosFeitosPage({super.key, required this.conteudos});
+  const DesafiosFeitosPage({super.key});
+
+  @override
+  State<DesafiosFeitosPage> createState() => _DesafiosFeitosPageState();
+}
+
+class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
+  final ConteudosService service = ConteudosService();
+  Map<int, ConteudoDesafio> conteudos = {};
+  bool carregando = true;
+
+  @override
+  void initState() {
+    super.initState();
+    carregarConteudos();
+  }
+
+  Future<void> carregarConteudos() async {
+    final dados = await service.carregarConteudos();
+    if (!mounted) return;
+
+    setState(() {
+      conteudos = dados;
+      carregando = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -528,17 +1182,16 @@ class DesafiosFeitosPage extends StatelessWidget {
     final numeros = visualizarTodosDesafiosFeitos
         ? [
             for (int numero = 1; numero <= 28; numero++)
-              if (!missoesEspeciais.contains(numero) &&
+              if (!DesafiosFeitosPage.missoesEspeciais.contains(numero) &&
                   !questionariosDePodcast.contains(numero))
                 numero,
           ]
         : (conteudos.entries
               .where(
                 (entry) =>
-                    !missoesEspeciais.contains(entry.key) &&
+                    !DesafiosFeitosPage.missoesEspeciais.contains(entry.key) &&
                     !questionariosDePodcast.contains(entry.key) &&
-                    (entry.value.temReflexao ||
-                        desafiosComAtividadeSalva.contains(entry.key)),
+                    conteudoDisponivelParaExibicao(entry.key, entry.value),
               )
               .map((entry) => entry.key)
               .toList()
@@ -546,92 +1199,137 @@ class DesafiosFeitosPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: fundo,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.black,
-        title: Text('Desafios feitos'),
-      ),
-      body: numeros.isEmpty
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  'Suas reflexões dos desafios aparecerão aqui.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white60, fontSize: 16),
-                ),
+      body: Column(
+        children: [
+          MainTabHeader(
+            title: 'Desafios feitos',
+            subtitle: 'Relembre respostas, escolhas e aprendizados',
+            leading: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
+            onLeadingTap: () => Navigator.of(context).pop(),
+            trailing: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(35),
+                shape: BoxShape.circle,
               ),
-            )
-          : ListView.separated(
-        padding: const EdgeInsets.fromLTRB(14, 16, 14, 24),
-        itemCount: numeros.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 10),
-        itemBuilder: (context, index) {
-          final numero = numeros[index];
-          final conteudoCompleto = conteudos[numero];
-          final mostraAtividadeCompleta =
-              desafiosComAtividadeSalva.contains(numero);
-          final conteudo = conteudoCompleto == null
-              ? null
-              : mostraAtividadeCompleta
-                  ? conteudoCompleto
-                  : conteudoCompleto.somenteReflexoes();
-          final temConteudo = conteudo != null && conteudo.itens.isNotEmpty;
-
-          return ListTile(
-            onTap: temConteudo
-                ? () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ConteudoDesafioPage(conteudo: conteudo!),
+              child: const Icon(
+                Icons.auto_stories_rounded,
+                color: Colors.white,
+                size: 23,
+              ),
+            ),
+          ),
+          Expanded(
+            child: carregando
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  )
+                : numeros.isEmpty
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text(
+                        'Suas reflexões dos desafios aparecerão aqui.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white60,
+                          fontSize: 16,
+                        ),
                       ),
-                    );
-                  }
-                : null,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(
-                color: temConteudo
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.white.withAlpha(26),
-              ),
-            ),
-            tileColor: temConteudo
-                ? const Color(0xFF2A2527)
-                : const Color(0xFF211D1F),
-            leading: CircleAvatar(
-              backgroundColor: temConteudo
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.white12,
-              foregroundColor: temConteudo ? Colors.black : Colors.white54,
-              child: Text('$numero'),
-            ),
-            title: Text(
-              tituloDesafio(numero),
-              style: TextStyle(
-                color: temConteudo ? Colors.white : Colors.white54,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text(
-              temConteudo
-                  ? mostraAtividadeCompleta
-                      ? '${conteudo.itens.length} resposta(s) salva(s)'
-                      : '${conteudo.itens.length} reflexão(ões) salva(s)'
-                  : 'Prévia do espaço',
-              style: TextStyle(color: Colors.white60),
-            ),
-            trailing: Icon(
-              temConteudo
-                  ? Icons.chevron_right_rounded
-                  : Icons.visibility_outlined,
-              color: temConteudo
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.white38,
-            ),
-          );
-        },
+                    ),
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(14, 18, 14, 24),
+                    itemCount: numeros.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final numero = numeros[index];
+                      final conteudoCompleto = conteudos[numero];
+                      final mostraAtividadeCompleta =
+                          DesafiosFeitosPage.desafiosComAtividadeSalva
+                              .contains(numero);
+                      final conteudo = conteudoCompleto == null
+                          ? null
+                          : mostraAtividadeCompleta
+                              ? conteudoCompleto
+                              : conteudoCompleto.somenteReflexoes();
+                      final temConteudo = conteudoCompleto != null &&
+                          conteudoDisponivelParaExibicao(
+                            numero,
+                            conteudoCompleto,
+                          ) &&
+                          conteudo != null &&
+                          conteudo.itens.isNotEmpty;
+
+                      return ListTile(
+                        onTap: temConteudo
+                            ? () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ConteudoDesafioPage(
+                                      conteudo: conteudo!,
+                                    ),
+                                  ),
+                                );
+                              }
+                            : null,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: temConteudo
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.white.withAlpha(26),
+                          ),
+                        ),
+                        tileColor: temConteudo
+                            ? const Color(0xFF2A2527)
+                            : const Color(0xFF211D1F),
+                        leading: CircleAvatar(
+                          backgroundColor: temConteudo
+                              ? Theme.of(context).colorScheme.primary
+                              : Colors.white12,
+                          foregroundColor:
+                              temConteudo ? Colors.black : Colors.white54,
+                          child: Text('$numero'),
+                        ),
+                        title: Text(
+                          temConteudo ? tituloDesafio(numero) : 'Dia $numero',
+                          style: TextStyle(
+                            color:
+                                temConteudo ? Colors.white : Colors.white54,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: temConteudo
+                            ? Text(
+                                mostraAtividadeCompleta
+                                    ? '${conteudo.itens.length} resposta(s) salva(s)'
+                                    : '${conteudo.itens.length} reflexão(ões) salva(s)',
+                                style:
+                                    const TextStyle(color: Colors.white60),
+                              )
+                            : null,
+                        trailing: Icon(
+                          temConteudo
+                              ? Icons.chevron_right_rounded
+                              : Icons.visibility_outlined,
+                          color: temConteudo
+                              ? Theme.of(context).colorScheme.primary
+                              : Colors.white38,
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -649,69 +1347,96 @@ class MissoesEspeciaisPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: fundo,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.black,
-        title: Text('Reflexões da semana'),
-      ),
-      body: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(14, 16, 14, 24),
-        itemCount: missoesEspeciais.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 10),
-        itemBuilder: (context, index) {
-          final numero = missoesEspeciais[index];
-          final numeroSemana = index + 1;
-          final conteudo = conteudos[numero]?.somenteReflexoes();
-          final temConteudo = conteudo != null && conteudo.itens.isNotEmpty;
-
-          return ListTile(
-            onTap: temConteudo
-                ? () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ConteudoDesafioPage(conteudo: conteudo),
-                      ),
-                    );
-                  }
-                : null,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(
-                color: temConteudo
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.white.withAlpha(20),
+      body: Column(
+        children: [
+          MainTabHeader(
+            title: 'Reflexões da semana',
+            subtitle: 'Revisite as decisões que marcaram sua jornada',
+            leading: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
+            onLeadingTap: () => Navigator.of(context).pop(),
+            trailing: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(35),
+                shape: BoxShape.circle,
               ),
-            ),
-            tileColor: temConteudo
-                ? const Color(0xFF2A2527)
-                : const Color(0xFF211D1F),
-            leading: CircleAvatar(
-              backgroundColor: temConteudo
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.white24,
-              foregroundColor: Colors.black,
-              child: Icon(Icons.auto_awesome_rounded),
-            ),
-            title: Text(
-              'Reflexão da semana $numeroSemana',
-              style: TextStyle(
+              child: const Icon(
+                Icons.auto_awesome_rounded,
                 color: Colors.white,
-                fontWeight: FontWeight.bold,
+                size: 23,
               ),
             ),
-            subtitle: Text(
-              temConteudo ? 'Lembrança salva' : 'Nada escrito ainda',
-              style: TextStyle(color: Colors.white60),
+          ),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.fromLTRB(14, 18, 14, 24),
+              itemCount: missoesEspeciais.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final numero = missoesEspeciais[index];
+                final numeroSemana = index + 1;
+                final conteudo = conteudos[numero]?.somenteReflexoes();
+                final temConteudo =
+                    conteudo != null && conteudo.itens.isNotEmpty;
+
+                return ListTile(
+                  onTap: temConteudo
+                      ? () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ConteudoDesafioPage(conteudo: conteudo),
+                            ),
+                          );
+                        }
+                      : null,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(
+                      color: temConteudo
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.white.withAlpha(20),
+                    ),
+                  ),
+                  tileColor: temConteudo
+                      ? const Color(0xFF2A2527)
+                      : const Color(0xFF211D1F),
+                  leading: CircleAvatar(
+                    backgroundColor: temConteudo
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.white24,
+                    foregroundColor: Colors.black,
+                    child: const Icon(Icons.auto_awesome_rounded),
+                  ),
+                  title: Text(
+                    'Reflexão da semana $numeroSemana',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    temConteudo ? 'Lembrança salva' : 'Nada escrito ainda',
+                    style: const TextStyle(color: Colors.white60),
+                  ),
+                  trailing: Icon(
+                    temConteudo
+                        ? Icons.chevron_right_rounded
+                        : Icons.lock_outline_rounded,
+                    color: temConteudo
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.white38,
+                  ),
+                );
+              },
             ),
-            trailing: Icon(
-              temConteudo
-                  ? Icons.chevron_right_rounded
-                  : Icons.lock_outline_rounded,
-              color: temConteudo ? Theme.of(context).colorScheme.primary : Colors.white38,
-            ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
@@ -732,60 +1457,96 @@ class ConteudoDesafioPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: fundo,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.black,
-        title: Text(tituloDesafio(conteudo.desafio)),
-      ),
-      body: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 26),
-        itemCount: conteudo.itens.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 12),
-        itemBuilder: (context, index) {
-          final item = conteudo.itens[index];
+      body: Column(
+        children: [
+          MainTabHeader(
+            title: 'Dia ${conteudo.desafio}',
+            subtitle: temaDesafio(conteudo.desafio),
+            leading: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
+            onLeadingTap: () => Navigator.of(context).pop(),
+            trailing: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(35),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.bookmark_added_rounded,
+                color: Colors.white,
+                size: 23,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 26),
+              itemCount: conteudo.itens.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final item = conteudo.itens[index];
 
-          return Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2A2527),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Theme.of(context).colorScheme.primary.withAlpha(120)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.titulo,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  item.texto,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    height: 1.35,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Row(
-                  children: [
-                    Icon(Icons.lock_rounded, color: Colors.white38, size: 15),
-                    SizedBox(width: 6),
-                    Text(
-                      'Lembrança salva',
-                      style: TextStyle(color: Colors.white38, fontSize: 12),
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2A2527),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withAlpha(120),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.titulo,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        item.texto,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          height: 1.35,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const Row(
+                        children: [
+                          Icon(
+                            Icons.lock_rounded,
+                            color: Colors.white38,
+                            size: 15,
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'Lembrança salva',
+                            style: TextStyle(
+                              color: Colors.white38,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
@@ -816,46 +1577,71 @@ class ConteudoDesafio2Page extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: fundo,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.black,
-        title: Text(tituloDesafio(2)),
-      ),
-      body: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 18, 16, 22),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Prédio da vida',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
+      body: Column(
+        children: [
+          MainTabHeader(
+            title: 'Dia 2',
+            subtitle: temaDesafio(2),
+            leading: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
+            onLeadingTap: () => Navigator.of(context).pop(),
+            trailing: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(35),
+                shape: BoxShape.circle,
               ),
-              const SizedBox(height: 6),
-              Text(
-                'Toque em uma janela para rever a lembrança salva.',
-                style: TextStyle(color: Colors.white60, fontSize: 14),
+              child: const Icon(
+                Icons.apartment_rounded,
+                color: Colors.white,
+                size: 24,
               ),
-              const SizedBox(height: 14),
-              Expanded(
-                child: Center(
-                  child: _PredioConteudo(
-                    areas: areasPredio,
-                    textos: textos,
-                    onJanelaTap: (area) {
-                      _abrirLeitura(context, area, textos[area] ?? '');
-                    },
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 22),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Prédio da vida',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Toque em uma janela para rever a lembrança salva.',
+                    style: TextStyle(color: Colors.white60, fontSize: 14),
+                  ),
+                  const SizedBox(height: 14),
+                  Expanded(
+                    child: Center(
+                      child: _PredioConteudo(
+                        areas: areasPredio,
+                        textos: textos,
+                        onJanelaTap: (area) {
+                          _abrirLeitura(
+                            context,
+                            area,
+                            textos[area] ?? '',
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

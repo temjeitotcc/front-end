@@ -1,4 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
+import '../../../widgets/challenge_header_surface.dart';
 
 import '../../../services/conteudos_service.dart';
 
@@ -68,48 +70,54 @@ class _Desafio2PageState extends State<Desafio2Page> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Dia 2 - Minha empresa, minha vida',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: textoPrincipal,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+              ChallengeHeaderSurface(
+                child: Column(
+                  children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Dia 2 - Minha empresa, minha vida',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: textoPrincipal,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              etapaAtual == 0 ? 'Instruções' : 'Prédio da vida',
+                              style: TextStyle(color: textoSecundario),
+                            ),
+                          ],
                         ),
-                        Text(
-                          etapaAtual == 0 ? 'Instruções' : 'Prédio da vida',
-                          style: TextStyle(color: textoSecundario),
+                      ),
+                      IconButton(
+                        tooltip: 'Sair',
+                        style: IconButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.black,
                         ),
+                        onPressed: () => Navigator.of(context).pop(false),
+                        icon: Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: (etapaAtual + 1) / 2,
+                      minHeight: 10,
+                      backgroundColor: Colors.white12,
+                      valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
+                    ),
+                  ),
                       ],
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: 'Sair',
-                    style: IconButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(false),
-                    icon: Icon(Icons.close_rounded),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: (etapaAtual + 1) / 2,
-                  minHeight: 10,
-                  backgroundColor: Colors.white12,
-                  valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
                 ),
               ),
               const SizedBox(height: 22),

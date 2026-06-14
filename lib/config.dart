@@ -674,19 +674,95 @@ class SobrePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fundo = Theme.of(context).scaffoldBackgroundColor;
-    final texto = Theme.of(context).brightness == Brightness.dark
+    final textoPrincipal = Theme.of(context).brightness == Brightness.dark
         ? Colors.white
         : Colors.black;
+    final textoSecundario = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white70
+        : Colors.black54;
+    final cardColor = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF2A2527)
+        : Colors.white;
+    final corTema = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
       backgroundColor: fundo,
-      appBar: AppBar(title: const Text('Sobre')),
-      body: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Text(
-          'Tem Jeito vale a pena\n\nVersão 1.0\n\nTCC',
-          style: TextStyle(color: texto, fontSize: 16),
-        ),
+      body: Column(
+        children: [
+          MainTabHeader(
+            title: 'Sobre',
+            subtitle: 'Conheça melhor o projeto',
+            leading: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
+            onLeadingTap: () => Navigator.of(context).pop(),
+            trailing: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(35),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.info_outline_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 22, 16, 24),
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: corTema.withAlpha(110)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.auto_awesome_rounded, color: corTema, size: 30),
+                      const SizedBox(height: 14),
+                      Text(
+                        'Tem Jeito e Vale a Pena',
+                        style: TextStyle(
+                          color: textoPrincipal,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Um projeto de autoconhecimento, reflexão e transformação construído como Trabalho de Conclusão de Curso.',
+                        style: TextStyle(
+                          color: textoSecundario,
+                          fontSize: 15,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Divider(color: corTema.withAlpha(80)),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Versão 1.0',
+                        style: TextStyle(
+                          color: corTema,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -698,19 +774,155 @@ class AjudaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fundo = Theme.of(context).scaffoldBackgroundColor;
-    final texto = Theme.of(context).brightness == Brightness.dark
+    final textoPrincipal = Theme.of(context).brightness == Brightness.dark
         ? Colors.white
         : Colors.black;
+    final textoSecundario = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white70
+        : Colors.black54;
+    final cardColor = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF2A2527)
+        : Colors.white;
+    final corTema = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
       backgroundColor: fundo,
-      appBar: AppBar(title: const Text('Ajuda')),
-      body: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Text(
-          'Aqui você pode colocar dúvidas frequentes, instruções de uso e contato de suporte.',
-          style: TextStyle(color: texto, fontSize: 16),
-        ),
+      body: Column(
+        children: [
+          MainTabHeader(
+            title: 'Ajuda',
+            subtitle: 'Orientações para seguir sua jornada',
+            leading: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
+            onLeadingTap: () => Navigator.of(context).pop(),
+            trailing: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(35),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.help_outline_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 22, 16, 24),
+              children: [
+                _HelpCard(
+                  icon: Icons.flag_outlined,
+                  title: 'Como avançar',
+                  text:
+                      'Conclua cada desafio com atenção. Suas respostas e reflexões ficam disponíveis na aba de conteúdos.',
+                  cardColor: cardColor,
+                  color: corTema,
+                  textColor: textoPrincipal,
+                  secondaryTextColor: textoSecundario,
+                ),
+                const SizedBox(height: 12),
+                _HelpCard(
+                  icon: Icons.palette_outlined,
+                  title: 'Temas do aplicativo',
+                  text:
+                      'Os temas adquiridos na loja podem ser escolhidos nas configurações e aplicados ao aplicativo.',
+                  cardColor: cardColor,
+                  color: corTema,
+                  textColor: textoPrincipal,
+                  secondaryTextColor: textoSecundario,
+                ),
+                const SizedBox(height: 12),
+                _HelpCard(
+                  icon: Icons.support_agent_rounded,
+                  title: 'Precisa de suporte?',
+                  text:
+                      'Caso encontre um problema, anote o desafio e a ação realizada para facilitar a identificação.',
+                  cardColor: cardColor,
+                  color: corTema,
+                  textColor: textoPrincipal,
+                  secondaryTextColor: textoSecundario,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HelpCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String text;
+  final Color cardColor;
+  final Color color;
+  final Color textColor;
+  final Color secondaryTextColor;
+
+  const _HelpCard({
+    required this.icon,
+    required this.title,
+    required this.text,
+    required this.cardColor,
+    required this.color,
+    required this.textColor,
+    required this.secondaryTextColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: color.withAlpha(100)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: color.withAlpha(38),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 23),
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  text,
+                  style: TextStyle(
+                    color: secondaryTextColor,
+                    fontSize: 14,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

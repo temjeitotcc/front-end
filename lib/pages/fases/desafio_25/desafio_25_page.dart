@@ -5,26 +5,23 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
-class Desafio13Page extends StatefulWidget {
-  const Desafio13Page({super.key});
+class Desafio25Page extends StatefulWidget {
+  const Desafio25Page({super.key});
 
   @override
-  State<Desafio13Page> createState() => _Desafio13PageState();
+  State<Desafio25Page> createState() => _Desafio25PageState();
 }
 
-class _Desafio13PageState extends State<Desafio13Page> {
+class _Desafio25PageState extends State<Desafio25Page> {
   final TextEditingController reflexaoController = TextEditingController();
-  String nomeUsuario = 'você';
+
+  String nomeUsuario = 'Usuário';
   int etapaAtual = 0;
   int? resposta1;
   int? resposta2;
-  final List<bool?> respostasVf3 = [null, null, null];
-  final List<bool?> respostasVf4 = [null, null, null];
+  int? resposta3;
 
-  static const int respostaCorreta1 = 1;
-  static const int respostaCorreta2 = 1;
-  static const List<bool> respostasCorretasVf3 = [true, false, true];
-  static const List<bool> respostasCorretasVf4 = [true, false, true];
+  static const List<int> respostasCorretas = [1, 1, 2];
 
   @override
   void initState() {
@@ -46,16 +43,11 @@ class _Desafio13PageState extends State<Desafio13Page> {
 
   @override
   Widget build(BuildContext context) {
+    final escuro = Theme.of(context).brightness == Brightness.dark;
     final fundo = Theme.of(context).scaffoldBackgroundColor;
-    final textoPrincipal = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
-    final textoSecundario = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white70
-        : Colors.black54;
-    final cardColor = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF2A2527)
-        : Colors.white;
+    final textoPrincipal = escuro ? Colors.white : Colors.black;
+    final textoSecundario = escuro ? Colors.white70 : Colors.black54;
+    final cardColor = escuro ? const Color(0xFF2A2527) : Colors.white;
     final corTema = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
@@ -76,7 +68,7 @@ class _Desafio13PageState extends State<Desafio13Page> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Dia 13 - Atividade',
+                              'Dia 25 - Revisitando os Aprendizados',
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -107,7 +99,7 @@ class _Desafio13PageState extends State<Desafio13Page> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(999),
                     child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 6,
+                      value: (etapaAtual + 1) / 5,
                       minHeight: 10,
                       backgroundColor: Colors.white12,
                       valueColor: AlwaysStoppedAnimation(corTema),
@@ -128,31 +120,17 @@ class _Desafio13PageState extends State<Desafio13Page> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: switch (etapaAtual) {
-                      0 => _conteudoIntroducao(textoPrincipal, textoSecundario),
-                      1 => _conteudoMultiplaEscolha1(),
-                      2 => _conteudoMultiplaEscolha2(),
-                      3 => _conteudoVerdadeiroFalso(
-                          titulo: "Questão 3  [ V ou F ]",
-                          intro: "Sobre a atividade 'Trocando os Óculos', avalie:",
-                          respostas: respostasVf3,
-                          afirmacoes: const [
-                            'A atividade propõe que o leitor relembre momentos de raiva, medo, inveja e ódio para ressignificá-los com um novo significado positivo.',
-                            'Trocar os óculos significa apagar o passado e fingir que experiências negativas nunca existiram.',
-                            'Os óculos da gratidão permitem enxergar o que realmente importa e reconhecer a própria jornada de sobrevivente.',
-                          ],
+                      0 => _conteudoIntroducao(
+                          textoPrincipal,
+                          textoSecundario,
                         ),
-                      4 => _conteudoVerdadeiroFalso(
-                          titulo: "Questão 4  [ V ou F ]",
-                          intro:
-                              'Julgue as afirmações sobre a Visualização Positiva de Futuro:',
-                          respostas: respostasVf4,
-                          afirmacoes: const [
-                            'A visualização positiva consiste em imaginar o futuro desejado e usar esse recurso para alinhar pensamentos, sentimentos e comportamentos ao propósito.',
-                            'O Mural dos Sonhos deve conter fotos pessoais antigas do leitor para relembrar quem ele foi.',
-                            'Quando um sonho recebe uma data e um plano de ação, ele se transforma em meta.',
-                          ],
+                      1 => _questao1(),
+                      2 => _questao2(),
+                      3 => _questao3(),
+                      _ => _conteudoReflexao(
+                          textoPrincipal,
+                          textoSecundario,
                         ),
-                      _ => _conteudoReflexao(textoPrincipal, textoSecundario),
                     },
                   ),
                 ),
@@ -180,13 +158,13 @@ class _Desafio13PageState extends State<Desafio13Page> {
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      onPressed: etapaAtual < 5 ? _proximo : _concluir,
+                      onPressed: etapaAtual < 4 ? _proximo : _concluir,
                       icon: Icon(
-                        etapaAtual < 5
+                        etapaAtual < 4
                             ? Icons.arrow_forward_rounded
                             : Icons.check_rounded,
                       ),
-                      label: Text(etapaAtual < 5 ? 'Próximo' : 'Concluir'),
+                      label: Text(etapaAtual < 4 ? 'Próximo' : 'Concluir'),
                     ),
                   ),
                 ],
@@ -200,12 +178,11 @@ class _Desafio13PageState extends State<Desafio13Page> {
 
   String _subtituloEtapa() {
     return switch (etapaAtual) {
-      0 => 'Troca de óculos e futuro',
-      1 => 'Questão 1 de 4',
-      2 => 'Questão 2 de 4',
-      3 => 'Questão 3 de 4',
-      4 => 'Questão 4 de 4',
-      _ => 'Reflexão final',
+      0 => 'Uma pausa para reconhecer sua evolução',
+      1 => 'Questão 1 de 3',
+      2 => 'Questão 2 de 3',
+      3 => 'Questão 3 de 3',
+      _ => 'O aprendizado que segue com você',
     };
   }
 
@@ -214,6 +191,7 @@ class _Desafio13PageState extends State<Desafio13Page> {
     Color textoSecundario,
   ) {
     final corTema = Theme.of(context).colorScheme.primary;
+
     return [
       Expanded(
         child: SingleChildScrollView(
@@ -221,19 +199,19 @@ class _Desafio13PageState extends State<Desafio13Page> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: corTema.withAlpha(34),
+                  color: corTema.withAlpha(32),
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: corTema.withAlpha(160)),
+                  border: Border.all(color: corTema.withAlpha(145)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.visibility_rounded, color: corTema, size: 30),
+                    Icon(Icons.history_edu_rounded, color: corTema, size: 31),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Revise o podcast e pense em como aplicar esses conceitos.',
+                        'Revisitar o caminho também é uma forma de perceber o quanto você cresceu.',
                         style: TextStyle(
                           color: corTema,
                           fontSize: 15,
@@ -247,7 +225,7 @@ class _Desafio13PageState extends State<Desafio13Page> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Oieee, $nomeUsuario! Estamos nos aproximando do fim de mais uma semana. Animado(a)?',
+                'Olá, $nomeUsuario! Que bom ter você aqui para mais um dia da sua jornada!',
                 style: TextStyle(
                   color: textoPrincipal,
                   fontSize: 18,
@@ -256,15 +234,36 @@ class _Desafio13PageState extends State<Desafio13Page> {
                 ),
               ),
               const SizedBox(height: 14),
-              _ParagraphText(
+              _Paragraph(
                 text:
-                    'Ontem você ouviu o podcast sobre a Troca de Óculos e a Visualização Positiva do Futuro.',
+                    'Ao longo deste projeto, você foi convidado a olhar para dentro de si, refletir sobre sua história, seus sonhos, suas escolhas e seu propósito.',
                 color: textoSecundario,
               ),
-              _ParagraphText(
+              _Paragraph(
                 text:
-                    'Agora é o momento de revisar os principais conceitos e refletir sobre como eles podem ser aplicados na sua vida.',
+                    'Aprendemos que a transformação acontece quando desenvolvemos consciência sobre quem somos, sobre os padrões que nos limitam e sobre as atitudes que nos aproximam da vida que desejamos construir.',
                 color: textoSecundario,
+              ),
+              _Paragraph(
+                text:
+                    'Hoje vamos revisar a metáfora do jardim e do pântano, os 7 Passos da Sobrevivência e a importância de reconhecer que cada pessoa possui uma identidade única e um papel especial no mundo.',
+                color: textoSecundario,
+              ),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: corTema.withAlpha(22),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  'Responda com atenção e relembre os ensinamentos que trouxeram você até aqui.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: corTema,
+                    fontWeight: FontWeight.bold,
+                    height: 1.3,
+                  ),
+                ),
               ),
             ],
           ),
@@ -273,71 +272,81 @@ class _Desafio13PageState extends State<Desafio13Page> {
     ];
   }
 
-  List<Widget> _conteudoMultiplaEscolha1() {
-    return _conteudoQuestaoMultiplaEscolha(
+  List<Widget> _questao1() {
+    return _conteudoQuestao(
       titulo: 'Questão 1',
       pergunta:
-          "A técnica de 'Visualização Positiva de Futuro', descrita no livro, consiste em:",
+          "Na atividade 'Quem Sou Eu?', a metáfora do jardim e do pântano representa respectivamente:",
       selecionada: resposta1,
       onChanged: (valor) => setState(() => resposta1 = valor),
       alternativas: const [
-        'Fingir que os problemas não existem para se sentir mais feliz.',
-        'Criar imagens mentais e visuais de sonhos futuros, colocando-os no papel com datas e plano de ação para transformá-los em metas.',
-        'Assistir a vídeos motivacionais todos os dias ao acordar.',
-        'Meditar por pelo menos uma hora diária em silêncio absoluto.',
-        'Eliminar qualquer pensamento negativo do cotidiano por meio de repetição de mantras.',
+        'O futuro desejado e o presente vivido.',
+        'As conquistas e alegrias da vida versus as dores, traumas e pedras que precisam ser reconhecidas e abandonadas.',
+        'Os relacionamentos saudáveis e os relacionamentos tóxicos.',
+        'Os sonhos realizados e os sonhos impossíveis.',
+        'A mente consciente e a mente subconsciente, sem possibilidade de integração.',
       ],
     );
   }
 
-  List<Widget> _conteudoMultiplaEscolha2() {
-    return _conteudoQuestaoMultiplaEscolha(
+  List<Widget> _questao2() {
+    return _conteudoQuestao(
       titulo: 'Questão 2',
       pergunta:
-          "Quando a autora fala em 'trocar os óculos', ela propõe que o leitor:",
+          "Considerando os '7 Passos da Sobrevivência' e a fórmula 'Conhecimento + Estratégia + Prática = Treinamento Eficaz', qual sequência representa o caminho mais coerente para assumir o controle da própria vida?",
       selecionada: resposta2,
       onChanged: (valor) => setState(() => resposta2 = valor),
       alternativas: const [
-        'Busque uma nova perspectiva de vida através de viagens e novas experiências externas.',
-        'Substitua sua forma de enxergar situações passadas, trocando os óculos do medo, da raiva e da dor pelos da gratidão e do propósito.',
-        'Ignore completamente o passado e foque somente no futuro.',
-        'Adote uma filosofia religiosa específica para enxergar o mundo de forma positiva.',
-        'Consulte um especialista para redirecionar sua visão de mundo.',
+        'Esperar as condições externas melhorarem, buscar conhecimento e agir eventualmente.',
+        'Decidir ser feliz, acreditar na mudança, sair da autossabotagem, encher a caixa de ferramentas, viver na gratidão, estabelecer metas claras e inspirar pessoas com autorresponsabilidade.',
+        'Primeiro eliminar todos os relacionamentos tóxicos, depois buscar autoconhecimento.',
+        'Estudar o passado exaustivamente antes de tomar qualquer decisão sobre o futuro.',
+        'Focar apenas no departamento profissional, pois é o que mais impacta os demais.',
       ],
     );
   }
 
-  List<Widget> _conteudoQuestaoMultiplaEscolha({
+  List<Widget> _questao3() {
+    return _conteudoQuestao(
+      titulo: 'Questão 3',
+      pergunta:
+          "A afirmação 'quando abandonas seus sonhos e começa a fazer escolhas equivocadas, toda a sociedade perde' está diretamente ligada a qual combinação de conceitos?",
+      selecionada: resposta3,
+      onChanged: (valor) => setState(() => resposta3 = valor),
+      alternativas: const [
+        'Inteligências Múltiplas e Mural dos Sonhos.',
+        'Trocar os Óculos e Autoestima.',
+        'Essência é Servir, Identidade Única e Impacto Coletivo do Propósito Individual.',
+        'Autorresponsabilidade e Terapia Cognitiva Comportamental.',
+        'Benzetacil, Gratidão e Relacionamentos.',
+      ],
+    );
+  }
+
+  List<Widget> _conteudoQuestao({
     required String titulo,
     required String pergunta,
     required int? selecionada,
     required ValueChanged<int> onChanged,
     required List<String> alternativas,
   }) {
-    final textoPrincipal = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
-    final textoSecundario = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white70
-        : Colors.black54;
+    final escuro = Theme.of(context).brightness == Brightness.dark;
+    final textoPrincipal = escuro ? Colors.white : Colors.black;
+    final textoSecundario = escuro ? Colors.white70 : Colors.black54;
 
     return [
       Text(
         '$titulo  [ Múltipla Escolha ]',
         style: TextStyle(
           color: textoPrincipal,
-          fontSize: 22,
+          fontSize: 21,
           fontWeight: FontWeight.bold,
         ),
       ),
       const SizedBox(height: 10),
       Text(
         pergunta,
-        style: TextStyle(
-          color: textoSecundario,
-          fontSize: 15,
-          height: 1.35,
-        ),
+        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
       Expanded(
@@ -357,63 +366,18 @@ class _Desafio13PageState extends State<Desafio13Page> {
     ];
   }
 
-  List<Widget> _conteudoVerdadeiroFalso({
-    required String titulo,
-    required String intro,
-    required List<bool?> respostas,
-    required List<String> afirmacoes,
-  }) {
-    final textoPrincipal = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
-    final textoSecundario = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white70
-        : Colors.black54;
-
-    return [
-      Text(
-        titulo,
-        style: TextStyle(
-          color: textoPrincipal,
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      const SizedBox(height: 10),
-      Text(
-        intro,
-        style: TextStyle(
-          color: textoSecundario,
-          fontSize: 15,
-          height: 1.35,
-        ),
-      ),
-      const SizedBox(height: 14),
-      Expanded(
-        child: ListView.separated(
-          itemCount: afirmacoes.length,
-          separatorBuilder: (_, _) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            return _TrueFalseTile(
-              letra: String.fromCharCode(97 + index),
-              texto: afirmacoes[index],
-              valor: respostas[index],
-              onChanged: (valor) => setState(() => respostas[index] = valor),
-            );
-          },
-        ),
-      ),
-    ];
-  }
-
   List<Widget> _conteudoReflexao(
     Color textoPrincipal,
     Color textoSecundario,
   ) {
     final corTema = Theme.of(context).colorScheme.primary;
+    final campo = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF171315)
+        : const Color(0xFFF6F1E7);
+
     return [
       Text(
-        'Reflexão final',
+        'O que permanece com você?',
         style: TextStyle(
           color: textoPrincipal,
           fontSize: 22,
@@ -422,23 +386,18 @@ class _Desafio13PageState extends State<Desafio13Page> {
       ),
       const SizedBox(height: 10),
       Text(
-        'Pare por alguns instantes e pense:',
+        'Toda transformação começa quando você escolhe olhar para sua história de uma forma diferente, assume o protagonismo das suas decisões e acredita que pode evoluir todos os dias.',
         style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
-      const SizedBox(height: 10),
+      const SizedBox(height: 12),
       Text(
-        'Quais "óculos" você tem usado para enxergar sua vida hoje: os da dor, do medo e da escassez ou os da gratidão, do aprendizado e das possibilidades?',
+        'Qual ensinamento desta jornada teve o maior impacto na sua vida e como você pretende aplicá-lo daqui para frente?',
         style: TextStyle(
           color: corTema,
           fontSize: 16,
           height: 1.35,
           fontWeight: FontWeight.bold,
         ),
-      ),
-      const SizedBox(height: 10),
-      Text(
-        'Qual futuro você deseja construir e qual pequeno passo pode dar hoje para se aproximar dele?',
-        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
       Expanded(
@@ -450,12 +409,10 @@ class _Desafio13PageState extends State<Desafio13Page> {
           textAlignVertical: TextAlignVertical.top,
           style: TextStyle(color: textoPrincipal, fontSize: 16, height: 1.35),
           decoration: InputDecoration(
-            hintText: 'Hoje eu escolho enxergar minha vida...',
+            hintText: 'O ensinamento que mais me marcou foi...',
             hintStyle: TextStyle(color: textoSecundario.withAlpha(140)),
             filled: true,
-            fillColor: Theme.of(context).brightness == Brightness.dark
-                ? const Color(0xFF171315)
-                : const Color(0xFFF6F1E7),
+            fillColor: campo,
             contentPadding: const EdgeInsets.all(16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
@@ -480,22 +437,18 @@ class _Desafio13PageState extends State<Desafio13Page> {
   }
 
   void _proximo() {
-    if (etapaAtual == 1 && resposta1 == null) {
+    final respostaAtual = switch (etapaAtual) {
+      1 => resposta1,
+      2 => resposta2,
+      3 => resposta3,
+      _ => 0,
+    };
+
+    if (etapaAtual >= 1 && etapaAtual <= 3 && respostaAtual == null) {
       _mostrarPendencia('Escolha uma alternativa antes de avançar.');
       return;
     }
-    if (etapaAtual == 2 && resposta2 == null) {
-      _mostrarPendencia('Escolha uma alternativa antes de avançar.');
-      return;
-    }
-    if (etapaAtual == 3 && respostasVf3.any((resposta) => resposta == null)) {
-      _mostrarPendencia('Marque verdadeiro ou falso em todos os itens.');
-      return;
-    }
-    if (etapaAtual == 4 && respostasVf4.any((resposta) => resposta == null)) {
-      _mostrarPendencia('Marque verdadeiro ou falso em todos os itens.');
-      return;
-    }
+
     setState(() => etapaAtual++);
   }
 
@@ -508,14 +461,14 @@ class _Desafio13PageState extends State<Desafio13Page> {
 
     final acertos = _contarAcertos();
     await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 13,
+      desafio: 25,
       itens: [
         ConteudoItem(
           titulo: 'Resultado da atividade',
-          texto: '$acertos de 8 acertos',
+          texto: '$acertos de 3 acertos',
         ),
         ConteudoItem(
-          titulo: 'Óculos e futuro',
+          titulo: 'Aprendizado de maior impacto',
           texto: reflexao,
           reflexao: true,
         ),
@@ -529,20 +482,18 @@ class _Desafio13PageState extends State<Desafio13Page> {
   }
 
   int _contarAcertos() {
+    final respostas = [resposta1, resposta2, resposta3];
     var acertos = 0;
-    if (resposta1 == respostaCorreta1) acertos++;
-    if (resposta2 == respostaCorreta2) acertos++;
-    for (int i = 0; i < respostasVf3.length; i++) {
-      if (respostasVf3[i] == respostasCorretasVf3[i]) acertos++;
-    }
-    for (int i = 0; i < respostasVf4.length; i++) {
-      if (respostasVf4[i] == respostasCorretasVf4[i]) acertos++;
+    for (int i = 0; i < respostas.length; i++) {
+      if (respostas[i] == respostasCorretas[i]) acertos++;
     }
     return acertos;
   }
 
   void _mostrarPendencia(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensagem)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensagem)),
+    );
   }
 
   Future<void> _mostrarResultado(int acertos) async {
@@ -556,13 +507,13 @@ class _Desafio13PageState extends State<Desafio13Page> {
               : Colors.white,
           title: Row(
             children: [
-              Icon(Icons.emoji_events_rounded, color: corTema),
+              Icon(Icons.auto_awesome_rounded, color: corTema),
               const SizedBox(width: 8),
-              const Text('Resultado'),
+              const Text('Aprendizados revisitados'),
             ],
           ),
           content: Text(
-            'Você acertou $acertos de 8. Nos vemos amanhã para mais um desafio!',
+            'Você acertou $acertos de 3. Mais importante que lembrar cada resposta é reconhecer o que essa jornada já transformou em você.',
           ),
           actions: [
             TextButton(
@@ -595,35 +546,40 @@ class _AlternativeTile extends StatelessWidget {
     final textoPrincipal = Theme.of(context).brightness == Brightness.dark
         ? Colors.white
         : Colors.black;
-    final textoSecundario = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white70
-        : Colors.black54;
+
     return Material(
-      color: selecionada ? corTema.withAlpha(42) : Colors.transparent,
-      borderRadius: BorderRadius.circular(18),
+      color: selecionada
+          ? corTema.withAlpha(38)
+          : Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF211D1F)
+              : const Color(0xFFF6F1E7),
+      borderRadius: BorderRadius.circular(16),
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
         onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: selecionada ? corTema : textoSecundario.withAlpha(65),
+              color: selecionada ? corTema : Colors.transparent,
+              width: 2,
             ),
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                radius: 17,
-                backgroundColor: selecionada ? corTema : corTema.withAlpha(32),
-                foregroundColor: selecionada ? Colors.black : corTema,
+                radius: 16,
+                backgroundColor: selecionada ? corTema : Colors.white12,
+                foregroundColor:
+                    selecionada ? Colors.black : textoPrincipal,
                 child: Text(
                   letra,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 11),
               Expanded(
                 child: Text(
                   texto,
@@ -642,108 +598,11 @@ class _AlternativeTile extends StatelessWidget {
   }
 }
 
-class _TrueFalseTile extends StatelessWidget {
-  final String letra;
-  final String texto;
-  final bool? valor;
-  final ValueChanged<bool> onChanged;
-
-  const _TrueFalseTile({
-    required this.letra,
-    required this.texto,
-    required this.valor,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final corTema = Theme.of(context).colorScheme.primary;
-    final textoPrincipal = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: corTema.withAlpha(24),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: corTema.withAlpha(95)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            '$letra. $texto',
-            style: TextStyle(
-              color: textoPrincipal,
-              fontSize: 15,
-              height: 1.35,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _VfButton(
-                  label: 'VERDADEIRO',
-                  selecionado: valor == true,
-                  cor: corTema,
-                  onTap: () => onChanged(true),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _VfButton(
-                  label: 'FALSO',
-                  selecionado: valor == false,
-                  cor: corTema,
-                  onTap: () => onChanged(false),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _VfButton extends StatelessWidget {
-  final String label;
-  final bool selecionado;
-  final Color cor;
-  final VoidCallback onTap;
-
-  const _VfButton({
-    required this.label,
-    required this.selecionado,
-    required this.cor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      style: OutlinedButton.styleFrom(
-        backgroundColor: selecionado ? cor : Colors.transparent,
-        foregroundColor: selecionado ? Colors.black : cor,
-        side: BorderSide(color: cor),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-      ),
-      onPressed: onTap,
-      child: Text(
-        label,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-}
-
-class _ParagraphText extends StatelessWidget {
+class _Paragraph extends StatelessWidget {
   final String text;
   final Color color;
 
-  const _ParagraphText({required this.text, required this.color});
+  const _Paragraph({required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -751,7 +610,7 @@ class _ParagraphText extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 14),
       child: Text(
         text,
-        style: TextStyle(color: color, fontSize: 16, height: 1.35),
+        style: TextStyle(color: color, fontSize: 16, height: 1.4),
       ),
     );
   }

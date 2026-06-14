@@ -1,4 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
+import '../../widgets/challenge_header_surface.dart';
 import '../../services/conteudos_service.dart';
 import 'desafio_01/desafio_01_page.dart';
 import 'desafio_02/desafio_02_page.dart';
@@ -22,6 +24,7 @@ import 'desafio_19/desafio_19_page.dart';
 import 'desafio_20/desafio_20_page.dart';
 import 'desafio_21/desafio_21_page.dart';
 import 'desafio_22/desafio_22_page.dart';
+import 'desafio_25/desafio_25_page.dart';
 import 'desafio_26/desafio_26_page.dart';
 import 'desafio_27/desafio_27_page.dart';
 import 'desafio_28/desafio_28_page.dart';
@@ -56,6 +59,7 @@ class FasePage extends StatelessWidget {
       '20' => const Desafio20Page(),
       '21' => const Desafio21Page(),
       '22' => const Desafio22Page(),
+      '25' => const Desafio25Page(),
       '26' => const Desafio26Page(),
       '27' => const Desafio27Page(),
       '28' => const Desafio28Page(),
@@ -117,46 +121,52 @@ class _MissaoEspecialPageState extends State<MissaoEspecialPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Reflexão da semana $reflexaoSemanaNumero',
-                          style: TextStyle(
-                            color: textoPrincipal,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+              ChallengeHeaderSurface(
+                child: Column(
+                  children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Reflexão da semana $reflexaoSemanaNumero',
+                              style: TextStyle(
+                                color: textoPrincipal,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Uma lembrança da sua semana',
+                              style: TextStyle(color: textoSecundario),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'Uma lembrança da sua semana',
-                          style: TextStyle(color: textoSecundario),
+                      ),
+                      IconButton(
+                        tooltip: 'Sair',
+                        style: IconButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.black,
                         ),
+                        onPressed: () => Navigator.of(context).pop(false),
+                        icon: Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: 1,
+                      minHeight: 10,
+                      backgroundColor: Colors.white12,
+                      valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
+                    ),
+                  ),
                       ],
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: 'Sair',
-                    style: IconButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(false),
-                    icon: Icon(Icons.close_rounded),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: 1,
-                  minHeight: 10,
-                  backgroundColor: Colors.white12,
-                  valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
                 ),
               ),
               const SizedBox(height: 22),
@@ -331,46 +341,52 @@ class _DesafioPlaceholderPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Desafio $numero',
-                          style: TextStyle(
-                            color: textoPrincipal,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+              ChallengeHeaderSurface(
+                child: Column(
+                  children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Desafio $numero',
+                              style: TextStyle(
+                                color: textoPrincipal,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              'Em construção',
+                              style: TextStyle(color: textoSecundario),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'Em construção',
-                          style: TextStyle(color: textoSecundario),
+                      ),
+                      IconButton(
+                        tooltip: 'Sair',
+                        style: IconButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.black,
                         ),
+                        onPressed: () => Navigator.of(context).pop(false),
+                        icon: Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: 1,
+                      minHeight: 10,
+                      backgroundColor: Colors.white12,
+                      valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
+                    ),
+                  ),
                       ],
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: 'Sair',
-                    style: IconButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(false),
-                    icon: Icon(Icons.close_rounded),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: 1,
-                  minHeight: 10,
-                  backgroundColor: Colors.white12,
-                  valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
                 ),
               ),
               const SizedBox(height: 22),

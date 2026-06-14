@@ -1,4 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+
+import '../../../widgets/challenge_header_surface.dart';
 
 import '../../../services/conteudos_service.dart';
 import '../../../widgets/challenge_intro_decoration.dart';
@@ -86,50 +88,56 @@ class _Desafio1PageState extends State<Desafio1Page> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Desafio 1',
-                          style: TextStyle(
-                            color: textoPrincipal,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+              ChallengeHeaderSurface(
+                child: Column(
+                  children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Desafio 1',
+                              style: TextStyle(
+                                color: textoPrincipal,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              mostrandoInstrucoes
+                                  ? 'Instruções ${instrucaoAtual + 1} de ${instrucoes.length}'
+                                  : mostrandoReflexao
+                                  ? 'Reflexão final'
+                                  : 'Pergunta ${perguntaAtual + 1} de ${perguntas.length}',
+                              style: TextStyle(color: textoSecundario),
+                            ),
+                          ],
                         ),
-                        Text(
-                          mostrandoInstrucoes
-                              ? 'Instruções ${instrucaoAtual + 1} de ${instrucoes.length}'
-                              : mostrandoReflexao
-                              ? 'Reflexão final'
-                              : 'Pergunta ${perguntaAtual + 1} de ${perguntas.length}',
-                          style: TextStyle(color: textoSecundario),
+                      ),
+                      IconButton(
+                        tooltip: 'Sair',
+                        style: IconButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.black,
                         ),
+                        onPressed: () => Navigator.of(context).pop(false),
+                        icon: Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: progresso,
+                      minHeight: 10,
+                      backgroundColor: Colors.white12,
+                      valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
+                    ),
+                  ),
                       ],
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: 'Sair',
-                    style: IconButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () => Navigator.of(context).pop(false),
-                    icon: Icon(Icons.close_rounded),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: progresso,
-                  minHeight: 10,
-                  backgroundColor: Colors.white12,
-                  valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
                 ),
               ),
               const SizedBox(height: 22),
