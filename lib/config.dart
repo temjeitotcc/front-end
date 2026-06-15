@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'main.dart';
-import 'pages/auth/auth_page.dart';
 import 'pages/login/conta_page.dart';
+import 'pages/auth/auth_page.dart';
 import 'services/app_theme_service.dart';
 import 'services/notificacao_service.dart';
 import 'widgets/main_tab_header.dart';
@@ -36,7 +36,9 @@ class _ConfigPageState extends State<ConfigPage> {
     final temaAtual = AppThemeService.temaAtual.value;
     final temasDisponiveis = [...comprados];
 
-    if (!temasDisponiveis.any((tema) => tema.id == AppThemeService.temaPadrao)) {
+    if (!temasDisponiveis.any(
+      (tema) => tema.id == AppThemeService.temaPadrao,
+    )) {
       temasDisponiveis.insert(0, AppThemeService.temas.first);
     }
 
@@ -76,13 +78,14 @@ class _ConfigPageState extends State<ConfigPage> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        final modoEscuroAtual =
-            Theme.of(context).brightness == Brightness.dark;
+        final modoEscuroAtual = Theme.of(context).brightness == Brightness.dark;
         final fundoSheet = modoEscuroAtual
             ? const Color(0xFF2A2527)
             : const Color(0xFFFFFBF0);
         final textoPrincipal = modoEscuroAtual ? Colors.white : Colors.black;
-        final textoSecundario = modoEscuroAtual ? Colors.white70 : Colors.black54;
+        final textoSecundario = modoEscuroAtual
+            ? Colors.white70
+            : Colors.black54;
 
         return SafeArea(
           child: Container(
@@ -399,10 +402,7 @@ class _ThemePickerTile extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         tema.nome,
-                        style: TextStyle(
-                          color: textoSecundario,
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(color: textoSecundario, fontSize: 13),
                       ),
                     ],
                   ),
@@ -726,7 +726,11 @@ class SobrePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.auto_awesome_rounded, color: corTema, size: 30),
+                      Icon(
+                        Icons.auto_awesome_rounded,
+                        color: corTema,
+                        size: 30,
+                      ),
                       const SizedBox(height: 14),
                       Text(
                         'Tem Jeito e Vale a Pena',
@@ -738,7 +742,9 @@ class SobrePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Um projeto de autoconhecimento, reflexão e transformação construído como Trabalho de Conclusão de Curso.',
+                        'Um projeto de autoconhecimento, reflexão e '
+                        'transformação construído como Trabalho de Conclusão '
+                        'de Curso.',
                         style: TextStyle(
                           color: textoSecundario,
                           fontSize: 15,
@@ -820,7 +826,8 @@ class AjudaPage extends StatelessWidget {
                   icon: Icons.flag_outlined,
                   title: 'Como avançar',
                   text:
-                      'Conclua cada desafio com atenção. Suas respostas e reflexões ficam disponíveis na aba de conteúdos.',
+                      'Conclua cada desafio com atenção. Suas respostas e '
+                      'reflexões ficam disponíveis na aba de conteúdos.',
                   cardColor: cardColor,
                   color: corTema,
                   textColor: textoPrincipal,
@@ -831,7 +838,8 @@ class AjudaPage extends StatelessWidget {
                   icon: Icons.palette_outlined,
                   title: 'Temas do aplicativo',
                   text:
-                      'Os temas adquiridos na loja podem ser escolhidos nas configurações e aplicados ao aplicativo.',
+                      'Os temas adquiridos na loja podem ser escolhidos nas '
+                      'configurações e aplicados ao aplicativo.',
                   cardColor: cardColor,
                   color: corTema,
                   textColor: textoPrincipal,
@@ -842,7 +850,8 @@ class AjudaPage extends StatelessWidget {
                   icon: Icons.support_agent_rounded,
                   title: 'Precisa de suporte?',
                   text:
-                      'Caso encontre um problema, anote o desafio e a ação realizada para facilitar a identificação.',
+                      'Caso encontre um problema, anote o desafio e a ação '
+                      'realizada para facilitar a identificação.',
                   cardColor: cardColor,
                   color: corTema,
                   textColor: textoPrincipal,

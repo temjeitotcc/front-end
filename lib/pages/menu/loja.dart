@@ -29,9 +29,9 @@ class _Page1State extends State<Page1> {
 
   Future<void> comprarTema(AppThemeOption tema) async {
     if (temasComprados.contains(tema.id)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${tema.nome} já está comprado.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('${tema.nome} já está comprado.')));
       return;
     }
 
@@ -64,7 +64,7 @@ class _Page1State extends State<Page1> {
         children: [
           const MainTabHeader(
             title: 'Lojinha',
-            subtitle: 'Troque seus pontos por novos temas',
+            subtitle: 'Faça sua jornada mais bela',
             asset: 'assets/iconloja.png',
           ),
 
@@ -112,10 +112,7 @@ class _Page1State extends State<Page1> {
                                       ),
                                     ),
                                     const SizedBox(width: 6),
-                                    Icon(
-                                      Icons.star,
-                                      color: corTema,
-                                    ),
+                                    Icon(Icons.star, color: corTema),
                                   ],
                                 );
                               },
@@ -227,10 +224,7 @@ class ItemCard extends StatelessWidget {
             children: [
               Text(
                 '$preco',
-                style: TextStyle(
-                  color: corTema,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: corTema, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 4),
               Icon(Icons.star, size: 16, color: corTema),
@@ -272,9 +266,7 @@ class TemaLojaCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: _TemaPreview(tema: tema),
-            ),
+            Expanded(child: _TemaPreview(tema: tema)),
             const SizedBox(height: 6),
             Text(
               tema.nome,
