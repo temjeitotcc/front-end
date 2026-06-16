@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../widgets/main_tab_header.dart';
+import '../../widgets/pet_widget.dart';
 
 class PetPage extends StatelessWidget {
   const PetPage({super.key});
@@ -21,11 +22,7 @@ class PetPage extends StatelessWidget {
               clipBehavior: Clip.none,
               alignment: Alignment.center,
               children: [
-                const Icon(
-                  Icons.pets_rounded,
-                  color: Colors.white,
-                  size: 32,
-                ),
+                const Icon(Icons.pets_rounded, color: Colors.white, size: 32),
                 Positioned(
                   top: 5,
                   right: 7,
@@ -38,7 +35,11 @@ class PetPage extends StatelessWidget {
               ],
             ),
           ),
-          const Expanded(child: SizedBox()),
+          Expanded(
+            child: Center(
+              child: PetWidget(cor: 'Vermelha', estado: 'Base'),
+            ),
+          ),
         ],
       ),
     );
