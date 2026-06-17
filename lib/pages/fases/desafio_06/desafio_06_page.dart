@@ -5,6 +5,9 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Desafio6Page extends StatefulWidget {
   const Desafio6Page({super.key});
 
@@ -22,34 +25,34 @@ class _Desafio6PageState extends State<Desafio6Page> {
   int etapaAtual = 0;
 
   List<_CartaInfo> get cartas => [
-        _CartaInfo(
-          numero: 1,
-          titulo: 'Acusação e Consequências',
-          subtitulo: 'Escreva sua dor e o que ela causou.',
-          orientacao:
-              'Escreva para a pessoa ou pessoas que mais o magoaram. Expresse sua dor, conte o que aconteceu e descreva as consequências que essas situações tiveram em sua vida.',
-          controller: carta1Controller,
-          icon: Icons.mail_outline_rounded,
-        ),
-        _CartaInfo(
-          numero: 2,
-          titulo: 'Pedido de Perdão',
-          subtitulo: 'Imagine essa pessoa pedindo perdão.',
-          orientacao:
-              'Agora escreva como se essa pessoa estivesse lhe pedindo perdão. Tente compreender sua história, suas dificuldades e os motivos que podem ter influenciado suas atitudes, sem justificar os erros cometidos.',
-          controller: carta2Controller,
-          icon: Icons.mark_email_read_outlined,
-        ),
-        _CartaInfo(
-          numero: 3,
-          titulo: 'Superação',
-          subtitulo: 'Escreva para si mesmo.',
-          orientacao:
-              'Escreva para si mesmo. Perdoe-se pelos erros, limitações e escolhas do passado. Reconheça sua força, seu crescimento e tudo o que aprendeu ao longo da vida. Ao final, escreva pelo menos 3 motivos pelos quais é grato e 5 motivos pelos quais se ama.',
-          controller: carta3Controller,
-          icon: Icons.local_florist_outlined,
-        ),
-      ];
+    _CartaInfo(
+      numero: 1,
+      titulo: 'Acusação e Consequências',
+      subtitulo: 'Escreva sua dor e o que ela causou.',
+      orientacao:
+          'Escreva para a pessoa ou pessoas que mais o magoaram. Expresse sua dor, conte o que aconteceu e descreva as consequências que essas situações tiveram em sua vida.',
+      controller: carta1Controller,
+      icon: Icons.mail_outline_rounded,
+    ),
+    _CartaInfo(
+      numero: 2,
+      titulo: 'Pedido de Perdão',
+      subtitulo: 'Imagine essa pessoa pedindo perdão.',
+      orientacao:
+          'Agora escreva como se essa pessoa estivesse lhe pedindo perdão. Tente compreender sua história, suas dificuldades e os motivos que podem ter influenciado suas atitudes, sem justificar os erros cometidos.',
+      controller: carta2Controller,
+      icon: Icons.mark_email_read_outlined,
+    ),
+    _CartaInfo(
+      numero: 3,
+      titulo: 'Superação',
+      subtitulo: 'Escreva para si mesmo.',
+      orientacao:
+          'Escreva para si mesmo. Perdoe-se pelos erros, limitações e escolhas do passado. Reconheça sua força, seu crescimento e tudo o que aprendeu ao longo da vida. Ao final, escreva pelo menos 3 motivos pelos quais é grato e 5 motivos pelos quais se ama.',
+      controller: carta3Controller,
+      icon: Icons.local_florist_outlined,
+    ),
+  ];
 
   @override
   void initState() {
@@ -100,51 +103,51 @@ class _Desafio6PageState extends State<Desafio6Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 6 - Exercitando a Sabedoria',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 6 - Exercitando a Sabedoria',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _subtituloEtapa(),
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                _subtituloEtapa(),
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 3,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 3,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -294,10 +297,7 @@ class _Desafio6PageState extends State<Desafio6Page> {
     ];
   }
 
-  List<Widget> _conteudoReflexao(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _conteudoReflexao(Color textoPrincipal, Color textoSecundario) {
     final corTema = Theme.of(context).colorScheme.primary;
 
     return [
@@ -332,11 +332,7 @@ class _Desafio6PageState extends State<Desafio6Page> {
           maxLines: null,
           minLines: null,
           textAlignVertical: TextAlignVertical.top,
-          style: TextStyle(
-            color: textoPrincipal,
-            fontSize: 16,
-            height: 1.35,
-          ),
+          style: TextStyle(color: textoPrincipal, fontSize: 16, height: 1.35),
           decoration: InputDecoration(
             hintText: 'A partir de hoje eu escolho...',
             hintStyle: TextStyle(color: textoSecundario.withAlpha(140)),
@@ -524,15 +520,44 @@ class _Desafio6PageState extends State<Desafio6Page> {
 
   Future<void> _concluir() async {
     final resposta = reflexaoController.text.trim();
+
     if (resposta.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Escreva sua decisão antes de concluir.'),
-        ),
+        const SnackBar(content: Text('Escreva sua decisão antes de concluir.')),
       );
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // 1. Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // 2. Salvar respostas do desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 06')
+        .collection('Respostas')
+        .doc('Respostas')
+        .set({
+          'Carta 1 - Acusação e Consequências': carta1Controller.text.trim(),
+          'Carta 2 - Pedido de Perdão': carta2Controller.text.trim(),
+          'Carta 3 - Superação': carta3Controller.text.trim(),
+          'Decisão a partir de hoje': resposta,
+          'Nome': user.displayName ?? 'Usuário',
+          'Respondido em': FieldValue.serverTimestamp(),
+        });
+
+    // 3. Manter salvamento atual do app
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 6,
       itens: [
@@ -734,10 +759,7 @@ class _ParagraphText extends StatelessWidget {
   final String text;
   final Color color;
 
-  const _ParagraphText({
-    required this.text,
-    required this.color,
-  });
+  const _ParagraphText({required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -745,11 +767,7 @@ class _ParagraphText extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 14),
       child: Text(
         text,
-        style: TextStyle(
-          color: color,
-          fontSize: 16,
-          height: 1.35,
-        ),
+        style: TextStyle(color: color, fontSize: 16, height: 1.35),
       ),
     );
   }

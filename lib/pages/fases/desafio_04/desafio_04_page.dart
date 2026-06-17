@@ -7,6 +7,9 @@ import '../../../services/conteudos_service.dart';
 
 import '../../../widgets/challenge_intro_decoration.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Desafio4Page extends StatefulWidget {
   const Desafio4Page({super.key});
 
@@ -65,51 +68,51 @@ class _Desafio4PageState extends State<Desafio4Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 4 - O que me move',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 4 - O que me move',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              etapaAtual == 0 ? 'Texto inicial' : 'Reflexão',
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                etapaAtual == 0 ? 'Texto inicial' : 'Reflexão',
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 2,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 2,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -125,10 +128,7 @@ class _Desafio4PageState extends State<Desafio4Page> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: etapaAtual == 0
                         ? _conteudoTexto(textoPrincipal, textoSecundario)
-                        : _conteudoReflexao(
-                            textoPrincipal,
-                            textoSecundario,
-                          ),
+                        : _conteudoReflexao(textoPrincipal, textoSecundario),
                   ),
                 ),
               ),
@@ -239,10 +239,7 @@ class _Desafio4PageState extends State<Desafio4Page> {
     ];
   }
 
-  List<Widget> _conteudoReflexao(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _conteudoReflexao(Color textoPrincipal, Color textoSecundario) {
     final corTema = Theme.of(context).colorScheme.primary;
 
     return [
@@ -277,11 +274,7 @@ class _Desafio4PageState extends State<Desafio4Page> {
           maxLines: null,
           minLines: null,
           textAlignVertical: TextAlignVertical.top,
-          style: TextStyle(
-            color: textoPrincipal,
-            fontSize: 16,
-            height: 1.35,
-          ),
+          style: TextStyle(color: textoPrincipal, fontSize: 16, height: 1.35),
           decoration: InputDecoration(
             hintText: 'A partir de hoje eu escolho...',
             hintStyle: TextStyle(color: textoSecundario.withAlpha(140)),
@@ -323,6 +316,7 @@ class _Desafio4PageState extends State<Desafio4Page> {
 
   Future<void> _concluir() async {
     final resposta = reflexaoController.text.trim();
+
     if (resposta.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Escreva sua decisão antes de concluir.')),
@@ -330,6 +324,33 @@ class _Desafio4PageState extends State<Desafio4Page> {
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // 1. Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // 2. Salvar resposta do desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 04')
+        .collection('Respostas')
+        .doc('Respostas')
+        .set({
+          'Resposta': resposta,
+          'Nome': user.displayName ?? 'Usuário',
+          'Respondido em': FieldValue.serverTimestamp(),
+        });
+
+    // 3. Manter salvamento local já existente
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 4,
       itens: [
@@ -361,13 +382,11 @@ class _InlineVirusParagraph extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 14),
       child: RichText(
         text: TextSpan(
-          style: TextStyle(
-            color: textColor,
-            fontSize: 16,
-            height: 1.35,
-          ),
+          style: TextStyle(color: textColor, fontSize: 16, height: 1.35),
           children: [
-            const TextSpan(text: 'Se eu te contasse que existe uma doença chamada '),
+            const TextSpan(
+              text: 'Se eu te contasse que existe uma doença chamada ',
+            ),
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Container(
@@ -404,10 +423,7 @@ class _ParagraphText extends StatelessWidget {
   final String text;
   final Color color;
 
-  const _ParagraphText({
-    required this.text,
-    required this.color,
-  });
+  const _ParagraphText({required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -415,11 +431,7 @@ class _ParagraphText extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 14),
       child: Text(
         text,
-        style: TextStyle(
-          color: color,
-          fontSize: 16,
-          height: 1.35,
-        ),
+        style: TextStyle(color: color, fontSize: 16, height: 1.35),
       ),
     );
   }

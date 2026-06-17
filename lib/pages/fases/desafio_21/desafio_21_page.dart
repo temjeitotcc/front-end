@@ -65,49 +65,49 @@ class _Desafio21PageState extends State<Desafio21Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 21 - Reflexão Semanal',
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 21 - Reflexão Semanal',
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _subtitulo(),
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                _subtitulo(),
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 3,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 3,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -388,19 +388,20 @@ class _Desafio21PageState extends State<Desafio21Page> {
     final firestore = FirebaseFirestore.instance;
 
     // 1. Salvar/atualizar dados do usuário
-    await firestore.collection('Usuários').doc(user.email).set({
+    await firestore.collection('Usuários').doc(user.uid).set({
       'Nome': user.displayName ?? 'Usuários',
-      'ID': user.uid,
+      'Email': user.email,
     }, SetOptions(merge: true));
 
     // 2. Salvar reflexão
     await firestore
         .collection('Usuários')
-        .doc(user.email)
-        .collection('Desafios')
+        .doc(user.uid)
+        .collection('Reflexões')
         .doc('Dia 21')
         .collection('Respostas')
-        .add({
+        .doc('Respostas')
+        .set({
           'Resposta': resposta,
           'Nome': user.displayName ?? 'Usuário',
           'Respondido em': FieldValue.serverTimestamp(),

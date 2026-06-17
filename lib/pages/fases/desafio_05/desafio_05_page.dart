@@ -5,6 +5,9 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Desafio5Page extends StatefulWidget {
   const Desafio5Page({super.key});
 
@@ -63,51 +66,53 @@ class _Desafio5PageState extends State<Desafio5Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 5 - Quem sou eu?',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 5 - Quem sou eu?',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              etapaAtual == 0 ? 'Meu pântano, meu jardim' : 'Reflexão',
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                etapaAtual == 0
+                                    ? 'Meu pântano, meu jardim'
+                                    : 'Reflexão',
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 2,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 2,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -227,9 +232,7 @@ class _Desafio5PageState extends State<Desafio5Page> {
                     'Pense sobre o seu pântano, aquele sentimento que não deseja mais visitar, aquelas memórias que não quer reviver. Guarde tudo isso no pântano, sem revisitar mais. E cultive o seu jardim repleto de memórias lindas, felizes e cheia de amor sempre que puder.',
                 color: textoSecundario,
               ),
-              _SwampClosingCard(
-                cor: Theme.of(context).colorScheme.primary,
-              ),
+              _SwampClosingCard(cor: Theme.of(context).colorScheme.primary),
             ],
           ),
         ),
@@ -237,10 +240,7 @@ class _Desafio5PageState extends State<Desafio5Page> {
     ];
   }
 
-  List<Widget> _conteudoReflexao(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _conteudoReflexao(Color textoPrincipal, Color textoSecundario) {
     final corTema = Theme.of(context).colorScheme.primary;
 
     return [
@@ -265,11 +265,7 @@ class _Desafio5PageState extends State<Desafio5Page> {
           maxLines: null,
           minLines: null,
           textAlignVertical: TextAlignVertical.top,
-          style: TextStyle(
-            color: textoPrincipal,
-            fontSize: 16,
-            height: 1.35,
-          ),
+          style: TextStyle(color: textoPrincipal, fontSize: 16, height: 1.35),
           decoration: InputDecoration(
             hintText: 'O que eu percebi sobre meu pântano e meu jardim...',
             hintStyle: TextStyle(color: textoSecundario.withAlpha(140)),
@@ -311,15 +307,43 @@ class _Desafio5PageState extends State<Desafio5Page> {
 
   Future<void> _concluir() async {
     final resposta = reflexaoController.text.trim();
+
     if (resposta.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Escreva sua reflexão antes de concluir.')),
+        const SnackBar(content: Text('Escreva sua decisão antes de concluir.')),
       );
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // 1. Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // 2. Salvar resposta do desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 05')
+        .collection('Respostas')
+        .doc('Respostas')
+        .set({
+          'Resposta': resposta,
+          'Nome': user.displayName ?? 'Usuário',
+          'Respondido em': FieldValue.serverTimestamp(),
+        });
+
+    // 3. Manter salvamento local já existente
     await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 5,
+      desafio: 4,
       itens: [
         ConteudoItem(
           titulo: 'Meu pântano e meu jardim',
@@ -407,11 +431,7 @@ class _SwampClosingCard extends StatelessWidget {
           Text(
             'Deixe no pântano o que não precisa mais acompanhar você.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: textoSecundario,
-              fontSize: 13,
-              height: 1.3,
-            ),
+            style: TextStyle(color: textoSecundario, fontSize: 13, height: 1.3),
           ),
         ],
       ),
@@ -439,7 +459,9 @@ class _FlowerDecoration extends StatelessWidget {
         borderRadius: BorderRadius.circular(17),
         child: Stack(
           children: [
-            Positioned.fill(child: CustomPaint(painter: _GardenLinePainter(linhaSuave))),
+            Positioned.fill(
+              child: CustomPaint(painter: _GardenLinePainter(linhaSuave)),
+            ),
             Positioned(
               left: 24,
               top: 18,
@@ -464,11 +486,7 @@ class _FlowerDecoration extends StatelessWidget {
               left: 0,
               right: 0,
               top: 19,
-              child: Icon(
-                Icons.spa_outlined,
-                color: linha,
-                size: 42,
-              ),
+              child: Icon(Icons.spa_outlined, color: linha, size: 42),
             ),
           ],
         ),
@@ -535,7 +553,9 @@ class _LilyPadDecoration extends StatelessWidget {
           borderRadius: BorderRadius.circular(17),
           child: Stack(
             children: [
-              Positioned.fill(child: CustomPaint(painter: _WaterLinePainter(linhaSuave))),
+              Positioned.fill(
+                child: CustomPaint(painter: _WaterLinePainter(linhaSuave)),
+              ),
               Positioned(
                 left: 22,
                 bottom: 10,
@@ -606,10 +626,7 @@ class _DecorFlower extends StatelessWidget {
   final double size;
   final Color color;
 
-  const _DecorFlower({
-    required this.size,
-    required this.color,
-  });
+  const _DecorFlower({required this.size, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -640,10 +657,7 @@ class _DecorFlower extends StatelessWidget {
           Container(
             width: size * 0.28,
             height: size * 0.28,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
         ],
       ),
@@ -655,10 +669,7 @@ class _LilyPad extends StatelessWidget {
   final double size;
   final Color color;
 
-  const _LilyPad({
-    required this.size,
-    required this.color,
-  });
+  const _LilyPad({required this.size, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -693,10 +704,7 @@ class _LilyPadPainter extends CustomPainter {
   final Color color;
   final Color waterColor;
 
-  const _LilyPadPainter({
-    required this.color,
-    required this.waterColor,
-  });
+  const _LilyPadPainter({required this.color, required this.waterColor});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -716,7 +724,12 @@ class _LilyPadPainter extends CustomPainter {
       ..strokeWidth = 1.2
       ..strokeCap = StrokeCap.round;
 
-    final rect = Rect.fromLTWH(0, size.height * 0.08, size.width, size.height * 0.78);
+    final rect = Rect.fromLTWH(
+      0,
+      size.height * 0.08,
+      size.width,
+      size.height * 0.78,
+    );
     canvas.drawOval(rect, leaf);
     canvas.drawOval(rect, edge);
 
@@ -787,10 +800,7 @@ class _TinyWaterFlower extends StatelessWidget {
           Container(
             width: size * 0.24,
             height: size * 0.24,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
         ],
       ),
@@ -802,10 +812,7 @@ class _ParagraphText extends StatelessWidget {
   final String text;
   final Color color;
 
-  const _ParagraphText({
-    required this.text,
-    required this.color,
-  });
+  const _ParagraphText({required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -813,11 +820,7 @@ class _ParagraphText extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 14),
       child: Text(
         text,
-        style: TextStyle(
-          color: color,
-          fontSize: 16,
-          height: 1.35,
-        ),
+        style: TextStyle(color: color, fontSize: 16, height: 1.35),
       ),
     );
   }

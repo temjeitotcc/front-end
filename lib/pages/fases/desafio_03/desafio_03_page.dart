@@ -7,6 +7,9 @@ import '../../../services/conteudos_service.dart';
 
 import '../../../widgets/challenge_intro_decoration.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Desafio3Page extends StatefulWidget {
   const Desafio3Page({super.key});
 
@@ -77,51 +80,55 @@ class _Desafio3PageState extends State<Desafio3Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 3 - Eu escolho',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 3 - Eu escolho',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              etapaAtual == 0 ? 'Texto inicial' : 'Reflexão',
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                etapaAtual == 0 ? 'Texto inicial' : 'Reflexão',
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 2,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 2,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -132,17 +139,16 @@ class _Desafio3PageState extends State<Desafio3Page> {
                     color: cardColor,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.primary.withAlpha(110),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withAlpha(110),
                     ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: etapaAtual == 0
                         ? _conteudoTexto(textoSecundario)
-                        : _conteudoReflexao(
-                            textoPrincipal,
-                            textoSecundario,
-                          ),
+                        : _conteudoReflexao(textoPrincipal, textoSecundario),
                   ),
                 ),
               ),
@@ -153,7 +159,9 @@ class _Desafio3PageState extends State<Desafio3Page> {
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: textoPrincipal,
-                        side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _voltar,
@@ -218,10 +226,7 @@ class _Desafio3PageState extends State<Desafio3Page> {
     ];
   }
 
-  List<Widget> _conteudoReflexao(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _conteudoReflexao(Color textoPrincipal, Color textoSecundario) {
     return [
       Text(
         'Sua reflexão',
@@ -263,17 +268,11 @@ class _Desafio3PageState extends State<Desafio3Page> {
           maxLines: null,
           minLines: null,
           textAlignVertical: TextAlignVertical.top,
-          style: TextStyle(
-            color: textoPrincipal,
-            fontSize: 16,
-            height: 1.35,
-          ),
+          style: TextStyle(color: textoPrincipal, fontSize: 16, height: 1.35),
           decoration: InputDecoration(
             hintText:
                 'Escreva sobre duas decisões e os comportamentos que você precisa mudar...',
-            hintStyle: TextStyle(
-              color: textoSecundario.withAlpha(140),
-            ),
+            hintStyle: TextStyle(color: textoSecundario.withAlpha(140)),
             filled: true,
             fillColor: Theme.of(context).brightness == Brightness.dark
                 ? const Color(0xFF171315)
@@ -314,19 +313,49 @@ class _Desafio3PageState extends State<Desafio3Page> {
   }
 
   Future<void> _concluir() async {
-    if (reflexaoController.text.trim().isEmpty) {
+    final reflexao = reflexaoController.text.trim();
+
+    if (reflexao.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Escreva sua reflexão antes de concluir.')),
+        const SnackBar(
+          content: Text('Escreva sua reflexão antes de concluir.'),
+        ),
       );
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salva/atualiza dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salva o desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 03')
+        .collection('Respostas')
+        .doc('Respostas')
+        .set({
+          'Reflexao': reflexao,
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Mantém o sistema atual
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 3,
       itens: [
         ConteudoItem(
           titulo: 'Reflexão sobre decisões',
-          texto: reflexaoController.text.trim(),
+          texto: reflexao,
           reflexao: true,
         ),
       ],

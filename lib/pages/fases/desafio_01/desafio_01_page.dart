@@ -5,6 +5,9 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/conteudos_service.dart';
 import '../../../widgets/challenge_intro_decoration.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Desafio1Page extends StatefulWidget {
   const Desafio1Page({super.key});
 
@@ -91,53 +94,57 @@ class _Desafio1PageState extends State<Desafio1Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Desafio 1',
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Desafio 1',
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              mostrandoInstrucoes
-                                  ? 'Instruções ${instrucaoAtual + 1} de ${instrucoes.length}'
-                                  : mostrandoReflexao
-                                  ? 'Reflexão final'
-                                  : 'Pergunta ${perguntaAtual + 1} de ${perguntas.length}',
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                mostrandoInstrucoes
+                                    ? 'Instruções ${instrucaoAtual + 1} de ${instrucoes.length}'
+                                    : mostrandoReflexao
+                                    ? 'Reflexão final'
+                                    : 'Pergunta ${perguntaAtual + 1} de ${perguntas.length}',
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: progresso,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: progresso,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -148,7 +155,9 @@ class _Desafio1PageState extends State<Desafio1Page> {
                     color: cardColor,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.primary.withAlpha(110),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withAlpha(110),
                     ),
                   ),
                   child: Column(
@@ -168,7 +177,9 @@ class _Desafio1PageState extends State<Desafio1Page> {
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: textoPrincipal,
-                        side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _voltarEtapa,
@@ -331,7 +342,10 @@ class _Desafio1PageState extends State<Desafio1Page> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
             ),
           ),
         ),
@@ -389,13 +403,13 @@ class _Desafio1PageState extends State<Desafio1Page> {
   }
 
   Future<void> _proximaEtapa() async {
+    // Sai da tela de instrução e vai para a primeira pergunta
     if (instrucaoAtual < instrucoes.length) {
       setState(() {
-        instrucaoAtual++;
+        instrucaoAtual = instrucoes.length;
       });
       return;
     }
-
     if (mostrandoReflexao) {
       if (reflexaoController.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -406,14 +420,46 @@ class _Desafio1PageState extends State<Desafio1Page> {
         return;
       }
 
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) return;
+
+      final firestore = FirebaseFirestore.instance;
+
+      // Salva/atualiza usuário
+      await firestore.collection('Usuários').doc(user.uid).set({
+        'Nome': user.displayName ?? 'Usuário',
+        'Email': user.email,
+      }, SetOptions(merge: true));
+
+      // Salva respostas das notas
+      await firestore
+          .collection('Usuários')
+          .doc(user.uid)
+          .collection('Desafios')
+          .doc('Dia 01')
+          .collection('Respostas')
+          .doc('Respostas')
+          .set({
+            'Familiar': respostas[0],
+            'Relacional': respostas[1],
+            'Social': respostas[2],
+            'Saude': respostas[3],
+            'Intelectual': respostas[4],
+            'Profissional': respostas[5],
+            'Emocional': respostas[6],
+            'Solidariedade': respostas[7],
+            'Futuro': respostas[8],
+            'ReflexaoFinal': reflexaoController.text.trim(),
+            'RespondidoEm': FieldValue.serverTimestamp(),
+          });
+
+      // Mantém seu sistema atual
       await ConteudosService().salvarConteudosDoDesafio(
         desafio: 1,
         itens: [
           for (int i = 0; i < perguntas.length; i++)
-            ConteudoItem(
-              titulo: perguntas[i],
-              texto: 'Nota: ${respostas[i]}',
-            ),
+            ConteudoItem(titulo: perguntas[i], texto: 'Nota: ${respostas[i]}'),
           ConteudoItem(
             titulo: 'Reflexão final',
             texto: reflexaoController.text.trim(),

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-
 import '../../../widgets/challenge_header_surface.dart';
-
 import '../../../services/conteudos_service.dart';
-
 import '../../../widgets/challenge_intro_decoration.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Desafio2Page extends StatefulWidget {
   const Desafio2Page({super.key});
@@ -73,51 +72,57 @@ class _Desafio2PageState extends State<Desafio2Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 2 - Minha empresa, minha vida',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 2 - Minha empresa, minha vida',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              etapaAtual == 0 ? 'Instruções' : 'Prédio da vida',
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                etapaAtual == 0
+                                    ? 'Instruções'
+                                    : 'Prédio da vida',
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 2,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(Theme.of(context).colorScheme.primary),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 2,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -128,7 +133,9 @@ class _Desafio2PageState extends State<Desafio2Page> {
                     color: cardColor,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.primary.withAlpha(110),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withAlpha(110),
                     ),
                   ),
                   child: Column(
@@ -146,7 +153,9 @@ class _Desafio2PageState extends State<Desafio2Page> {
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: textoPrincipal,
-                        side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: _voltar,
@@ -180,10 +189,7 @@ class _Desafio2PageState extends State<Desafio2Page> {
     );
   }
 
-  List<Widget> _conteudoInstrucao(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _conteudoInstrucao(Color textoPrincipal, Color textoSecundario) {
     return [
       const ChallengeIntroDecoration(
         mainIcon: Icons.apartment_rounded,
@@ -319,6 +325,39 @@ class _Desafio2PageState extends State<Desafio2Page> {
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salva/atualiza dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Monta automaticamente o mapa das respostas
+    final respostasFirestore = <String, String>{};
+
+    for (int i = 0; i < areasPredio.length; i++) {
+      respostasFirestore[areasPredio[i]] = respostasPredio[i].trim();
+    }
+
+    // Salva o desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 02')
+        .collection('Respostas')
+        .doc('Respostas')
+        .set({
+          ...respostasFirestore,
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Mantém o salvamento local já existente
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 2,
       itens: [
@@ -339,10 +378,7 @@ class _JanelaTextoDialog extends StatefulWidget {
   final String titulo;
   final String valorInicial;
 
-  const _JanelaTextoDialog({
-    required this.titulo,
-    required this.valorInicial,
-  });
+  const _JanelaTextoDialog({required this.titulo, required this.valorInicial});
 
   @override
   State<_JanelaTextoDialog> createState() => _JanelaTextoDialogState();
@@ -386,7 +422,10 @@ class _JanelaTextoDialogState extends State<_JanelaTextoDialog> {
             decoration: BoxDecoration(
               color: const Color(0xFF2A2527),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withAlpha(90),
@@ -590,10 +629,7 @@ class _PredioVida extends StatelessWidget {
                       left: predioLargura * 0.16,
                       top: altura * 0.04,
                       bottom: altura * 0.025,
-                      child: Container(
-                        width: 2,
-                        color: Colors.white24,
-                      ),
+                      child: Container(width: 2, color: Colors.white24),
                     ),
                   ],
                 ),
@@ -622,17 +658,17 @@ class _PredioVida extends StatelessWidget {
                 ),
                 for (int coluna = 0; coluna < 2; coluna++)
                   Positioned(
-                    left: predioEsquerda +
-                        (predioLargura -
-                                (janela * 2 + espacamentoJanela)) /
-                            2 +
+                    left:
+                        predioEsquerda +
+                        (predioLargura - (janela * 2 + espacamentoJanela)) / 2 +
                         coluna * (janela + espacamentoJanela),
                     top: topo + andar * andarAltura,
                     width: janela,
                     height: janela,
                     child: _JanelaPredio(
-                      preenchida:
-                          respostas[andar * 2 + coluna].trim().isNotEmpty,
+                      preenchida: respostas[andar * 2 + coluna]
+                          .trim()
+                          .isNotEmpty,
                       imagemAsset: imagens[andar * 2 + coluna],
                       onTap: () => onJanelaTap(andar * 2 + coluna),
                     ),
@@ -701,7 +737,9 @@ class _JanelaPredio extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         decoration: BoxDecoration(
-          color: preenchida ? Theme.of(context).colorScheme.secondary : Theme.of(context).colorScheme.primary,
+          color: preenchida
+              ? Theme.of(context).colorScheme.secondary
+              : Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: preenchida ? Colors.white : Colors.transparent,
