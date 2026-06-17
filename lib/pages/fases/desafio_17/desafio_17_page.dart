@@ -5,6 +5,9 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio17Page extends StatefulWidget {
   const Desafio17Page({super.key});
 
@@ -31,7 +34,8 @@ class _Desafio17PageState extends State<Desafio17Page> {
     _LensPair(
       antiga: 'ÓDIO',
       nova: 'AMOR E PERDÃO',
-      perguntaAntiga: 'Lembre-se de um momento em que sentiu ódio ou ressentimento.',
+      perguntaAntiga:
+          'Lembre-se de um momento em que sentiu ódio ou ressentimento.',
       perguntaNova:
           'Como essa experiência pode se transformar em compreensão, compaixão ou perdão?',
     ),
@@ -93,51 +97,51 @@ class _Desafio17PageState extends State<Desafio17Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 17 - Trocando de Óculos',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 17 - Trocando de Óculos',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _subtituloEtapa(),
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                _subtituloEtapa(),
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 3,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 3,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -154,21 +158,21 @@ class _Desafio17PageState extends State<Desafio17Page> {
                     children: switch (etapaAtual) {
                       0 => _conteudoTexto(textoPrincipal, textoSecundario),
                       1 => _conteudoOculos(
-                          titulo: 'Óculos antigos',
-                          subtitulo:
-                              'Toque em cada sentimento e escreva uma ocasião em que ele apareceu.',
-                          positivo: false,
-                          textoPrincipal: textoPrincipal,
-                          textoSecundario: textoSecundario,
-                        ),
+                        titulo: 'Óculos antigos',
+                        subtitulo:
+                            'Toque em cada sentimento e escreva uma ocasião em que ele apareceu.',
+                        positivo: false,
+                        textoPrincipal: textoPrincipal,
+                        textoSecundario: textoSecundario,
+                      ),
                       _ => _conteudoOculos(
-                          titulo: 'Óculos novos',
-                          subtitulo:
-                              'Agora toque em cada nova lente e dê um significado mais consciente para a história.',
-                          positivo: true,
-                          textoPrincipal: textoPrincipal,
-                          textoSecundario: textoSecundario,
-                        ),
+                        titulo: 'Óculos novos',
+                        subtitulo:
+                            'Agora toque em cada nova lente e dê um significado mais consciente para a história.',
+                        positivo: true,
+                        textoPrincipal: textoPrincipal,
+                        textoSecundario: textoSecundario,
+                      ),
                     },
                   ),
                 ),
@@ -497,6 +501,46 @@ class _Desafio17PageState extends State<Desafio17Page> {
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salvar resultado do desafio
+    // Salvar resultado do desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 17')
+        .set({
+          'Medo_Aventura': {
+            'Situacao': pares[0].situacaoController.text.trim(),
+            'NovaPerspectiva': pares[0].ressignificacaoController.text.trim(),
+          },
+          'Inveja_Inspiracao': {
+            'Situacao': pares[1].situacaoController.text.trim(),
+            'NovaPerspectiva': pares[1].ressignificacaoController.text.trim(),
+          },
+          'Odio_AmorPerdao': {
+            'Situacao': pares[2].situacaoController.text.trim(),
+            'NovaPerspectiva': pares[2].ressignificacaoController.text.trim(),
+          },
+          'Raiva_Tolerancia': {
+            'Situacao': pares[3].situacaoController.text.trim(),
+            'NovaPerspectiva': pares[3].ressignificacaoController.text.trim(),
+          },
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Mantém seu sistema atual
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 17,
       itens: [
@@ -504,20 +548,22 @@ class _Desafio17PageState extends State<Desafio17Page> {
           ConteudoItem(
             titulo: '${par.antiga} -> ${par.nova}',
             texto:
-                'Situação: ${par.situacaoController.text.trim()}\n\nNova perspectiva: ${par.ressignificacaoController.text.trim()}',
+                'Situação: ${par.situacaoController.text.trim()}\n\n'
+                'Nova perspectiva: ${par.ressignificacaoController.text.trim()}',
             reflexao: true,
           ),
       ],
     );
 
     if (!mounted) return;
+
     Navigator.of(context).pop(true);
   }
 
   void _mostrarPendencia(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   }
 }
 
@@ -527,7 +573,8 @@ class _LensPair {
   final String perguntaAntiga;
   final String perguntaNova;
   final TextEditingController situacaoController = TextEditingController();
-  final TextEditingController ressignificacaoController = TextEditingController();
+  final TextEditingController ressignificacaoController =
+      TextEditingController();
 
   _LensPair({
     required this.antiga,
@@ -575,12 +622,13 @@ class _GlassesCanvas extends StatelessWidget {
               _LensLabel(
                 label: positivo ? pares[i].nova : pares[i].antiga,
                 position: positions[i],
-                filled: (positivo
-                        ? pares[i].ressignificacaoController
-                        : pares[i].situacaoController)
-                    .text
-                    .trim()
-                    .isNotEmpty,
+                filled:
+                    (positivo
+                            ? pares[i].ressignificacaoController
+                            : pares[i].situacaoController)
+                        .text
+                        .trim()
+                        .isNotEmpty,
                 cor: cor,
                 onTap: () => onTap(pares[i]),
               ),
@@ -644,8 +692,12 @@ class _GlassesPainter extends CustomPainter {
 
     final bridge = Path()
       ..moveTo(leftLens.right, centerY)
-      ..quadraticBezierTo(size.width * 0.50, centerY - size.height * 0.06,
-          rightLens.left, centerY);
+      ..quadraticBezierTo(
+        size.width * 0.50,
+        centerY - size.height * 0.06,
+        rightLens.left,
+        centerY,
+      );
     canvas.drawPath(bridge, frame);
 
     final leftArm = Path()
@@ -660,13 +712,25 @@ class _GlassesPainter extends CustomPainter {
     canvas.drawPath(rightArm, frame);
 
     canvas.drawLine(
-      Offset(leftLens.left + lensWidth * 0.22, leftLens.top + lensHeight * 0.22),
-      Offset(leftLens.left + lensWidth * 0.45, leftLens.top + lensHeight * 0.12),
+      Offset(
+        leftLens.left + lensWidth * 0.22,
+        leftLens.top + lensHeight * 0.22,
+      ),
+      Offset(
+        leftLens.left + lensWidth * 0.45,
+        leftLens.top + lensHeight * 0.12,
+      ),
       shine,
     );
     canvas.drawLine(
-      Offset(rightLens.left + lensWidth * 0.22, rightLens.top + lensHeight * 0.22),
-      Offset(rightLens.left + lensWidth * 0.45, rightLens.top + lensHeight * 0.12),
+      Offset(
+        rightLens.left + lensWidth * 0.22,
+        rightLens.top + lensHeight * 0.22,
+      ),
+      Offset(
+        rightLens.left + lensWidth * 0.45,
+        rightLens.top + lensHeight * 0.12,
+      ),
       shine,
     );
   }

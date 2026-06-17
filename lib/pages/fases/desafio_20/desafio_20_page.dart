@@ -5,6 +5,9 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio20Page extends StatefulWidget {
   const Desafio20Page({super.key});
 
@@ -37,8 +40,9 @@ class _Desafio20PageState extends State<Desafio20Page> {
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final corTema = tema.colorScheme.primary;
-    final textoPrincipal =
-        tema.brightness == Brightness.dark ? Colors.white : Colors.black;
+    final textoPrincipal = tema.brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
     final textoSecundario = tema.brightness == Brightness.dark
         ? Colors.white70
         : Colors.black54;
@@ -57,51 +61,51 @@ class _Desafio20PageState extends State<Desafio20Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 20 - Identidade e Pertencimento',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 20 - Identidade e Pertencimento',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _subtitulo(),
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                _subtitulo(),
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 3,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 3,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -232,10 +236,7 @@ class _Desafio20PageState extends State<Desafio20Page> {
     ];
   }
 
-  List<Widget> _multiplaEscolha(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _multiplaEscolha(Color textoPrincipal, Color textoSecundario) {
     const alternativas = [
       'Impede a pessoa de se relacionar profissionalmente.',
       'Corrompe a identidade do indivíduo, pois é justamente o sentimento de utilidade, de servir, que faz o ser humano perseverar.',
@@ -256,11 +257,7 @@ class _Desafio20PageState extends State<Desafio20Page> {
       const SizedBox(height: 10),
       Text(
         'Segundo o livro, o sentimento de inutilidade é destrutivo porque:',
-        style: TextStyle(
-          color: textoSecundario,
-          fontSize: 15,
-          height: 1.35,
-        ),
+        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
       Expanded(
@@ -278,10 +275,7 @@ class _Desafio20PageState extends State<Desafio20Page> {
     ];
   }
 
-  List<Widget> _verdadeiroFalso(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _verdadeiroFalso(Color textoPrincipal, Color textoSecundario) {
     const afirmacoes = [
       'Quando a pessoa não sabe quem é, tende a participar de tribos e grupos que outros definem para ela, perdendo sua identidade.',
       'A autora defende que a criação de grupos e minorias fortalece a identidade individual de cada ser humano.',
@@ -300,11 +294,7 @@ class _Desafio20PageState extends State<Desafio20Page> {
       const SizedBox(height: 10),
       Text(
         'Sobre o conceito de identidade e pertencimento abordado no livro:',
-        style: TextStyle(
-          color: textoSecundario,
-          fontSize: 15,
-          height: 1.35,
-        ),
+        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
       Expanded(
@@ -345,6 +335,33 @@ class _Desafio20PageState extends State<Desafio20Page> {
     }
 
     final acertos = _contarAcertos();
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salvar resultado do desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 20')
+        .set({
+          'Acertos': acertos,
+          'TotalQuestoes': respostas2.length,
+          'Respostas': respostas2,
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Mantém seu sistema atual
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 20,
       itens: [
@@ -356,8 +373,11 @@ class _Desafio20PageState extends State<Desafio20Page> {
     );
 
     if (!mounted) return;
+
     await _mostrarResultado(acertos);
+
     if (!mounted) return;
+
     Navigator.of(context).pop(true);
   }
 
@@ -370,9 +390,9 @@ class _Desafio20PageState extends State<Desafio20Page> {
   }
 
   void _pendencia(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   }
 
   Future<void> _mostrarResultado(int acertos) async {
@@ -457,10 +477,7 @@ class _Symbol extends StatelessWidget {
     return Container(
       width: 48,
       height: 48,
-      decoration: BoxDecoration(
-        color: cor,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: cor, shape: BoxShape.circle),
       child: Icon(icon, color: Colors.black, size: 25),
     );
   }

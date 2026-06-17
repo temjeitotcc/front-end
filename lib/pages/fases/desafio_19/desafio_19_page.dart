@@ -5,6 +5,9 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio19Page extends StatefulWidget {
   const Desafio19Page({super.key});
 
@@ -39,8 +42,9 @@ class _Desafio19PageState extends State<Desafio19Page> {
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final corTema = tema.colorScheme.primary;
-    final textoPrincipal =
-        tema.brightness == Brightness.dark ? Colors.white : Colors.black;
+    final textoPrincipal = tema.brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
     final textoSecundario = tema.brightness == Brightness.dark
         ? Colors.white70
         : Colors.black54;
@@ -59,51 +63,51 @@ class _Desafio19PageState extends State<Desafio19Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 19 - Minha Empresa, Minha Vida',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 19 - Minha Empresa, Minha Vida',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _subtituloEtapa(),
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                _subtituloEtapa(),
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 4,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 4,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -120,28 +124,28 @@ class _Desafio19PageState extends State<Desafio19Page> {
                     children: switch (etapaAtual) {
                       0 => _introducao(textoPrincipal, textoSecundario),
                       1 => _verdadeiroFalso(
-                          titulo: 'Questão 19  [ V ou F ]',
-                          introducao:
-                              'Sobre o processo de treinamento proposto no livro, avalie as afirmações:',
-                          respostas: respostasQuestao19,
-                          afirmacoes: const [
-                            'Assim como aprendemos a andar e a falar por repetição e treino, podemos reprogramar nossos padrões mentais e emocionais.',
-                            'O treinamento emocional proposto pela autora requer anos de dedicação exclusiva antes de produzir qualquer resultado.',
-                            'A fórmula do treinamento eficaz apresentada no livro é: Conhecimento + Estratégia + Prática = Treinamento Eficaz.',
-                          ],
-                        ),
+                        titulo: 'Questão 19  [ V ou F ]',
+                        introducao:
+                            'Sobre o processo de treinamento proposto no livro, avalie as afirmações:',
+                        respostas: respostasQuestao19,
+                        afirmacoes: const [
+                          'Assim como aprendemos a andar e a falar por repetição e treino, podemos reprogramar nossos padrões mentais e emocionais.',
+                          'O treinamento emocional proposto pela autora requer anos de dedicação exclusiva antes de produzir qualquer resultado.',
+                          'A fórmula do treinamento eficaz apresentada no livro é: Conhecimento + Estratégia + Prática = Treinamento Eficaz.',
+                        ],
+                      ),
                       2 => _multiplaEscolha(),
                       _ => _verdadeiroFalso(
-                          titulo: 'Questão 17  [ V ou F ]',
-                          introducao:
-                              'Sobre os 10 Departamentos da Vida, avalie:',
-                          respostas: respostasQuestao17,
-                          afirmacoes: const [
-                            'Os 10 departamentos incluem: Familiar, Relacional, Social, Saúde, Intelectual, Profissional, Emocional, Solidariedade, Futuro e Espiritual.',
-                            'Colocar nota máxima (10) em um departamento é recomendado para celebrar as conquistas nessa área.',
-                            'O objetivo da atividade é conduzir o leitor à tomada de consciência sobre sua realidade atual e definir ações concretas para cada área.',
-                          ],
-                        ),
+                        titulo: 'Questão 17  [ V ou F ]',
+                        introducao:
+                            'Sobre os 10 Departamentos da Vida, avalie:',
+                        respostas: respostasQuestao17,
+                        afirmacoes: const [
+                          'Os 10 departamentos incluem: Familiar, Relacional, Social, Saúde, Intelectual, Profissional, Emocional, Solidariedade, Futuro e Espiritual.',
+                          'Colocar nota máxima (10) em um departamento é recomendado para celebrar as conquistas nessa área.',
+                          'O objetivo da atividade é conduzir o leitor à tomada de consciência sobre sua realidade atual e definir ações concretas para cada área.',
+                        ],
+                      ),
                     },
                   ),
                 ),
@@ -267,8 +271,9 @@ class _Desafio19PageState extends State<Desafio19Page> {
   List<Widget> _multiplaEscolha() {
     final tema = Theme.of(context);
     final corTema = tema.colorScheme.primary;
-    final textoPrincipal =
-        tema.brightness == Brightness.dark ? Colors.white : Colors.black;
+    final textoPrincipal = tema.brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
     final textoSecundario = tema.brightness == Brightness.dark
         ? Colors.white70
         : Colors.black54;
@@ -292,11 +297,7 @@ class _Desafio19PageState extends State<Desafio19Page> {
       const SizedBox(height: 10),
       Text(
         "Na atividade 'Minha Empresa, Minha Vida', a autora divide a vida em departamentos para:",
-        style: TextStyle(
-          color: textoSecundario,
-          fontSize: 15,
-          height: 1.35,
-        ),
+        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
       Expanded(
@@ -325,10 +326,10 @@ class _Desafio19PageState extends State<Desafio19Page> {
                     children: [
                       CircleAvatar(
                         radius: 17,
-                        backgroundColor:
-                            selecionada ? corTema : corTema.withAlpha(32),
-                        foregroundColor:
-                            selecionada ? Colors.black : corTema,
+                        backgroundColor: selecionada
+                            ? corTema
+                            : corTema.withAlpha(32),
+                        foregroundColor: selecionada ? Colors.black : corTema,
                         child: Text(
                           String.fromCharCode(65 + index),
                           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -363,8 +364,9 @@ class _Desafio19PageState extends State<Desafio19Page> {
     required List<String> afirmacoes,
   }) {
     final tema = Theme.of(context);
-    final textoPrincipal =
-        tema.brightness == Brightness.dark ? Colors.white : Colors.black;
+    final textoPrincipal = tema.brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
     final textoSecundario = tema.brightness == Brightness.dark
         ? Colors.white70
         : Colors.black54;
@@ -381,11 +383,7 @@ class _Desafio19PageState extends State<Desafio19Page> {
       const SizedBox(height: 10),
       Text(
         introducao,
-        style: TextStyle(
-          color: textoSecundario,
-          fontSize: 15,
-          height: 1.35,
-        ),
+        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
       Expanded(
@@ -433,6 +431,32 @@ class _Desafio19PageState extends State<Desafio19Page> {
     }
 
     final acertos = _contarAcertos();
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salvar resultado do desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 19')
+        .set({
+          'Acertos': acertos,
+          'TotalQuestoes': 7,
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Mantém seu sistema atual
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 19,
       itens: [
@@ -444,8 +468,11 @@ class _Desafio19PageState extends State<Desafio19Page> {
     );
 
     if (!mounted) return;
+
     await _mostrarResultado(acertos);
+
     if (!mounted) return;
+
     Navigator.of(context).pop(true);
   }
 
@@ -461,9 +488,9 @@ class _Desafio19PageState extends State<Desafio19Page> {
   }
 
   void _pendencia(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   }
 
   Future<void> _mostrarResultado(int acertos) async {

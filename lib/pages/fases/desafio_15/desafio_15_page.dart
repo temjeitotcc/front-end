@@ -9,6 +9,9 @@ import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 import '../../../widgets/podcast_volume_control.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio15Page extends StatefulWidget {
   const Desafio15Page({super.key});
 
@@ -98,55 +101,52 @@ class _Desafio15PageState extends State<Desafio15Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 15 - Podcast',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 15 - Podcast',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              switch (etapaAtual) {
+                              Text(switch (etapaAtual) {
                                 0 => '7 Passos da Sobrevivência',
                                 1 => 'Ouça e anote os passos',
                                 _ => 'Escolha o seu próximo passo',
-                              },
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              }, style: TextStyle(color: textoSecundario)),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 3,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 3,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -252,7 +252,10 @@ class _Desafio15PageState extends State<Desafio15Page> {
               ),
               const SizedBox(height: 4),
               for (final passo in _passos)
-                _StepMiniCard(passo: passo, cor: Theme.of(context).colorScheme.primary),
+                _StepMiniCard(
+                  passo: passo,
+                  cor: Theme.of(context).colorScheme.primary,
+                ),
             ],
           ),
         ),
@@ -409,10 +412,7 @@ class _Desafio15PageState extends State<Desafio15Page> {
     ];
   }
 
-  List<Widget> _conteudoReflexao(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _conteudoReflexao(Color textoPrincipal, Color textoSecundario) {
     final corTema = Theme.of(context).colorScheme.primary;
 
     return [
@@ -503,8 +503,8 @@ class _Desafio15PageState extends State<Desafio15Page> {
       novaPosicao < limiteInferior
           ? limiteInferior
           : novaPosicao > limiteSuperior
-              ? limiteSuperior
-              : novaPosicao,
+          ? limiteSuperior
+          : novaPosicao,
     );
   }
 
@@ -528,15 +528,42 @@ class _Desafio15PageState extends State<Desafio15Page> {
 
   Future<void> _concluir() async {
     final resposta = reflexaoController.text.trim();
+
     if (resposta.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Escreva sua reflexão antes de concluir.')),
+        const SnackBar(
+          content: Text('Escreva sua reflexão antes de concluir.'),
+        ),
       );
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // 1. Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuários',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // 2. Salvar reflexão
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 15')
+        .set({
+          'Resposta': resposta,
+          'Nome': user.displayName ?? 'Usuário',
+          'Respondido em': FieldValue.serverTimestamp(),
+        });
+
     await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 15,
+      desafio: 7,
       itens: [
         ConteudoItem(
           titulo: 'Reflexão sobre os 7 passos',
@@ -552,13 +579,41 @@ class _Desafio15PageState extends State<Desafio15Page> {
 }
 
 const List<_SurvivalStep> _passos = [
-  _SurvivalStep('1', 'Recupere seu foco', 'Direcione sua atenção para aquilo que realmente importa.'),
-  _SurvivalStep('2', 'Aceite a mudança', 'Crescer exige adaptação e disposição para sair da zona de conforto.'),
-  _SurvivalStep('3', 'Saia da autossabotagem', 'Identifique comportamentos que limitam seu potencial.'),
-  _SurvivalStep('4', 'Encha sua caixa de ferramentas', 'Busque conhecimento, habilidades e recursos para a vida.'),
-  _SurvivalStep('5', 'Fique ligado na gratidão', 'Valorize suas conquistas, aprendizados e oportunidades.'),
-  _SurvivalStep('6', 'Estabeleça metas', 'Transforme sonhos em objetivos concretos e crie um plano.'),
-  _SurvivalStep('7', 'Pratique a auto-responsabilidade', 'Assuma o protagonismo e inspire pessoas.'),
+  _SurvivalStep(
+    '1',
+    'Recupere seu foco',
+    'Direcione sua atenção para aquilo que realmente importa.',
+  ),
+  _SurvivalStep(
+    '2',
+    'Aceite a mudança',
+    'Crescer exige adaptação e disposição para sair da zona de conforto.',
+  ),
+  _SurvivalStep(
+    '3',
+    'Saia da autossabotagem',
+    'Identifique comportamentos que limitam seu potencial.',
+  ),
+  _SurvivalStep(
+    '4',
+    'Encha sua caixa de ferramentas',
+    'Busque conhecimento, habilidades e recursos para a vida.',
+  ),
+  _SurvivalStep(
+    '5',
+    'Fique ligado na gratidão',
+    'Valorize suas conquistas, aprendizados e oportunidades.',
+  ),
+  _SurvivalStep(
+    '6',
+    'Estabeleça metas',
+    'Transforme sonhos em objetivos concretos e crie um plano.',
+  ),
+  _SurvivalStep(
+    '7',
+    'Pratique a auto-responsabilidade',
+    'Assuma o protagonismo e inspire pessoas.',
+  ),
 ];
 
 class _SurvivalStep {
@@ -853,10 +908,7 @@ class _ParagraphText extends StatelessWidget {
   final String text;
   final Color color;
 
-  const _ParagraphText({
-    required this.text,
-    required this.color,
-  });
+  const _ParagraphText({required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {
