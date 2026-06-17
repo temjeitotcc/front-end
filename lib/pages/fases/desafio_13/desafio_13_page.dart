@@ -5,6 +5,9 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio13Page extends StatefulWidget {
   const Desafio13Page({super.key});
 
@@ -69,51 +72,51 @@ class _Desafio13PageState extends State<Desafio13Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 13 - Atividade',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 13 - Atividade',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _subtituloEtapa(),
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                _subtituloEtapa(),
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 6,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 6,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -132,26 +135,27 @@ class _Desafio13PageState extends State<Desafio13Page> {
                       1 => _conteudoMultiplaEscolha1(),
                       2 => _conteudoMultiplaEscolha2(),
                       3 => _conteudoVerdadeiroFalso(
-                          titulo: "Questão 3  [ V ou F ]",
-                          intro: "Sobre a atividade 'Trocando os Óculos', avalie:",
-                          respostas: respostasVf3,
-                          afirmacoes: const [
-                            'A atividade propõe que o leitor relembre momentos de raiva, medo, inveja e ódio para ressignificá-los com um novo significado positivo.',
-                            'Trocar os óculos significa apagar o passado e fingir que experiências negativas nunca existiram.',
-                            'Os óculos da gratidão permitem enxergar o que realmente importa e reconhecer a própria jornada de sobrevivente.',
-                          ],
-                        ),
+                        titulo: "Questão 3  [ V ou F ]",
+                        intro:
+                            "Sobre a atividade 'Trocando os Óculos', avalie:",
+                        respostas: respostasVf3,
+                        afirmacoes: const [
+                          'A atividade propõe que o leitor relembre momentos de raiva, medo, inveja e ódio para ressignificá-los com um novo significado positivo.',
+                          'Trocar os óculos significa apagar o passado e fingir que experiências negativas nunca existiram.',
+                          'Os óculos da gratidão permitem enxergar o que realmente importa e reconhecer a própria jornada de sobrevivente.',
+                        ],
+                      ),
                       4 => _conteudoVerdadeiroFalso(
-                          titulo: "Questão 4  [ V ou F ]",
-                          intro:
-                              'Julgue as afirmações sobre a Visualização Positiva de Futuro:',
-                          respostas: respostasVf4,
-                          afirmacoes: const [
-                            'A visualização positiva consiste em imaginar o futuro desejado e usar esse recurso para alinhar pensamentos, sentimentos e comportamentos ao propósito.',
-                            'O Mural dos Sonhos deve conter fotos pessoais antigas do leitor para relembrar quem ele foi.',
-                            'Quando um sonho recebe uma data e um plano de ação, ele se transforma em meta.',
-                          ],
-                        ),
+                        titulo: "Questão 4  [ V ou F ]",
+                        intro:
+                            'Julgue as afirmações sobre a Visualização Positiva de Futuro:',
+                        respostas: respostasVf4,
+                        afirmacoes: const [
+                          'A visualização positiva consiste em imaginar o futuro desejado e usar esse recurso para alinhar pensamentos, sentimentos e comportamentos ao propósito.',
+                          'O Mural dos Sonhos deve conter fotos pessoais antigas do leitor para relembrar quem ele foi.',
+                          'Quando um sonho recebe uma data e um plano de ação, ele se transforma em meta.',
+                        ],
+                      ),
                       _ => _conteudoReflexao(textoPrincipal, textoSecundario),
                     },
                   ),
@@ -333,11 +337,7 @@ class _Desafio13PageState extends State<Desafio13Page> {
       const SizedBox(height: 10),
       Text(
         pergunta,
-        style: TextStyle(
-          color: textoSecundario,
-          fontSize: 15,
-          height: 1.35,
-        ),
+        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
       Expanded(
@@ -382,11 +382,7 @@ class _Desafio13PageState extends State<Desafio13Page> {
       const SizedBox(height: 10),
       Text(
         intro,
-        style: TextStyle(
-          color: textoSecundario,
-          fontSize: 15,
-          height: 1.35,
-        ),
+        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
       Expanded(
@@ -406,10 +402,7 @@ class _Desafio13PageState extends State<Desafio13Page> {
     ];
   }
 
-  List<Widget> _conteudoReflexao(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _conteudoReflexao(Color textoPrincipal, Color textoSecundario) {
     final corTema = Theme.of(context).colorScheme.primary;
     return [
       Text(
@@ -501,12 +494,40 @@ class _Desafio13PageState extends State<Desafio13Page> {
 
   Future<void> _concluir() async {
     final reflexao = reflexaoController.text.trim();
+
     if (reflexao.isEmpty) {
       _mostrarPendencia('Escreva sua reflexão antes de concluir.');
       return;
     }
 
     final acertos = _contarAcertos();
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salvar resultado do desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 13')
+        .set({
+          'Acertos': acertos,
+          'TotalQuestoes': 8,
+          'Reflexao': reflexao,
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Mantém seu sistema atual
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 13,
       itens: [
@@ -523,8 +544,11 @@ class _Desafio13PageState extends State<Desafio13Page> {
     );
 
     if (!mounted) return;
+
     await _mostrarResultado(acertos);
+
     if (!mounted) return;
+
     Navigator.of(context).pop(true);
   }
 
@@ -542,7 +566,9 @@ class _Desafio13PageState extends State<Desafio13Page> {
   }
 
   void _mostrarPendencia(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensagem)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   }
 
   Future<void> _mostrarResultado(int acertos) async {

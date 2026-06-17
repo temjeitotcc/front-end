@@ -5,6 +5,9 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio9Page extends StatefulWidget {
   const Desafio9Page({super.key});
 
@@ -63,51 +66,51 @@ class _Desafio9PageState extends State<Desafio9Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 9 - Coraferido Vírus',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 9 - Coraferido Vírus',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _subtituloEtapa(),
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                _subtituloEtapa(),
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 4,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 4,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -126,9 +129,9 @@ class _Desafio9PageState extends State<Desafio9Page> {
                       1 => _conteudoMultiplaEscolha1(textoPrincipal),
                       2 => _conteudoMultiplaEscolha2(textoPrincipal),
                       _ => _conteudoVerdadeiroFalso(
-                          textoPrincipal,
-                          textoSecundario,
-                        ),
+                        textoPrincipal,
+                        textoSecundario,
+                      ),
                     },
                   ),
                 ),
@@ -204,7 +207,11 @@ class _Desafio9PageState extends State<Desafio9Page> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.psychology_alt_rounded, color: corTema, size: 30),
+                    Icon(
+                      Icons.psychology_alt_rounded,
+                      color: corTema,
+                      size: 30,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -308,11 +315,7 @@ class _Desafio9PageState extends State<Desafio9Page> {
       const SizedBox(height: 10),
       Text(
         pergunta,
-        style: TextStyle(
-          color: textoSecundario,
-          fontSize: 15,
-          height: 1.35,
-        ),
+        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
       Expanded(
@@ -348,11 +351,7 @@ class _Desafio9PageState extends State<Desafio9Page> {
       const SizedBox(height: 10),
       Text(
         "Sobre a metáfora da 'Injeção de Benzetacil', julgue as afirmações:",
-        style: TextStyle(
-          color: textoSecundario,
-          fontSize: 15,
-          height: 1.35,
-        ),
+        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
       Expanded(
@@ -421,6 +420,32 @@ class _Desafio9PageState extends State<Desafio9Page> {
 
     final acertos = _contarAcertos();
 
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salvar resultado do desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 09')
+        .set({
+          'Acertos': acertos,
+          'TotalQuestoes': respostasVf.length,
+          'Respostas': respostasVf,
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Mantém seu sistema atual
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 9,
       itens: [
@@ -432,8 +457,11 @@ class _Desafio9PageState extends State<Desafio9Page> {
     );
 
     if (!mounted) return;
+
     await _mostrarResultado(acertos);
+
     if (!mounted) return;
+
     Navigator.of(context).pop(true);
   }
 
@@ -450,9 +478,9 @@ class _Desafio9PageState extends State<Desafio9Page> {
   }
 
   void _mostrarPendencia(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   }
 
   Future<void> _mostrarResultado(int acertos) async {
@@ -666,10 +694,7 @@ class _ParagraphText extends StatelessWidget {
   final String text;
   final Color color;
 
-  const _ParagraphText({
-    required this.text,
-    required this.color,
-  });
+  const _ParagraphText({required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -677,11 +702,7 @@ class _ParagraphText extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 14),
       child: Text(
         text,
-        style: TextStyle(
-          color: color,
-          fontSize: 16,
-          height: 1.35,
-        ),
+        style: TextStyle(color: color, fontSize: 16, height: 1.35),
       ),
     );
   }
