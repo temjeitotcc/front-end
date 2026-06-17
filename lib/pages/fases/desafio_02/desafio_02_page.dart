@@ -350,8 +350,6 @@ class _Desafio2PageState extends State<Desafio2Page> {
         .doc(user.uid)
         .collection('Desafios')
         .doc('Dia 02')
-        .collection('Respostas')
-        .doc('Respostas')
         .set({
           ...respostasFirestore,
           'RespondidoEm': FieldValue.serverTimestamp(),

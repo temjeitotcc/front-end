@@ -546,8 +546,6 @@ class _Desafio6PageState extends State<Desafio6Page> {
         .doc(user.uid)
         .collection('Desafios')
         .doc('Dia 06')
-        .collection('Respostas')
-        .doc('Respostas')
         .set({
           'Carta 1 - Acusação e Consequências': carta1Controller.text.trim(),
           'Carta 2 - Pedido de Perdão': carta2Controller.text.trim(),

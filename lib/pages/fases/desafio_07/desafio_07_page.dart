@@ -416,8 +416,6 @@ class _Desafio7PageState extends State<Desafio7Page> {
         .doc(user.uid)
         .collection('Reflexões')
         .doc('Dia 07')
-        .collection('Respostas')
-        .doc('Respostas')
         .set({
           'Resposta': resposta,
           'Nome': user.displayName ?? 'Usuário',

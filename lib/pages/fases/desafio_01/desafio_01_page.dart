@@ -438,8 +438,6 @@ class _Desafio1PageState extends State<Desafio1Page> {
           .doc(user.uid)
           .collection('Desafios')
           .doc('Dia 01')
-          .collection('Respostas')
-          .doc('Respostas')
           .set({
             'Familiar': respostas[0],
             'Relacional': respostas[1],

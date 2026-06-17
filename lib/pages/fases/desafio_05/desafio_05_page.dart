@@ -333,8 +333,6 @@ class _Desafio5PageState extends State<Desafio5Page> {
         .doc(user.uid)
         .collection('Desafios')
         .doc('Dia 05')
-        .collection('Respostas')
-        .doc('Respostas')
         .set({
           'Resposta': resposta,
           'Nome': user.displayName ?? 'Usuário',

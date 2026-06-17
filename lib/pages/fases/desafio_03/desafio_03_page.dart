@@ -342,8 +342,6 @@ class _Desafio3PageState extends State<Desafio3Page> {
         .doc(user.uid)
         .collection('Desafios')
         .doc('Dia 03')
-        .collection('Respostas')
-        .doc('Respostas')
         .set({
           'Reflexao': reflexao,
           'RespondidoEm': FieldValue.serverTimestamp(),
