@@ -211,7 +211,7 @@ class _Desafio28PageState extends State<Desafio28Page> {
               const SizedBox(height: 14),
               _ParagraphText(
                 text:
-                    'Antes de nos despedirmos, que tal relembrar tudo o que vivemos e aprendemos ao longo desses dias?',
+                    'Antes de nos despedirmos, que tal relembrar tudo o que vivemos e aprendemos ao longo de todos esses dias?',
                 color: textoSecundario,
               ),
               _HighlightCard(
@@ -283,9 +283,23 @@ class _Desafio28PageState extends State<Desafio28Page> {
                     'Você aprendeu a trocar os óculos, construir um Mural dos Sonhos e visualizar um futuro com planejamento e ação.',
                 cor: corTema,
               ),
+              _JourneyItem(
+                icon: Icons.volunteer_activism_rounded,
+                title: 'Linguagens do amor',
+                text:
+                    'Você entendeu que cada pessoa demonstra e recebe amor de uma forma. Conhecer sua linguagem principal e a das pessoas ao redor desenvolve empatia, conexão e inteligência emocional.',
+                cor: corTema,
+              ),
+              _JourneyItem(
+                icon: Icons.auto_awesome_rounded,
+                title: 'Mudança possível',
+                text:
+                    'Ao longo dessa jornada, você falou sobre gratidão, perdão, inteligência emocional, propósito, autorresponsabilidade, autoconhecimento e a importância de acreditar que a mudança é possível.',
+                cor: corTema,
+              ),
               const SizedBox(height: 6),
               Text(
-                'Sonhos se tornam metas quando são acompanhados de planejamento e ação.',
+                'Saber a forma de amor do próximo também é uma forma de amar.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: textoSecundario,

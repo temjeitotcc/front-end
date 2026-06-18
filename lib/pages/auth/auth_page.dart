@@ -172,377 +172,410 @@ class _AuthPageState extends State<AuthPage> {
 
     return Scaffold(
       backgroundColor: fundo,
-      body: Column(
+      body: Stack(
         children: [
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.fromLTRB(
-              18,
-              MediaQuery.paddingOf(context).top + 12,
-              18,
-              14,
-            ),
-            decoration: BoxDecoration(
-              color: corTema,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(28),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(45),
-                  blurRadius: 14,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(35),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.auto_awesome_rounded,
-                    color: Colors.white,
-                    size: 27,
-                  ),
-                ),
-                const SizedBox(width: 13),
-                const Expanded(
-                  child: Text(
-                    'Tem Jeito e Vale a Pena',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 21,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-              ],
+          Positioned.fill(
+            child: Image.asset(
+              'assets/login_background.jpeg',
+              fit: BoxFit.cover,
             ),
           ),
-          Expanded(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(18, 22, 18, 28),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 480),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: cardColor,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: borda),
-                          ),
-                          child: _AuthModeSelector(
-                            criandoConta: _criandoConta,
-                            cor: corTema,
-                            enabled: !_carregando,
-                            onChanged: (criandoConta) {
-                              if (criandoConta == _criandoConta) return;
-                              FocusScope.of(context).unfocus();
-                              setState(() => _criandoConta = criandoConta);
-                            },
-                          ),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withAlpha(145),
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.fromLTRB(
+                  18,
+                  MediaQuery.paddingOf(context).top + 12,
+                  18,
+                  14,
+                ),
+                decoration: BoxDecoration(
+                  color: corTema.withAlpha(235),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(28),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(45),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(35),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.auto_awesome_rounded,
+                        color: Colors.white,
+                        size: 27,
+                      ),
+                    ),
+                    const SizedBox(width: 13),
+                    const Expanded(
+                      child: Text(
+                        'Tem Jeito e Vale a Pena',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 21,
+                          fontWeight: FontWeight.w900,
                         ),
-                        const SizedBox(height: 22),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 320),
-                          switchInCurve: Curves.easeOutCubic,
-                          switchOutCurve: Curves.easeInCubic,
-                          transitionBuilder: (child, animation) {
-                            final deslocamento = Tween<Offset>(
-                              begin: Offset(
-                                _criandoConta ? 0.08 : -0.08,
-                                0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(18, 22, 18, 28),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 480),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Container(
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: cardColor,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: borda),
                               ),
-                              end: Offset.zero,
-                            ).animate(animation);
-                            return FadeTransition(
-                              opacity: animation,
-                              child: SlideTransition(
-                                position: deslocamento,
-                                child: child,
+                              child: _AuthModeSelector(
+                                criandoConta: _criandoConta,
+                                cor: corTema,
+                                enabled: !_carregando,
+                                onChanged: (criandoConta) {
+                                  if (criandoConta == _criandoConta) return;
+                                  FocusScope.of(context).unfocus();
+                                  setState(() => _criandoConta = criandoConta);
+                                },
                               ),
-                            );
-                          },
-                          child: Column(
-                            key: ValueKey(_criandoConta),
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _criandoConta
-                                    ? 'Comece sua jornada'
-                                    : 'Que bom ter você de volta',
-                                style: TextStyle(
-                                  color: textoPrincipal,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                _criandoConta
-                                    ? 'Crie sua conta para guardar seu progresso.'
-                                    : 'Entre para continuar de onde parou.',
-                                style: TextStyle(
-                                  color: textoSecundario,
-                                  fontSize: 14,
-                                  height: 1.35,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        Container(
-                          padding: const EdgeInsets.all(18),
-                          decoration: BoxDecoration(
-                            color: cardColor,
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: corTema.withAlpha(95),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withAlpha(26),
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              AnimatedSize(
-                                duration: const Duration(milliseconds: 330),
-                                curve: Curves.easeInOutCubic,
-                                alignment: Alignment.topCenter,
-                                child: AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 260),
-                                  transitionBuilder: (child, animation) {
-                                    return SizeTransition(
-                                      sizeFactor: animation,
-                                      axisAlignment: -1,
-                                      child: FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      ),
-                                    );
-                                  },
-                                  child: _criandoConta
-                                      ? Padding(
-                                          key: const ValueKey('campo_nome'),
-                                          padding:
-                                              const EdgeInsets.only(bottom: 14),
-                                          child: TextFormField(
-                                            controller:
-                                                _nomeUsuarioController,
-                                            textInputAction:
-                                                TextInputAction.next,
-                                            textCapitalization:
-                                                TextCapitalization.words,
-                                            decoration: _decoracaoCampo(
-                                              context,
-                                              label: 'Nome de usuário',
-                                              icon: Icons
-                                                  .person_outline_rounded,
-                                            ),
-                                            validator: (valor) {
-                                              if (!_criandoConta) return null;
-                                              final nome =
-                                                  valor?.trim() ?? '';
-                                              if (nome.length < 2) {
-                                                return 'Digite seu nome de usuário.';
-                                              }
-                                              return null;
-                                            },
-                                          ),
-                                        )
-                                      : const SizedBox(
-                                          key: ValueKey('sem_campo_nome'),
-                                        ),
+                            const SizedBox(height: 22),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 320),
+                              switchInCurve: Curves.easeOutCubic,
+                              switchOutCurve: Curves.easeInCubic,
+                              transitionBuilder: (child, animation) {
+                                final deslocamento = Tween<Offset>(
+                                  begin: Offset(
+                                    _criandoConta ? 0.08 : -0.08,
+                                    0,
                                   ),
-                                ),
-                              TextFormField(
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                textInputAction: TextInputAction.next,
-                                autocorrect: false,
-                                decoration: _decoracaoCampo(
-                                  context,
-                                  label: 'E-mail',
-                                  icon: Icons.email_outlined,
-                                ),
-                                validator: (valor) {
-                                  final email = valor?.trim() ?? '';
-                                  if (email.isEmpty) {
-                                    return 'E-mail não encontrado.';
-                                  }
-                                  if (!email.contains('@') ||
-                                      !email.contains('.')) {
-                                    return 'Digite um e-mail válido.';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 14),
-                              TextFormField(
-                                controller: _senhaController,
-                                obscureText: _ocultarSenha,
-                                textInputAction: TextInputAction.done,
-                                onFieldSubmitted: (_) {
-                                  if (!_carregando) _enviar();
-                                },
-                                decoration: _decoracaoCampo(
-                                  context,
-                                  label: 'Senha',
-                                  icon: Icons.lock_outline_rounded,
-                                  suffixIcon: IconButton(
-                                    tooltip: _ocultarSenha
-                                        ? 'Mostrar senha'
-                                        : 'Ocultar senha',
-                                    icon: Icon(
-                                      _ocultarSenha
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
-                                    ),
-                                    onPressed: () {
-                                      setState(
-                                        () =>
-                                            _ocultarSenha = !_ocultarSenha,
-                                      );
-                                    },
+                                  end: Offset.zero,
+                                ).animate(animation);
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: SlideTransition(
+                                    position: deslocamento,
+                                    child: child,
                                   ),
-                                ),
-                                validator: (valor) {
-                                  final senha = valor ?? '';
-                                  if (senha.isEmpty) {
-                                    return 'Senha não encontrada.';
-                                  }
-                                  if (senha.length < 6) {
-                                    return 'Use pelo menos 6 caracteres.';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              if (!_criandoConta) ...[
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: TextButton(
-                                    onPressed:
-                                        _carregando ? null : _redefinirSenha,
-                                    child: const Text('Esqueci minha senha'),
-                                  ),
-                                ),
-                              ],
-                              const SizedBox(height: 18),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 52,
-                                child: ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: corTema,
-                                    foregroundColor: Colors.black,
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  onPressed: _carregando ? null : _enviar,
-                                  icon: _carregando
-                                      ? const SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.5,
-                                            color: Colors.black,
-                                          ),
-                                        )
-                                      : Icon(
-                                          _criandoConta
-                                              ? Icons.person_add_alt_1_rounded
-                                              : Icons.login_rounded,
-                                        ),
-                                  label: Text(
-                                    key: ValueKey(
-                                      'acao_${_carregando}_$_criandoConta',
-                                    ),
-                                    _carregando
-                                        ? 'AGUARDE...'
-                                        : _criandoConta
-                                            ? 'CRIAR CONTA'
-                                            : 'ENTRAR',
-                                    style: const TextStyle(
+                                );
+                              },
+                              child: Column(
+                                key: ValueKey(_criandoConta),
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _criandoConta
+                                        ? 'Comece sua jornada'
+                                        : 'Que bom ter você de volta',
+                                    style: TextStyle(
+                                      color: textoPrincipal,
+                                      fontSize: 24,
                                       fontWeight: FontWeight.w900,
                                     ),
                                   ),
-                                ),
-                              ),
-                              const SizedBox(height: 17),
-                              Row(
-                                children: [
-                                  Expanded(child: Divider(color: borda)),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    _criandoConta
+                                        ? 'Crie sua conta para guardar seu progresso.'
+                                        : 'Entre para continuar de onde parou.',
+                                    style: TextStyle(
+                                      color: textoSecundario,
+                                      fontSize: 14,
+                                      height: 1.35,
                                     ),
-                                    child: Text(
-                                      'OU',
-                                      style: TextStyle(
-                                        color: textoSecundario,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w800,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            Container(
+                              padding: const EdgeInsets.all(18),
+                              decoration: BoxDecoration(
+                                color: cardColor.withAlpha(238),
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: corTema.withAlpha(95),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withAlpha(45),
+                                    blurRadius: 14,
+                                    offset: const Offset(0, 7),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [
+                                  AnimatedSize(
+                                    duration:
+                                        const Duration(milliseconds: 330),
+                                    curve: Curves.easeInOutCubic,
+                                    alignment: Alignment.topCenter,
+                                    child: AnimatedSwitcher(
+                                      duration:
+                                          const Duration(milliseconds: 260),
+                                      transitionBuilder: (child, animation) {
+                                        return SizeTransition(
+                                          sizeFactor: animation,
+                                          axisAlignment: -1,
+                                          child: FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          ),
+                                        );
+                                      },
+                                      child: _criandoConta
+                                          ? Padding(
+                                              key: const ValueKey(
+                                                'campo_nome',
+                                              ),
+                                              padding: const EdgeInsets.only(
+                                                bottom: 14,
+                                              ),
+                                              child: TextFormField(
+                                                controller:
+                                                    _nomeUsuarioController,
+                                                textInputAction:
+                                                    TextInputAction.next,
+                                                textCapitalization:
+                                                    TextCapitalization.words,
+                                                decoration: _decoracaoCampo(
+                                                  context,
+                                                  label: 'Nome de usuário',
+                                                  icon: Icons
+                                                      .person_outline_rounded,
+                                                ),
+                                                validator: (valor) {
+                                                  if (!_criandoConta) {
+                                                    return null;
+                                                  }
+                                                  final nome =
+                                                      valor?.trim() ?? '';
+                                                  if (nome.length < 2) {
+                                                    return 'Digite seu nome de usuário.';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            )
+                                          : const SizedBox(
+                                              key: ValueKey('sem_campo_nome'),
+                                            ),
+                                    ),
+                                  ),
+                                  TextFormField(
+                                    controller: _emailController,
+                                    keyboardType: TextInputType.emailAddress,
+                                    textInputAction: TextInputAction.next,
+                                    autocorrect: false,
+                                    decoration: _decoracaoCampo(
+                                      context,
+                                      label: 'E-mail',
+                                      icon: Icons.email_outlined,
+                                    ),
+                                    validator: (valor) {
+                                      final email = valor?.trim() ?? '';
+                                      if (email.isEmpty) {
+                                        return 'E-mail não encontrado.';
+                                      }
+                                      if (!email.contains('@') ||
+                                          !email.contains('.')) {
+                                        return 'Digite um e-mail válido.';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 14),
+                                  TextFormField(
+                                    controller: _senhaController,
+                                    obscureText: _ocultarSenha,
+                                    textInputAction: TextInputAction.done,
+                                    onFieldSubmitted: (_) {
+                                      if (!_carregando) _enviar();
+                                    },
+                                    decoration: _decoracaoCampo(
+                                      context,
+                                      label: 'Senha',
+                                      icon: Icons.lock_outline_rounded,
+                                      suffixIcon: IconButton(
+                                        tooltip: _ocultarSenha
+                                            ? 'Mostrar senha'
+                                            : 'Ocultar senha',
+                                        icon: Icon(
+                                          _ocultarSenha
+                                              ? Icons.visibility_outlined
+                                              : Icons.visibility_off_outlined,
+                                        ),
+                                        onPressed: () {
+                                          setState(
+                                            () => _ocultarSenha =
+                                                !_ocultarSenha,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    validator: (valor) {
+                                      final senha = valor ?? '';
+                                      if (senha.isEmpty) {
+                                        return 'Senha não encontrada.';
+                                      }
+                                      if (senha.length < 6) {
+                                        return 'Use pelo menos 6 caracteres.';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  if (!_criandoConta) ...[
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: TextButton(
+                                        onPressed: _carregando
+                                            ? null
+                                            : _redefinirSenha,
+                                        child: const Text(
+                                          'Esqueci minha senha',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                  const SizedBox(height: 18),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 52,
+                                    child: ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: corTema,
+                                        foregroundColor: Colors.black,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      onPressed:
+                                          _carregando ? null : _enviar,
+                                      icon: _carregando
+                                          ? const SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child:
+                                                  CircularProgressIndicator(
+                                                strokeWidth: 2.5,
+                                                color: Colors.black,
+                                              ),
+                                            )
+                                          : Icon(
+                                              _criandoConta
+                                                  ? Icons
+                                                      .person_add_alt_1_rounded
+                                                  : Icons.login_rounded,
+                                            ),
+                                      label: Text(
+                                        key: ValueKey(
+                                          'acao_${_carregando}_$_criandoConta',
+                                        ),
+                                        _carregando
+                                            ? 'AGUARDE...'
+                                            : _criandoConta
+                                                ? 'CRIAR CONTA'
+                                                : 'ENTRAR',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w900,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                  Expanded(child: Divider(color: borda)),
+                                  const SizedBox(height: 17),
+                                  Row(
+                                    children: [
+                                      Expanded(child: Divider(color: borda)),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                        ),
+                                        child: Text(
+                                          'OU',
+                                          style: TextStyle(
+                                            color: textoSecundario,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(child: Divider(color: borda)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 17),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 50,
+                                    child: OutlinedButton.icon(
+                                      onPressed: _carregando
+                                          ? null
+                                          : _loginComGoogle,
+                                      icon: const Icon(
+                                        Icons.g_mobiledata_rounded,
+                                        size: 29,
+                                      ),
+                                      label: const Text(
+                                        'CONTINUAR COM GOOGLE',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: textoPrincipal,
+                                        side: BorderSide(color: borda),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
-                              const SizedBox(height: 17),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 50,
-                                child: OutlinedButton.icon(
-                                  onPressed:
-                                      _carregando ? null : _loginComGoogle,
-                                  icon: const Icon(
-                                    Icons.g_mobiledata_rounded,
-                                    size: 29,
-                                  ),
-                                  label: const Text(
-                                    'CONTINUAR COM GOOGLE',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: textoPrincipal,
-                                    side: BorderSide(color: borda),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         ],
       ),

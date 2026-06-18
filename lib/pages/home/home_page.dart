@@ -8,7 +8,9 @@ import '../../widgets/main_tab_header.dart';
 import '../fases/fase_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final int scrollSignal;
+
+  const HomePage({super.key, required this.scrollSignal});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -18,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   final int totalFases = 28;
   static const double _alturaGrupo = 760;
   static const double _tamanhoCirculoFase = 76;
-
+  final ScrollController _jornadaController = ScrollController();
   late List<DateTime?> fasesConcluidas;
   final service = FasesService();
   String nomeUsuario = 'você';
@@ -30,6 +32,21 @@ class _HomePageState extends State<HomePage> {
     carregarFases();
     carregarNomeUsuario();
     PontosService.carregarPontos();
+  }
+
+  @override
+  void didUpdateWidget(covariant HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.scrollSignal != widget.scrollSignal) {
+      _rolarJornadaParaBaixo();
+    }
+  }
+
+  @override
+  void dispose() {
+    _jornadaController.dispose();
+    super.dispose();
   }
 
   Future<void> carregarNomeUsuario() async {
@@ -125,6 +142,7 @@ class _HomePageState extends State<HomePage> {
 
           Expanded(
             child: ListView(
+              controller: _jornadaController,
               reverse: true,
               padding: const EdgeInsets.only(bottom: 70),
               children: [
@@ -137,6 +155,16 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _rolarJornadaParaBaixo() {
+    if (!_jornadaController.hasClients) return;
+
+    _jornadaController.animateTo(
+      _jornadaController.position.minScrollExtent,
+      duration: const Duration(milliseconds: 650),
+      curve: Curves.easeInOutCubic,
     );
   }
 

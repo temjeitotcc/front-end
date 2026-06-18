@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'main.dart';
 import 'pages/login/conta_page.dart';
 import 'pages/auth/auth_page.dart';
 import 'services/app_theme_service.dart';
@@ -10,7 +9,9 @@ import 'services/notificacao_service.dart';
 import 'widgets/main_tab_header.dart';
 
 class ConfigPage extends StatefulWidget {
-  const ConfigPage({super.key});
+  final VoidCallback? onAbrirTutorial;
+
+  const ConfigPage({super.key, this.onAbrirTutorial});
 
   @override
   State<ConfigPage> createState() => _ConfigPageState();
@@ -20,7 +21,6 @@ class _ConfigPageState extends State<ConfigPage> {
   bool notificacoes = true;
   bool som = true;
   bool vibracao = true;
-  bool modoEscuro = true;
   String temaCoresAtual = AppThemeService.temaPadrao;
   List<AppThemeOption> temasComprados = [AppThemeService.temas.first];
 
@@ -52,7 +52,6 @@ class _ConfigPageState extends State<ConfigPage> {
       notificacoes = prefs.getBool('notificações') ?? true;
       som = prefs.getBool('som') ?? true;
       vibracao = prefs.getBool('vibracao') ?? true;
-      modoEscuro = prefs.getBool('modoEscuro') ?? true;
       temasComprados = temasDisponiveis;
       temaCoresAtual = temaAtual.id;
     });
@@ -285,22 +284,17 @@ class _ConfigPageState extends State<ConfigPage> {
                     await salvarBool('vibracao', valor);
                   },
                 ),
-                _SwitchTile(
-                  icon: Icons.dark_mode_outlined,
-                  titulo: 'Modo escuro',
-                  subtitulo: 'Tema visual do aplicativo',
-                  valor: modoEscuro,
+                const SizedBox(height: 18),
+                const _SectionTitle('Suporte'),
+                _ActionTile(
+                  icon: Icons.explore_outlined,
+                  titulo: 'Ver tutorial',
+                  subtitulo: 'Rever a apresentação do aplicativo',
                   cardColor: cardColor,
                   textoPrincipal: textoPrincipal,
                   textoSecundario: textoSecundario,
-                  onChanged: (valor) async {
-                    setState(() => modoEscuro = valor);
-                    await salvarBool('modoEscuro', valor);
-                    await MyApp.of(context).trocarTema(valor);
-                  },
+                  onTap: widget.onAbrirTutorial ?? () {},
                 ),
-                const SizedBox(height: 18),
-                const _SectionTitle('Suporte'),
                 _ActionTile(
                   icon: Icons.help_outline_rounded,
                   titulo: 'Ajuda',

@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
 import 'mainscreen.dart';
@@ -28,54 +27,20 @@ Future<void> main() async {
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  static _MyAppState of(BuildContext context) {
-    final state = maybeOf(context);
-    if (state == null) {
-      throw FlutterError('MyApp.of() called with a context that has no MyApp.');
-    }
-    return state;
-  }
-
-  static _MyAppState? maybeOf(BuildContext context) {
-    return context.findAncestorStateOfType<_MyAppState>();
-  }
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  bool modoEscuro = true;
-
   @override
   void initState() {
     super.initState();
-    carregarTema();
     configurarNotificacoes();
   }
 
   Future<void> configurarNotificacoes() async {
     await NotificacaoService.inicializar();
     await NotificacaoService.configurarPeloPreferencias();
-  }
-
-  Future<void> carregarTema() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!mounted) return;
-
-    setState(() {
-      modoEscuro = prefs.getBool('modoEscuro') ?? true;
-    });
-  }
-
-  Future<void> trocarTema(bool valor) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('modoEscuro', valor);
-
-    if (!mounted) return;
-    setState(() {
-      modoEscuro = valor;
-    });
   }
 
   @override
@@ -85,7 +50,7 @@ class _MyAppState extends State<MyApp> {
       builder: (context, temaCores, _) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          themeMode: modoEscuro ? ThemeMode.dark : ThemeMode.light,
+          themeMode: ThemeMode.dark,
           theme: ThemeData(
             brightness: Brightness.light,
             scaffoldBackgroundColor: const Color(0xFFF7F4EA),
