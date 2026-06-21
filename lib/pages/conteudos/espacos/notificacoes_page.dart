@@ -2,17 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../services/feedback_service.dart';
-import '../../widgets/main_tab_header.dart';
+import '../../../services/feedback_service.dart';
+import '../../../widgets/main_tab_header.dart';
 
-class FeedbacksPage extends StatefulWidget {
-  const FeedbacksPage({super.key});
+class NotificacoesPage extends StatefulWidget {
+  const NotificacoesPage({super.key});
 
   @override
-  State<FeedbacksPage> createState() => _FeedbacksPageState();
+  State<NotificacoesPage> createState() => _NotificacoesPageState();
 }
 
-class _FeedbacksPageState extends State<FeedbacksPage> {
+class _NotificacoesPageState extends State<NotificacoesPage> {
   final FeedbackService service = FeedbackService();
 
   @override

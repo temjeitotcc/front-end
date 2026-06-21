@@ -1,12 +1,9 @@
-import 'dart:async';
-import 'dart:typed_data';
-
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 
-import '../../widgets/main_tab_header.dart';
+import '../../../widgets/main_tab_header.dart';
 
 const String _livroAsset = 'assets/livro_tem_jeito_e_vale_a_pena.pdf';
 const String _livroTitulo = 'Tem Jeito e Vale a Pena';
@@ -275,14 +272,16 @@ class LeitorLivroPage extends StatefulWidget {
   State<LeitorLivroPage> createState() => _LeitorLivroPageState();
 }
 
+enum _ModoLeitura { vertical, horizontal }
+
 class _LeitorLivroPageState extends State<LeitorLivroPage> {
-  final Completer<PDFViewController> controller =
-      Completer<PDFViewController>();
+  PDFViewController? pdfController;
 
   Uint8List? dadosPdf;
   String? erro;
   int paginaAtual = 0;
   int totalPaginas = 0;
+  _ModoLeitura modoLeitura = _ModoLeitura.vertical;
 
   @override
   void initState() {
@@ -303,8 +302,13 @@ class _LeitorLivroPageState extends State<LeitorLivroPage> {
 
   @override
   Widget build(BuildContext context) {
-    final corTema = Theme.of(context).colorScheme.primary;
-    final fundo = Theme.of(context).scaffoldBackgroundColor;
+    final tema = Theme.of(context);
+    final corTema = tema.colorScheme.primary;
+    final fundo = tema.scaffoldBackgroundColor;
+    final escuro = tema.brightness == Brightness.dark;
+    final painel = escuro ? const Color(0xFF211D1F) : Colors.white;
+    final textoPrincipal = escuro ? Colors.white : Colors.black87;
+    final textoSecundario = escuro ? Colors.white60 : Colors.black54;
     final pagina = totalPaginas == 0 ? 'Carregando...' : '${paginaAtual + 1}';
 
     return Scaffold(
@@ -322,17 +326,42 @@ class _LeitorLivroPageState extends State<LeitorLivroPage> {
               size: 30,
             ),
             onLeadingTap: () => Navigator.of(context).pop(),
-            trailing: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: Colors.white.withAlpha(35),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.menu_book_rounded,
-                color: Colors.white,
-                size: 24,
+            trailing: PopupMenuButton<_ModoLeitura>(
+              initialValue: modoLeitura,
+              tooltip: 'Modo de leitura',
+              onSelected: _alterarModoLeitura,
+              itemBuilder: (context) => const [
+                PopupMenuItem(
+                  value: _ModoLeitura.vertical,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(Icons.swap_vert_rounded),
+                    title: Text('Rolar para baixo'),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: _ModoLeitura.horizontal,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(Icons.menu_book_rounded),
+                    title: Text('Folhear para o lado'),
+                  ),
+                ),
+              ],
+              child: Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(35),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  modoLeitura == _ModoLeitura.horizontal
+                      ? Icons.menu_book_rounded
+                      : Icons.swap_vert_rounded,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
             ),
           ),
@@ -353,18 +382,22 @@ class _LeitorLivroPageState extends State<LeitorLivroPage> {
                         child: CircularProgressIndicator(color: corTema),
                       )
                     : PDFView(
+                        key: ValueKey(modoLeitura),
                         pdfData: dadosPdf,
                         enableSwipe: true,
-                        swipeHorizontal: false,
+                        swipeHorizontal:
+                            modoLeitura == _ModoLeitura.horizontal,
                         autoSpacing: true,
-                        pageFling: true,
-                        pageSnap: true,
+                        pageFling: modoLeitura == _ModoLeitura.horizontal,
+                        pageSnap: modoLeitura == _ModoLeitura.horizontal,
+                        defaultPage: paginaAtual,
                         fitPolicy: FitPolicy.WIDTH,
-                        backgroundColor: const Color(0xFF353033),
+                        backgroundColor: escuro
+                            ? const Color(0xFF353033)
+                            : const Color(0xFFE9E7E2),
                         onViewCreated: (pdfController) {
-                          if (!controller.isCompleted) {
-                            controller.complete(pdfController);
-                          }
+                          this.pdfController = pdfController;
+                          pdfController.setPage(paginaAtual);
                         },
                         onRender: (paginas) {
                           if (!mounted) return;
@@ -390,44 +423,93 @@ class _LeitorLivroPageState extends State<LeitorLivroPage> {
             SafeArea(
               top: false,
               child: Container(
-                height: 62,
-                padding: const EdgeInsets.symmetric(horizontal: 18),
+                constraints: const BoxConstraints(minHeight: 86),
+                padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
                 decoration: BoxDecoration(
-                  color: fundo,
+                  color: painel,
+                  border: Border(
+                    top: BorderSide(color: corTema.withAlpha(105)),
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withAlpha(36),
-                      blurRadius: 10,
-                      offset: const Offset(0, -4),
+                      color: Colors.black.withAlpha(escuro ? 55 : 24),
+                      blurRadius: 16,
+                      offset: const Offset(0, -6),
                     ),
                   ],
                 ),
                 child: Row(
                   children: [
-                    IconButton(
+                    _ReaderPageButton(
                       tooltip: 'Página anterior',
-                      onPressed: paginaAtual > 0
-                          ? () => _irParaPagina(paginaAtual - 1)
-                          : null,
-                      icon: const Icon(Icons.chevron_left_rounded),
+                      icon: Icons.chevron_left_rounded,
+                      cor: corTema,
+                      habilitado: paginaAtual > 0,
+                      onPressed: () => _irParaPagina(paginaAtual - 1),
                     ),
+                    const SizedBox(width: 12),
                     Expanded(
-                      child: Slider(
-                        value: paginaAtual.toDouble(),
-                        min: 0,
-                        max: (totalPaginas - 1).toDouble(),
-                        divisions: totalPaginas > 1 ? totalPaginas - 1 : null,
-                        activeColor: corTema,
-                        onChanged: (valor) =>
-                            _irParaPagina(valor.round()),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.menu_book_rounded,
+                                color: corTema,
+                                size: 17,
+                              ),
+                              const SizedBox(width: 7),
+                              Text(
+                                'Página ${paginaAtual + 1}',
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              Text(
+                                ' de $totalPaginas',
+                                style: TextStyle(
+                                  color: textoSecundario,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              trackHeight: 3,
+                              activeTrackColor: corTema,
+                              inactiveTrackColor: corTema.withAlpha(45),
+                              thumbColor: corTema,
+                              overlayColor: corTema.withAlpha(28),
+                              thumbShape: const RoundSliderThumbShape(
+                                enabledThumbRadius: 7,
+                              ),
+                              overlayShape: const RoundSliderOverlayShape(
+                                overlayRadius: 15,
+                              ),
+                            ),
+                            child: Slider(
+                              value: paginaAtual.toDouble(),
+                              min: 0,
+                              max: (totalPaginas - 1).toDouble(),
+                              onChanged: (valor) =>
+                                  _irParaPagina(valor.round()),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    IconButton(
+                    const SizedBox(width: 12),
+                    _ReaderPageButton(
                       tooltip: 'Próxima página',
-                      onPressed: paginaAtual < totalPaginas - 1
-                          ? () => _irParaPagina(paginaAtual + 1)
-                          : null,
-                      icon: const Icon(Icons.chevron_right_rounded),
+                      icon: Icons.chevron_right_rounded,
+                      cor: corTema,
+                      habilitado: paginaAtual < totalPaginas - 1,
+                      onPressed: () => _irParaPagina(paginaAtual + 1),
                     ),
                   ],
                 ),
@@ -439,8 +521,56 @@ class _LeitorLivroPageState extends State<LeitorLivroPage> {
   }
 
   Future<void> _irParaPagina(int pagina) async {
-    if (!controller.isCompleted) return;
-    final pdfController = await controller.future;
-    await pdfController.setPage(pagina);
+    await pdfController?.setPage(pagina);
+  }
+
+  void _alterarModoLeitura(_ModoLeitura novoModo) {
+    if (novoModo == modoLeitura) return;
+    setState(() {
+      modoLeitura = novoModo;
+      pdfController = null;
+    });
+  }
+}
+
+class _ReaderPageButton extends StatelessWidget {
+  final String tooltip;
+  final IconData icon;
+  final Color cor;
+  final bool habilitado;
+  final VoidCallback onPressed;
+
+  const _ReaderPageButton({
+    required this.tooltip,
+    required this.icon,
+    required this.cor,
+    required this.habilitado,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: habilitado ? cor : cor.withAlpha(24),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: habilitado ? onPressed : null,
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Icon(
+              icon,
+              color: habilitado
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : Theme.of(context).disabledColor,
+              size: 28,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

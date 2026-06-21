@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../widgets/challenge_header_surface.dart';
+import '../../../widgets/challenge_feedback_dialog.dart';
 
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
@@ -556,32 +557,10 @@ class _Desafio13PageState extends State<Desafio13Page> {
   }
 
   Future<void> _mostrarResultado(int acertos) async {
-    final corTema = Theme.of(context).colorScheme.primary;
-    await showDialog<void>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF2A2527)
-              : Colors.white,
-          title: Row(
-            children: [
-              Icon(Icons.emoji_events_rounded, color: corTema),
-              const SizedBox(width: 8),
-              const Text('Resultado'),
-            ],
-          ),
-          content: Text(
-            'Você acertou $acertos de 8. Nos vemos amanhã para mais um desafio!',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Continuar'),
-            ),
-          ],
-        );
-      },
+    await showQuizFeedbackDialog(
+      context,
+      correctAnswers: acertos,
+      totalQuestions: 8,
     );
   }
 }

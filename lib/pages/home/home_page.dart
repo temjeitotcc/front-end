@@ -5,6 +5,7 @@ import '../../services/conteudos_service.dart';
 import '../../services/fases_service.dart';
 import '../../services/pontos_service.dart';
 import '../../widgets/main_tab_header.dart';
+import '../../widgets/challenge_feedback_dialog.dart';
 import '../fases/fase_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -541,7 +542,34 @@ class _HomePageState extends State<HomePage> {
       fasesConcluidas[index] = DateTime.now();
     });
 
-    salvarFases();
+    await salvarFases();
+
+    if (!mounted) return;
+
+    const desafiosComReflexaoFinal = {
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      12,
+      14,
+      15,
+      17,
+      21,
+      22,
+      23,
+      24,
+      26,
+      27,
+      28,
+    };
+    if (desafiosComReflexaoFinal.contains(index + 1)) {
+      await showReflectionFeedbackDialog(context);
+    }
   }
 
   Future<bool> _precisaRecuperarConteudo(int numero) async {

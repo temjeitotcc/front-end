@@ -8,7 +8,13 @@ class PetPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fundo = Theme.of(context).scaffoldBackgroundColor;
+    final tema = Theme.of(context);
+    final fundo = tema.scaffoldBackgroundColor;
+    final corTema = tema.colorScheme.primary;
+    final escuro = tema.brightness == Brightness.dark;
+    final cardColor = escuro ? const Color(0xFF2A2527) : Colors.white;
+    final textoPrincipal = escuro ? Colors.white : Colors.black87;
+    final textoSecundario = escuro ? Colors.white60 : Colors.black54;
 
     return Scaffold(
       backgroundColor: fundo,
@@ -68,9 +74,16 @@ class PetPage extends StatelessWidget {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(18),
+                        color: cardColor,
                         borderRadius: BorderRadius.circular(28),
-                        border: Border.all(color: Colors.white.withAlpha(35)),
+                        border: Border.all(color: corTema.withAlpha(105)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(escuro ? 45 : 18),
+                            blurRadius: 18,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
                       ),
                       child: Stack(
                         children: [
@@ -79,7 +92,7 @@ class PetPage extends StatelessWidget {
                             left: 30,
                             child: Icon(
                               Icons.pets,
-                              color: Colors.white.withAlpha(20),
+                              color: corTema.withAlpha(24),
                               size: 40,
                             ),
                           ),
@@ -88,7 +101,7 @@ class PetPage extends StatelessWidget {
                             right: 40,
                             child: Icon(
                               Icons.pets,
-                              color: Colors.white.withAlpha(20),
+                              color: corTema.withAlpha(24),
                               size: 35,
                             ),
                           ),
@@ -97,7 +110,7 @@ class PetPage extends StatelessWidget {
                             left: 50,
                             child: Icon(
                               Icons.pets,
-                              color: Colors.white.withAlpha(20),
+                              color: corTema.withAlpha(24),
                               size: 35,
                             ),
                           ),
@@ -106,7 +119,7 @@ class PetPage extends StatelessWidget {
                             right: 50,
                             child: Icon(
                               Icons.pets,
-                              color: Colors.white.withAlpha(20),
+                              color: corTema.withAlpha(24),
                               size: 45,
                             ),
                           ),
@@ -137,10 +150,10 @@ class PetPage extends StatelessWidget {
 
                                 const SizedBox(height: 10),
 
-                                const Text(
+                                Text(
                                   'Gratidão',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: textoPrincipal,
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -151,7 +164,7 @@ class PetPage extends StatelessWidget {
                                 Text(
                                   'Seu companheiro diário',
                                   style: TextStyle(
-                                    color: Colors.white.withAlpha(150),
+                                    color: textoSecundario,
                                     fontSize: 13,
                                   ),
                                 ),
@@ -180,21 +193,31 @@ class _PetMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final esquema = Theme.of(context).colorScheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFED23E),
+        color: esquema.primary,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: esquema.primary.withAlpha(185)),
+        boxShadow: [
+          BoxShadow(
+            color: esquema.primary.withAlpha(38),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          Icon(icon, color: Colors.black, size: 28),
+          Icon(icon, color: esquema.onPrimary, size: 28),
           const SizedBox(height: 6),
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.black,
+            style: TextStyle(
+              color: esquema.onPrimary,
               fontWeight: FontWeight.bold,
               fontSize: 13,
             ),
