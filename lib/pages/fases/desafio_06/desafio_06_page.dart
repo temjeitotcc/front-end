@@ -555,30 +555,6 @@ class _Desafio6PageState extends State<Desafio6Page> {
           'Respondido em': FieldValue.serverTimestamp(),
         });
 
-    // 3. Manter salvamento atual do app
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 6,
-      itens: [
-        ConteudoItem(
-          titulo: 'Carta 1 - Acusação e Consequências',
-          texto: carta1Controller.text.trim(),
-        ),
-        ConteudoItem(
-          titulo: 'Carta 2 - Pedido de Perdão',
-          texto: carta2Controller.text.trim(),
-        ),
-        ConteudoItem(
-          titulo: 'Carta 3 - Superação',
-          texto: carta3Controller.text.trim(),
-        ),
-        ConteudoItem(
-          titulo: 'Decisão a partir de hoje',
-          texto: resposta,
-          reflexao: true,
-        ),
-      ],
-    );
-
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }

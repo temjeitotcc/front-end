@@ -355,18 +355,6 @@ class _Desafio2PageState extends State<Desafio2Page> {
           'RespondidoEm': FieldValue.serverTimestamp(),
         });
 
-    // Mantém o salvamento local já existente
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 2,
-      itens: [
-        for (int i = 0; i < areasPredio.length; i++)
-          ConteudoItem(
-            titulo: areasPredio[i],
-            texto: respostasPredio[i].trim(),
-          ),
-      ],
-    );
-
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }

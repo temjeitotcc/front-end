@@ -443,35 +443,13 @@ class _Desafio22PageState extends State<Desafio22Page> {
         .collection('usuarios')
         .doc(user.uid)
         .collection('desafios')
-        .doc('')
+        .doc('22')
         .set({
           'MinhaHistoriaEPadroes': padroesController.text.trim(),
           'MinhaFormaDeServir': servirController.text.trim(),
           'QuemEscolhoSerEMeuLegado': legadoController.text.trim(),
           'RespondidoEm': FieldValue.serverTimestamp(),
         });
-
-    // Mantém seu sistema atual
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 22,
-      itens: [
-        ConteudoItem(
-          titulo: 'Minha história e meus padrões',
-          texto: padroesController.text.trim(),
-          reflexao: true,
-        ),
-        ConteudoItem(
-          titulo: 'Minha forma de servir',
-          texto: servirController.text.trim(),
-          reflexao: true,
-        ),
-        ConteudoItem(
-          titulo: 'Quem escolho ser e meu legado',
-          texto: legadoController.text.trim(),
-          reflexao: true,
-        ),
-      ],
-    );
 
     if (!mounted) return;
 

@@ -589,17 +589,6 @@ class _Desafio8PageState extends State<Desafio8Page> {
           'Respondido em': FieldValue.serverTimestamp(),
         });
 
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 7,
-      itens: [
-        ConteudoItem(
-          titulo: 'Aprendizados do podcast',
-          texto: resposta,
-          reflexao: true,
-        ),
-      ],
-    );
-
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }

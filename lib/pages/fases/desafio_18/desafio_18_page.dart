@@ -465,22 +465,6 @@ class _Desafio18PageState extends State<Desafio18Page> {
           'RespondidoEm': FieldValue.serverTimestamp(),
         });
 
-    // Mantém seu sistema atual
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 18,
-      itens: [
-        ConteudoItem(
-          titulo: 'Resultado da atividade',
-          texto: '$acertos de 5 acertos',
-        ),
-        ConteudoItem(
-          titulo: 'Como posso fazer a diferença hoje',
-          texto: reflexao,
-          reflexao: true,
-        ),
-      ],
-    );
-
     if (!mounted) return;
 
     await _mostrarResultado(acertos);

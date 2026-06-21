@@ -562,17 +562,6 @@ class _Desafio15PageState extends State<Desafio15Page> {
           'Respondido em': FieldValue.serverTimestamp(),
         });
 
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 7,
-      itens: [
-        ConteudoItem(
-          titulo: 'Reflexão sobre os 7 passos',
-          texto: resposta,
-          reflexao: true,
-        ),
-      ],
-    );
-
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }

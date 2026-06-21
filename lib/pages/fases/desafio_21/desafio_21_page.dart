@@ -398,23 +398,12 @@ class _Desafio21PageState extends State<Desafio21Page> {
         .collection('usuarios')
         .doc(user.uid)
         .collection('reflexoes')
-        .doc('07')
+        .doc('21')
         .set({
           'Resposta': resposta,
           'Nome': user.displayName ?? 'Usuário',
           'Respondido em': FieldValue.serverTimestamp(),
         });
-
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 21,
-      itens: [
-        ConteudoItem(
-          titulo: 'Reflexão da semana 3',
-          texto: resposta,
-          reflexao: true,
-        ),
-      ],
-    );
 
     if (!mounted) return;
     Navigator.of(context).pop(true);

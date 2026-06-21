@@ -355,22 +355,12 @@ class _Desafio20PageState extends State<Desafio20Page> {
         .collection('desafios')
         .doc('20')
         .set({
+          'concluido': true,
           'Acertos': acertos,
           'TotalQuestoes': respostas2.length,
           'Respostas': respostas2,
           'RespondidoEm': FieldValue.serverTimestamp(),
         });
-
-    // Mantém seu sistema atual
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 20,
-      itens: [
-        ConteudoItem(
-          titulo: 'Resultado da atividade',
-          texto: '$acertos de 4 acertos',
-        ),
-      ],
-    );
 
     if (!mounted) return;
 

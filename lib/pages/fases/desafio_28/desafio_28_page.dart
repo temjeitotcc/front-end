@@ -498,27 +498,6 @@ class _Desafio28PageState extends State<Desafio28Page> {
           'Respondido em': FieldValue.serverTimestamp(),
         });
 
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 28,
-      itens: [
-        ConteudoItem(
-          titulo: 'Principais aprendizados',
-          texto: aprendizados,
-          reflexao: true,
-        ),
-        ConteudoItem(
-          titulo: 'O que mais me marcou',
-          texto: marcou,
-          reflexao: true,
-        ),
-        ConteudoItem(
-          titulo: 'Mudança que vou continuar',
-          texto: mudanca,
-          reflexao: true,
-        ),
-      ],
-    );
-
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }

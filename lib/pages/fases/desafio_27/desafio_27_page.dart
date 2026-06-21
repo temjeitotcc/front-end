@@ -377,29 +377,12 @@ class _Desafio27PageState extends State<Desafio27Page> {
         .collection('usuarios')
         .doc(user.uid)
         .collection('desafios')
-        .doc('')
+        .doc('27')
         .set({
           'CartaDoFuturo': cartaController.text.trim(),
           'DecisaoParaConstruirOFuturo': decisao,
           'RespondidoEm': FieldValue.serverTimestamp(),
         });
-
-    // Mantém seu sistema atual
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 27,
-      itens: [
-        ConteudoItem(
-          titulo: 'Carta do futuro',
-          texto: cartaController.text.trim(),
-          reflexao: true,
-        ),
-        ConteudoItem(
-          titulo: 'Decisão para construir o futuro',
-          texto: decisao,
-          reflexao: true,
-        ),
-      ],
-    );
 
     if (!mounted) return;
 

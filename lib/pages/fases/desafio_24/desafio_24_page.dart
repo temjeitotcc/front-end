@@ -391,18 +391,6 @@ class _Desafio24PageState extends State<Desafio24Page> {
           'RespondidoEm': FieldValue.serverTimestamp(),
         });
 
-    // Seu sistema atual
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 24,
-      itens: [
-        ConteudoItem(
-          titulo: 'Reflexão sobre minha linguagem do amor',
-          texto: reflexao,
-          reflexao: true,
-        ),
-      ],
-    );
-
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }

@@ -571,17 +571,6 @@ class _Desafio12PageState extends State<Desafio12Page> {
           'Respondido em': FieldValue.serverTimestamp(),
         });
 
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 7,
-      itens: [
-        ConteudoItem(
-          titulo: 'Reflexão sobre novas lentes e futuro',
-          texto: resposta,
-          reflexao: true,
-        ),
-      ],
-    );
-
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }

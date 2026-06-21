@@ -445,17 +445,6 @@ class _Desafio9PageState extends State<Desafio9Page> {
           'RespondidoEm': FieldValue.serverTimestamp(),
         });
 
-    // Mantém seu sistema atual
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 9,
-      itens: [
-        ConteudoItem(
-          titulo: 'Resultado da atividade',
-          texto: '$acertos de 5 acertos',
-        ),
-      ],
-    );
-
     if (!mounted) return;
 
     await _mostrarResultado(acertos);

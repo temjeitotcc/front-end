@@ -493,18 +493,6 @@ class _Desafio23PageState extends State<Desafio23Page> {
           'RespondidoEm': FieldValue.serverTimestamp(),
         });
 
-    // Seu sistema atual
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 23,
-      itens: [
-        ConteudoItem(
-          titulo: 'Reflexão sobre linguagens do amor',
-          texto: reflexao,
-          reflexao: true,
-        ),
-      ],
-    );
-
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }

@@ -492,11 +492,6 @@ class _Desafio26PageState extends State<Desafio26Page> {
       ),
     ];
 
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 26,
-      itens: itens,
-    );
-
     if (!mounted) return;
 
     Navigator.of(context).pop(true);

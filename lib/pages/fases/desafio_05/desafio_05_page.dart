@@ -339,18 +339,6 @@ class _Desafio5PageState extends State<Desafio5Page> {
           'Respondido em': FieldValue.serverTimestamp(),
         });
 
-    // 3. Manter salvamento local já existente
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 4,
-      itens: [
-        ConteudoItem(
-          titulo: 'Meu pântano e meu jardim',
-          texto: resposta,
-          reflexao: true,
-        ),
-      ],
-    );
-
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }

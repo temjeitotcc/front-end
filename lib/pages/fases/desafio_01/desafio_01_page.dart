@@ -452,20 +452,6 @@ class _Desafio1PageState extends State<Desafio1Page> {
             'RespondidoEm': FieldValue.serverTimestamp(),
           });
 
-      // Mantém seu sistema atual
-      await ConteudosService().salvarConteudosDoDesafio(
-        desafio: 1,
-        itens: [
-          for (int i = 0; i < perguntas.length; i++)
-            ConteudoItem(titulo: perguntas[i], texto: 'Nota: ${respostas[i]}'),
-          ConteudoItem(
-            titulo: 'Reflexão final',
-            texto: reflexaoController.text.trim(),
-            reflexao: true,
-          ),
-        ],
-      );
-
       if (!mounted) return;
       Navigator.of(context).pop(true);
       return;

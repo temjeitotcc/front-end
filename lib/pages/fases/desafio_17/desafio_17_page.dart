@@ -539,22 +539,6 @@ class _Desafio17PageState extends State<Desafio17Page> {
           },
           'RespondidoEm': FieldValue.serverTimestamp(),
         });
-
-    // Mantém seu sistema atual
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 17,
-      itens: [
-        for (final par in pares)
-          ConteudoItem(
-            titulo: '${par.antiga} -> ${par.nova}',
-            texto:
-                'Situação: ${par.situacaoController.text.trim()}\n\n'
-                'Nova perspectiva: ${par.ressignificacaoController.text.trim()}',
-            reflexao: true,
-          ),
-      ],
-    );
-
     if (!mounted) return;
 
     Navigator.of(context).pop(true);

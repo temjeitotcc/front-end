@@ -347,18 +347,6 @@ class _Desafio3PageState extends State<Desafio3Page> {
           'RespondidoEm': FieldValue.serverTimestamp(),
         });
 
-    // Mantém o sistema atual
-    await ConteudosService().salvarConteudosDoDesafio(
-      desafio: 3,
-      itens: [
-        ConteudoItem(
-          titulo: 'Reflexão sobre decisões',
-          texto: reflexao,
-          reflexao: true,
-        ),
-      ],
-    );
-
     if (!mounted) return;
     Navigator.of(context).pop(true);
   }
