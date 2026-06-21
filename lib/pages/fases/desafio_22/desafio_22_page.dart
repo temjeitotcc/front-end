@@ -433,17 +433,17 @@ class _Desafio22PageState extends State<Desafio22Page> {
     final firestore = FirebaseFirestore.instance;
 
     // Salvar/atualizar dados do usuário
-    await firestore.collection('Usuários').doc(user.uid).set({
-      'Nome': user.displayName ?? 'Usuário',
-      'Email': user.email,
+    await firestore.collection('usuarios').doc(user.uid).set({
+      'nome': user.displayName ?? 'Usuário',
+      'email': user.email,
     }, SetOptions(merge: true));
 
     // Salvar respostas do desafio
     await firestore
-        .collection('Usuários')
+        .collection('usuarios')
         .doc(user.uid)
-        .collection('Desafios')
-        .doc('Dia 22')
+        .collection('desafios')
+        .doc('')
         .set({
           'MinhaHistoriaEPadroes': padroesController.text.trim(),
           'MinhaFormaDeServir': servirController.text.trim(),

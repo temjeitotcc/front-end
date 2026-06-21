@@ -451,17 +451,17 @@ class _Desafio26PageState extends State<Desafio26Page> {
     final firestore = FirebaseFirestore.instance;
 
     // Salvar/atualizar dados do usuário
-    await firestore.collection('Usuários').doc(user.uid).set({
-      'Nome': user.displayName ?? 'Usuário',
-      'Email': user.email,
+    await firestore.collection('usuarios').doc(user.uid).set({
+      'nome': user.displayName ?? 'Usuário',
+      'email': user.email,
     }, SetOptions(merge: true));
 
     // Salvar respostas do desafio
     await firestore
-        .collection('Usuários')
+        .collection('usuarios')
         .doc(user.uid)
-        .collection('Desafios')
-        .doc('Dia 26')
+        .collection('desafios')
+        .doc('26')
         .set({
           'Sonhos': [
             for (int i = 0; i < sonhos.length; i++)

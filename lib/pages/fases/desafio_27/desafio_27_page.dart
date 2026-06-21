@@ -367,17 +367,17 @@ class _Desafio27PageState extends State<Desafio27Page> {
     final firestore = FirebaseFirestore.instance;
 
     // Salvar/atualizar usuário
-    await firestore.collection('Usuários').doc(user.uid).set({
-      'Nome': user.displayName ?? 'Usuário',
-      'Email': user.email,
+    await firestore.collection('usuarios').doc(user.uid).set({
+      'nome': user.displayName ?? 'Usuário',
+      'email': user.email,
     }, SetOptions(merge: true));
 
     // Salvar desafio
     await firestore
-        .collection('Usuários')
+        .collection('usuarios')
         .doc(user.uid)
-        .collection('Desafios')
-        .doc('Dia 27')
+        .collection('desafios')
+        .doc('')
         .set({
           'CartaDoFuturo': cartaController.text.trim(),
           'DecisaoParaConstruirOFuturo': decisao,

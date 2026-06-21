@@ -572,17 +572,17 @@ class _Desafio8PageState extends State<Desafio8Page> {
     final firestore = FirebaseFirestore.instance;
 
     // 1. Salvar/atualizar dados do usuário
-    await firestore.collection('Usuários').doc(user.uid).set({
-      'Nome': user.displayName ?? 'Usuários',
-      'Email': user.email,
+    await firestore.collection('usuarios').doc(user.uid).set({
+      'nome': user.displayName ?? 'Usuário',
+      'email': user.email,
     }, SetOptions(merge: true));
 
     // 2. Salvar reflexão
     await firestore
-        .collection('Usuários')
+        .collection('usuarios')
         .doc(user.uid)
-        .collection('Desafios')
-        .doc('Dia 08')
+        .collection('desafios')
+        .doc('08')
         .set({
           'Resposta': resposta,
           'Nome': user.displayName ?? 'Usuário',

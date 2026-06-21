@@ -332,9 +332,9 @@ class _Desafio2PageState extends State<Desafio2Page> {
     final firestore = FirebaseFirestore.instance;
 
     // Salva/atualiza dados do usuário
-    await firestore.collection('Usuários').doc(user.uid).set({
-      'Nome': user.displayName ?? 'Usuário',
-      'Email': user.email,
+    await firestore.collection('usuarios').doc(user.uid).set({
+      'nome': user.displayName ?? 'Usuário',
+      'email': user.email,
     }, SetOptions(merge: true));
 
     // Monta automaticamente o mapa das respostas
@@ -346,10 +346,10 @@ class _Desafio2PageState extends State<Desafio2Page> {
 
     // Salva o desafio
     await firestore
-        .collection('Usuários')
+        .collection('usuarios')
         .doc(user.uid)
-        .collection('Desafios')
-        .doc('Dia 02')
+        .collection('desafios')
+        .doc('02')
         .set({
           ...respostasFirestore,
           'RespondidoEm': FieldValue.serverTimestamp(),

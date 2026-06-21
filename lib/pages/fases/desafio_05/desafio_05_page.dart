@@ -322,17 +322,17 @@ class _Desafio5PageState extends State<Desafio5Page> {
     final firestore = FirebaseFirestore.instance;
 
     // 1. Salvar/atualizar dados do usuário
-    await firestore.collection('Usuários').doc(user.uid).set({
-      'Nome': user.displayName ?? 'Usuário',
-      'Email': user.email,
+    await firestore.collection('usuarios').doc(user.uid).set({
+      'nome': user.displayName ?? 'Usuário',
+      'email': user.email,
     }, SetOptions(merge: true));
 
     // 2. Salvar resposta do desafio
     await firestore
-        .collection('Usuários')
+        .collection('usuarios')
         .doc(user.uid)
-        .collection('Desafios')
-        .doc('Dia 05')
+        .collection('desafios')
+        .doc('05')
         .set({
           'Resposta': resposta,
           'Nome': user.displayName ?? 'Usuário',

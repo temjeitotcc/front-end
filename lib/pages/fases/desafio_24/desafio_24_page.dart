@@ -375,17 +375,17 @@ class _Desafio24PageState extends State<Desafio24Page> {
     final firestore = FirebaseFirestore.instance;
 
     // Salvar/atualizar usuário
-    await firestore.collection('Usuários').doc(user.uid).set({
-      'Nome': user.displayName ?? 'Usuário',
-      'Email': user.email,
+    await firestore.collection('usuarios').doc(user.uid).set({
+      'nome': user.displayName ?? 'Usuário',
+      'email': user.email,
     }, SetOptions(merge: true));
 
     // Salvar no Firestore
     await firestore
-        .collection('Usuários')
+        .collection('usuarios')
         .doc(user.uid)
-        .collection('Desafios')
-        .doc('Dia 24')
+        .collection('desafios')
+        .doc('24')
         .set({
           'ReflexaoSobreMinhaLinguagemDoAmor': reflexao,
           'RespondidoEm': FieldValue.serverTimestamp(),

@@ -427,17 +427,17 @@ class _Desafio1PageState extends State<Desafio1Page> {
       final firestore = FirebaseFirestore.instance;
 
       // Salva/atualiza usuário
-      await firestore.collection('Usuários').doc(user.uid).set({
-        'Nome': user.displayName ?? 'Usuário',
-        'Email': user.email,
+      await firestore.collection('usuarios').doc(user.uid).set({
+        'nome': user.displayName ?? 'Usuário',
+        'email': user.email,
       }, SetOptions(merge: true));
 
       // Salva respostas das notas
       await firestore
-          .collection('Usuários')
+          .collection('usuarios')
           .doc(user.uid)
-          .collection('Desafios')
-          .doc('Dia 01')
+          .collection('desafios')
+          .doc('01')
           .set({
             'Familiar': respostas[0],
             'Relacional': respostas[1],

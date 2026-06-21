@@ -388,19 +388,17 @@ class _Desafio21PageState extends State<Desafio21Page> {
     final firestore = FirebaseFirestore.instance;
 
     // 1. Salvar/atualizar dados do usuário
-    await firestore.collection('Usuários').doc(user.uid).set({
-      'Nome': user.displayName ?? 'Usuários',
-      'Email': user.email,
+    await firestore.collection('usuarios').doc(user.uid).set({
+      'nome': user.displayName ?? 'Usuário',
+      'email': user.email,
     }, SetOptions(merge: true));
 
     // 2. Salvar reflexão
     await firestore
-        .collection('Usuários')
+        .collection('usuarios')
         .doc(user.uid)
-        .collection('Reflexões')
-        .doc('Dia 21')
-        .collection('Respostas')
-        .doc('Respostas')
+        .collection('reflexoes')
+        .doc('07')
         .set({
           'Resposta': resposta,
           'Nome': user.displayName ?? 'Usuário',
