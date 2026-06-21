@@ -5,6 +5,9 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio22Page extends StatefulWidget {
   const Desafio22Page({super.key});
 
@@ -43,8 +46,9 @@ class _Desafio22PageState extends State<Desafio22Page> {
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
     final corTema = tema.colorScheme.primary;
-    final textoPrincipal =
-        tema.brightness == Brightness.dark ? Colors.white : Colors.black;
+    final textoPrincipal = tema.brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
     final textoSecundario = tema.brightness == Brightness.dark
         ? Colors.white70
         : Colors.black54;
@@ -63,51 +67,51 @@ class _Desafio22PageState extends State<Desafio22Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 22 - Responsabilidade e Propósito',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 22 - Responsabilidade e Propósito',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _subtitulo(),
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                _subtitulo(),
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 4,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 4,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -124,35 +128,33 @@ class _Desafio22PageState extends State<Desafio22Page> {
                     children: switch (etapaAtual) {
                       0 => _introducao(textoPrincipal, textoSecundario),
                       1 => _paginaEscrita(
-                          titulo: 'Questão 1 - Minha história',
-                          destaque:
-                              '"Somos cegos conduzindo cegos" e fomos treinados para nos tornar suicidas emocionais sem perceber.',
-                          perguntas: const [
-                            'Em quais momentos você desistiu de sonhos, aceitou menos do que merecia ou limitou sua existência?',
-                            'Quem ou quais situações treinaram esses padrões? Como você avalia a responsabilidade deles e a sua?',
-                            'O que muda agora que você reconhece esses padrões?',
-                          ],
-                          controller: padroesController,
-                          hint:
-                              'Olho para a minha história e reconheço que...',
-                          textoPrincipal: textoPrincipal,
-                          textoSecundario: textoSecundario,
-                        ),
+                        titulo: 'Questão 1 - Minha história',
+                        destaque:
+                            '"Somos cegos conduzindo cegos" e fomos treinados para nos tornar suicidas emocionais sem perceber.',
+                        perguntas: const [
+                          'Em quais momentos você desistiu de sonhos, aceitou menos do que merecia ou limitou sua existência?',
+                          'Quem ou quais situações treinaram esses padrões? Como você avalia a responsabilidade deles e a sua?',
+                          'O que muda agora que você reconhece esses padrões?',
+                        ],
+                        controller: padroesController,
+                        hint: 'Olho para a minha história e reconheço que...',
+                        textoPrincipal: textoPrincipal,
+                        textoSecundario: textoSecundario,
+                      ),
                       2 => _paginaEscrita(
-                          titulo: 'Questão 2 - Minha forma de servir',
-                          destaque:
-                              '"Nossa essência é servir, e servir com excelência é o que nos torna livres."',
-                          perguntas: const [
-                            'Como você serve hoje na família, nos estudos, no trabalho ou na comunidade?',
-                            'Existe uma forma de servir que faz você se sentir mais vivo, útil e realizado?',
-                            'Se sua forma de servir pudesse mudar a vida de alguém, o que faria diferente a partir de amanhã?',
-                          ],
-                          controller: servirController,
-                          hint:
-                              'Eu reconheço que minha forma de servir pode...',
-                          textoPrincipal: textoPrincipal,
-                          textoSecundario: textoSecundario,
-                        ),
+                        titulo: 'Questão 2 - Minha forma de servir',
+                        destaque:
+                            '"Nossa essência é servir, e servir com excelência é o que nos torna livres."',
+                        perguntas: const [
+                          'Como você serve hoje na família, nos estudos, no trabalho ou na comunidade?',
+                          'Existe uma forma de servir que faz você se sentir mais vivo, útil e realizado?',
+                          'Se sua forma de servir pudesse mudar a vida de alguém, o que faria diferente a partir de amanhã?',
+                        ],
+                        controller: servirController,
+                        hint: 'Eu reconheço que minha forma de servir pode...',
+                        textoPrincipal: textoPrincipal,
+                        textoSecundario: textoSecundario,
+                      ),
                       _ => _paginaFinal(textoPrincipal, textoSecundario),
                     },
                   ),
@@ -362,11 +364,7 @@ class _Desafio22PageState extends State<Desafio22Page> {
       const SizedBox(height: 10),
       Text(
         'Reconhecer padrões não é motivo para culpa, mas uma oportunidade de crescimento. Descobrir formas de servir e contribuir dá mais significado à própria existência.',
-        style: TextStyle(
-          color: textoSecundario,
-          fontSize: 15,
-          height: 1.35,
-        ),
+        style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
       ),
       const SizedBox(height: 14),
       Container(
@@ -422,10 +420,38 @@ class _Desafio22PageState extends State<Desafio22Page> {
 
   Future<void> _concluir() async {
     if (legadoController.text.trim().isEmpty) {
-      _pendencia('Escreva quem você escolhe ser e o legado que deseja construir.');
+      _pendencia(
+        'Escreva quem você escolhe ser e o legado que deseja construir.',
+      );
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salvar respostas do desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 22')
+        .set({
+          'MinhaHistoriaEPadroes': padroesController.text.trim(),
+          'MinhaFormaDeServir': servirController.text.trim(),
+          'QuemEscolhoSerEMeuLegado': legadoController.text.trim(),
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Mantém seu sistema atual
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 22,
       itens: [
@@ -448,13 +474,14 @@ class _Desafio22PageState extends State<Desafio22Page> {
     );
 
     if (!mounted) return;
+
     Navigator.of(context).pop(true);
   }
 
   void _pendencia(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   }
 }
 

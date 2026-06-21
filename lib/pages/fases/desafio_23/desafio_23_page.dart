@@ -8,6 +8,9 @@ import '../../../services/conteudos_service.dart';
 import '../../../widgets/challenge_header_surface.dart';
 import '../../../widgets/podcast_volume_control.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio23Page extends StatefulWidget {
   const Desafio23Page({super.key});
 
@@ -179,9 +182,7 @@ class _Desafio23PageState extends State<Desafio23Page> {
                         backgroundColor: corTema,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                        ),
+                        textStyle: const TextStyle(fontWeight: FontWeight.w900),
                       ),
                     ),
                   ),
@@ -257,8 +258,9 @@ class _Desafio23PageState extends State<Desafio23Page> {
     Color textoSecundario,
     Color corTema,
   ) {
-    final maximo =
-        duracao.inMilliseconds > 0 ? duracao.inMilliseconds.toDouble() : 1.0;
+    final maximo = duracao.inMilliseconds > 0
+        ? duracao.inMilliseconds.toDouble()
+        : 1.0;
     final valor = posicao.inMilliseconds.clamp(0, maximo.toInt()).toDouble();
 
     return ListView(
@@ -283,11 +285,7 @@ class _Desafio23PageState extends State<Desafio23Page> {
                   shape: BoxShape.circle,
                   border: Border.all(color: corTema.withAlpha(120)),
                 ),
-                child: Icon(
-                  Icons.favorite_rounded,
-                  color: corTema,
-                  size: 42,
-                ),
+                child: Icon(Icons.favorite_rounded, color: corTema, size: 42),
               ),
               const SizedBox(height: 16),
               Text(
@@ -456,13 +454,14 @@ class _Desafio23PageState extends State<Desafio23Page> {
       destino < Duration.zero
           ? Duration.zero
           : destino > duracao
-              ? duracao
-              : destino,
+          ? duracao
+          : destino,
     );
   }
 
   Future<void> _concluir() async {
     final reflexao = reflexaoController.text.trim();
+
     if (reflexao.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -472,6 +471,29 @@ class _Desafio23PageState extends State<Desafio23Page> {
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salvar/atualizar usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salvar no Firestore
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 23')
+        .set({
+          'ReflexaoSobreLinguagensDoAmor': reflexao,
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Seu sistema atual
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 23,
       itens: [

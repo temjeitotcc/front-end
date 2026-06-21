@@ -4,6 +4,9 @@ import '../../../widgets/challenge_header_surface.dart';
 
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio27Page extends StatefulWidget {
   const Desafio27Page({super.key});
 
@@ -48,51 +51,51 @@ class _Desafio27PageState extends State<Desafio27Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 27 - Visão Positiva do Futuro',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 27 - Visão Positiva do Futuro',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _subtituloEtapa(),
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                _subtituloEtapa(),
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 3,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 3,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -276,10 +279,7 @@ class _Desafio27PageState extends State<Desafio27Page> {
     ];
   }
 
-  List<Widget> _conteudoDecisao(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _conteudoDecisao(Color textoPrincipal, Color textoSecundario) {
     final corTema = Theme.of(context).colorScheme.primary;
 
     return [
@@ -352,6 +352,7 @@ class _Desafio27PageState extends State<Desafio27Page> {
 
   Future<void> _concluir() async {
     final decisao = decisaoController.text.trim();
+
     if (decisao.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Escreva sua decisão antes de concluir.')),
@@ -359,6 +360,31 @@ class _Desafio27PageState extends State<Desafio27Page> {
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salvar/atualizar usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salvar desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 27')
+        .set({
+          'CartaDoFuturo': cartaController.text.trim(),
+          'DecisaoParaConstruirOFuturo': decisao,
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Mantém seu sistema atual
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 27,
       itens: [
@@ -376,6 +402,7 @@ class _Desafio27PageState extends State<Desafio27Page> {
     );
 
     if (!mounted) return;
+
     Navigator.of(context).pop(true);
   }
 }
@@ -401,27 +428,17 @@ class _FutureScene extends StatelessWidget {
         child: Stack(
           children: [
             Positioned.fill(
-              child: CustomPaint(
-                painter: _FuturePathPainter(cor: cor),
-              ),
+              child: CustomPaint(painter: _FuturePathPainter(cor: cor)),
             ),
             Positioned(
               left: 26,
               bottom: 18,
-              child: _PersonFigure(
-                size: 54,
-                cor: cor,
-                label: 'hoje',
-              ),
+              child: _PersonFigure(size: 54, cor: cor, label: 'hoje'),
             ),
             Positioned(
               right: 24,
               bottom: 18,
-              child: _PersonFigure(
-                size: 82,
-                cor: cor,
-                label: 'futuro',
-              ),
+              child: _PersonFigure(size: 82, cor: cor, label: 'futuro'),
             ),
             Positioned(
               top: 18,
@@ -523,10 +540,7 @@ class _PersonFigure extends StatelessWidget {
             child: Container(
               width: size * 0.32,
               height: size * 0.32,
-              decoration: BoxDecoration(
-                color: cor,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: cor, shape: BoxShape.circle),
             ),
           ),
           Positioned(
@@ -561,10 +575,7 @@ class _ParagraphText extends StatelessWidget {
   final String text;
   final Color color;
 
-  const _ParagraphText({
-    required this.text,
-    required this.color,
-  });
+  const _ParagraphText({required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {

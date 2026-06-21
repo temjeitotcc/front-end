@@ -5,6 +5,9 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio26Page extends StatefulWidget {
   const Desafio26Page({super.key});
 
@@ -68,51 +71,51 @@ class _Desafio26PageState extends State<Desafio26Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 26 - Mural dos Sonhos',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 26 - Mural dos Sonhos',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _subtituloEtapa(),
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                _subtituloEtapa(),
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 3,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 3,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -315,9 +318,7 @@ class _Desafio26PageState extends State<Desafio26Page> {
                     },
               icon: const Icon(Icons.add_rounded),
               label: Text(
-                sonhos.length >= 10
-                    ? 'Limite de 10 sonhos'
-                    : 'Adicionar sonho',
+                sonhos.length >= 10 ? 'Limite de 10 sonhos' : 'Adicionar sonho',
               ),
             ),
           ),
@@ -338,9 +339,7 @@ class _Desafio26PageState extends State<Desafio26Page> {
                       });
                     },
               icon: const Icon(Icons.remove_rounded),
-              label: Text(
-                sonhos.length <= 6 ? 'Mínimo 6' : 'Remover último',
-              ),
+              label: Text(sonhos.length <= 6 ? 'Mínimo 6' : 'Remover último'),
             ),
           ),
         ],
@@ -348,10 +347,7 @@ class _Desafio26PageState extends State<Desafio26Page> {
     ];
   }
 
-  List<Widget> _conteudoReflexao(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _conteudoReflexao(Color textoPrincipal, Color textoSecundario) {
     final corTema = Theme.of(context).colorScheme.primary;
 
     return [
@@ -440,14 +436,45 @@ class _Desafio26PageState extends State<Desafio26Page> {
 
   Future<void> _concluir() async {
     final resposta = reflexaoController.text.trim();
+
     if (resposta.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Escreva sua decisão antes de concluir.'),
-        ),
+        const SnackBar(content: Text('Escreva sua decisão antes de concluir.')),
       );
       return;
     }
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salvar respostas do desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 26')
+        .set({
+          'Sonhos': [
+            for (int i = 0; i < sonhos.length; i++)
+              {
+                'Sonho': sonhos[i].sonho.text.trim(),
+                'AreaDaVida': sonhos[i].area.text.trim(),
+                'OQueProporcionara': sonhos[i].proporcionara.text.trim(),
+                'ComoMeSentirei': sonhos[i].sentirei.text.trim(),
+              },
+          ],
+          'DecisaoParaConstruirOFuturo': resposta,
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
 
     final itens = <ConteudoItem>[
       for (int i = 0; i < sonhos.length; i++)
@@ -471,6 +498,7 @@ class _Desafio26PageState extends State<Desafio26Page> {
     );
 
     if (!mounted) return;
+
     Navigator.of(context).pop(true);
   }
 }
@@ -688,10 +716,7 @@ class _ParagraphText extends StatelessWidget {
   final String text;
   final Color color;
 
-  const _ParagraphText({
-    required this.text,
-    required this.color,
-  });
+  const _ParagraphText({required this.text, required this.color});
 
   @override
   Widget build(BuildContext context) {

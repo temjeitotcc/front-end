@@ -5,6 +5,9 @@ import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 import '../../../widgets/challenge_header_surface.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio24Page extends StatefulWidget {
   const Desafio24Page({super.key});
 
@@ -165,9 +168,7 @@ class _Desafio24PageState extends State<Desafio24Page> {
                         backgroundColor: corTema,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        textStyle: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                        ),
+                        textStyle: const TextStyle(fontWeight: FontWeight.w900),
                       ),
                     ),
                   ),
@@ -280,11 +281,7 @@ class _Desafio24PageState extends State<Desafio24Page> {
         const SizedBox(height: 10),
         Text(
           'Ao finalizar, reflita sobre o resultado:',
-          style: TextStyle(
-            color: textoSecundario,
-            fontSize: 15,
-            height: 1.35,
-          ),
+          style: TextStyle(color: textoSecundario, fontSize: 15, height: 1.35),
         ),
         const SizedBox(height: 12),
         _Question(text: 'Você se identificou com a linguagem apontada?'),
@@ -302,11 +299,7 @@ class _Desafio24PageState extends State<Desafio24Page> {
             minLines: null,
             textAlignVertical: TextAlignVertical.top,
             textCapitalization: TextCapitalization.sentences,
-            style: TextStyle(
-              color: textoPrincipal,
-              fontSize: 16,
-              height: 1.35,
-            ),
+            style: TextStyle(color: textoPrincipal, fontSize: 16, height: 1.35),
             decoration: InputDecoration(
               hintText: 'Minha reflexão sobre minha linguagem do amor...',
               hintStyle: TextStyle(color: textoSecundario.withAlpha(150)),
@@ -366,6 +359,7 @@ class _Desafio24PageState extends State<Desafio24Page> {
 
   Future<void> _concluir() async {
     final reflexao = reflexaoController.text.trim();
+
     if (reflexao.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -375,6 +369,29 @@ class _Desafio24PageState extends State<Desafio24Page> {
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salvar/atualizar usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salvar no Firestore
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 24')
+        .set({
+          'ReflexaoSobreMinhaLinguagemDoAmor': reflexao,
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Seu sistema atual
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 24,
       itens: [

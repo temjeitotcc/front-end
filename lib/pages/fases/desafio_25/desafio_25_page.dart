@@ -5,6 +5,9 @@ import '../../../widgets/challenge_header_surface.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class Desafio25Page extends StatefulWidget {
   const Desafio25Page({super.key});
 
@@ -61,51 +64,51 @@ class _Desafio25PageState extends State<Desafio25Page> {
               ChallengeHeaderSurface(
                 child: Column(
                   children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dia 25 - Revisitando os Aprendizados',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: textoPrincipal,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Dia 25 - Revisitando os Aprendizados',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textoPrincipal,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              _subtituloEtapa(),
-                              style: TextStyle(color: textoSecundario),
-                            ),
-                          ],
+                              Text(
+                                _subtituloEtapa(),
+                                style: TextStyle(color: textoSecundario),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        tooltip: 'Sair',
-                        style: IconButton.styleFrom(
-                          backgroundColor: corTema,
-                          foregroundColor: Colors.black,
+                        IconButton(
+                          tooltip: 'Sair',
+                          style: IconButton.styleFrom(
+                            backgroundColor: corTema,
+                            foregroundColor: Colors.black,
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          icon: const Icon(Icons.close_rounded),
                         ),
-                        onPressed: () => Navigator.of(context).pop(false),
-                        icon: const Icon(Icons.close_rounded),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 18),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(999),
-                    child: LinearProgressIndicator(
-                      value: (etapaAtual + 1) / 5,
-                      minHeight: 10,
-                      backgroundColor: Colors.white12,
-                      valueColor: AlwaysStoppedAnimation(corTema),
-                    ),
-                  ),
                       ],
+                    ),
+                    const SizedBox(height: 18),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: LinearProgressIndicator(
+                        value: (etapaAtual + 1) / 5,
+                        minHeight: 10,
+                        backgroundColor: Colors.white12,
+                        valueColor: AlwaysStoppedAnimation(corTema),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 22),
@@ -120,17 +123,11 @@ class _Desafio25PageState extends State<Desafio25Page> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: switch (etapaAtual) {
-                      0 => _conteudoIntroducao(
-                          textoPrincipal,
-                          textoSecundario,
-                        ),
+                      0 => _conteudoIntroducao(textoPrincipal, textoSecundario),
                       1 => _questao1(),
                       2 => _questao2(),
                       3 => _questao3(),
-                      _ => _conteudoReflexao(
-                          textoPrincipal,
-                          textoSecundario,
-                        ),
+                      _ => _conteudoReflexao(textoPrincipal, textoSecundario),
                     },
                   ),
                 ),
@@ -366,10 +363,7 @@ class _Desafio25PageState extends State<Desafio25Page> {
     ];
   }
 
-  List<Widget> _conteudoReflexao(
-    Color textoPrincipal,
-    Color textoSecundario,
-  ) {
+  List<Widget> _conteudoReflexao(Color textoPrincipal, Color textoSecundario) {
     final corTema = Theme.of(context).colorScheme.primary;
     final campo = Theme.of(context).brightness == Brightness.dark
         ? const Color(0xFF171315)
@@ -460,6 +454,33 @@ class _Desafio25PageState extends State<Desafio25Page> {
     }
 
     final acertos = _contarAcertos();
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final firestore = FirebaseFirestore.instance;
+
+    // Salvar/atualizar dados do usuário
+    await firestore.collection('Usuários').doc(user.uid).set({
+      'Nome': user.displayName ?? 'Usuário',
+      'Email': user.email,
+    }, SetOptions(merge: true));
+
+    // Salvar resultado do desafio
+    await firestore
+        .collection('Usuários')
+        .doc(user.uid)
+        .collection('Desafios')
+        .doc('Dia 25')
+        .set({
+          'Acertos': acertos,
+          'TotalQuestoes': 3,
+          'ReflexaoFinal': reflexao,
+          'RespondidoEm': FieldValue.serverTimestamp(),
+        });
+
+    // Mantém seu sistema atual
     await ConteudosService().salvarConteudosDoDesafio(
       desafio: 25,
       itens: [
@@ -476,8 +497,11 @@ class _Desafio25PageState extends State<Desafio25Page> {
     );
 
     if (!mounted) return;
+
     await _mostrarResultado(acertos);
+
     if (!mounted) return;
+
     Navigator.of(context).pop(true);
   }
 
@@ -491,9 +515,9 @@ class _Desafio25PageState extends State<Desafio25Page> {
   }
 
   void _mostrarPendencia(String mensagem) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   }
 
   Future<void> _mostrarResultado(int acertos) async {
@@ -551,8 +575,8 @@ class _AlternativeTile extends StatelessWidget {
       color: selecionada
           ? corTema.withAlpha(38)
           : Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF211D1F)
-              : const Color(0xFFF6F1E7),
+          ? const Color(0xFF211D1F)
+          : const Color(0xFFF6F1E7),
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -572,8 +596,7 @@ class _AlternativeTile extends StatelessWidget {
               CircleAvatar(
                 radius: 16,
                 backgroundColor: selecionada ? corTema : Colors.white12,
-                foregroundColor:
-                    selecionada ? Colors.black : textoPrincipal,
+                foregroundColor: selecionada ? Colors.black : textoPrincipal,
                 child: Text(
                   letra,
                   style: const TextStyle(fontWeight: FontWeight.bold),
