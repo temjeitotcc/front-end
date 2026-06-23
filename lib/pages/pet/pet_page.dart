@@ -144,7 +144,13 @@ class PetPage extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                    PetWidget(cor: 'Vermelha', estado: 'Base'),
+                                    PetWidget(
+                                      cor: 'Vermelha',
+                                      estado: 'Base',
+                                      coleira: 'Vermelha',
+                                      oculos: true,
+                                      coroa: true,
+                                    ),
                                   ],
                                 ),
 
