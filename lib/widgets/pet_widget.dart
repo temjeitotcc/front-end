@@ -4,8 +4,7 @@ class PetWidget extends StatelessWidget {
   final String cor;
   final String estado;
   final String? coleira;
-  final bool oculos;
-  final bool oculosEstrela;
+  final String? oculos;
   final bool coroa;
 
   const PetWidget({
@@ -13,8 +12,7 @@ class PetWidget extends StatelessWidget {
     required this.cor,
     required this.estado,
     this.coleira,
-    this.oculos = false,
-    this.oculosEstrela = false,
+    this.oculos,
     this.coroa = false,
   });
 
@@ -26,40 +24,44 @@ class PetWidget extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
+          // Base
           Image.asset(
-            'pet/base/$cor$estado.png',
+            'assets/pet/base/$cor$estado.png',
             width: 220,
             height: 220,
             fit: BoxFit.contain,
           ),
 
+          // Coleira
           if (coleira != null)
             Image.asset(
-              'pet/acessorios/coleira$coleira.png',
+              'assets/pet/acessorios/coleira$coleira.png',
               width: 220,
               height: 220,
               fit: BoxFit.contain,
             ),
 
-          if (oculos)
+          // Óculos
+          if (oculos == 'normal')
             Image.asset(
-              'pet/acessorios/Oculos.png',
+              'assets/pet/acessorios/Oculos.png',
               width: 220,
               height: 220,
               fit: BoxFit.contain,
             ),
 
-          if (oculosEstrela)
+          if (oculos == 'estrela')
             Image.asset(
-              'pet/acessorios/OculosEstrela.png',
+              'assets/pet/acessorios/OculosEstrela.png',
               width: 220,
               height: 220,
               fit: BoxFit.contain,
             ),
 
+          // Coroa
           if (coroa)
             Image.asset(
-              'pet/acessorios/coroa.png.png',
+              'assets/pet/acessorios/coroa.png',
               width: 220,
               height: 220,
               fit: BoxFit.contain,

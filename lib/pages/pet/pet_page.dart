@@ -41,6 +41,7 @@ class PetPage extends StatelessWidget {
               ],
             ),
           ),
+
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -138,17 +139,17 @@ class PetPage extends StatelessWidget {
                                         height: 22,
                                         decoration: BoxDecoration(
                                           color: Colors.black.withAlpha(45),
-                                          borderRadius: BorderRadius.circular(
-                                            999,
-                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(999),
                                         ),
                                       ),
                                     ),
+
                                     PetWidget(
                                       cor: 'Vermelha',
                                       estado: 'Base',
                                       coleira: 'Vermelha',
-                                      oculos: true,
+                                      oculos: 'normal',
                                       coroa: true,
                                     ),
                                   ],
@@ -195,7 +196,10 @@ class _PetMenuButton extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _PetMenuButton({required this.icon, required this.label});
+  const _PetMenuButton({
+    required this.icon,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
