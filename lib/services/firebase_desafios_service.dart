@@ -23,7 +23,7 @@ class FirebaseDesafiosService {
       final dia = int.tryParse(doc.id.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
       final data = doc.data();
 
-      final timestamp = data['RespondidoEm'] as Timestamp?;
+      final timestamp = data['Respondido Em'] as Timestamp?;
 
       List<ConteudoItem> itens = [];
 
@@ -163,6 +163,129 @@ class FirebaseDesafiosService {
               titulo: 'Nome',
               texto: data['Nome'] ?? '',
               reflexao: false,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 8
+        // =========================
+        case 8:
+          itens = [
+            ConteudoItem(
+              titulo: 'Resposta',
+              texto: data['Resposta'] ?? '',
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Nome',
+              texto: data['Nome'] ?? '',
+              reflexao: false,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 9 (quiz / VF)
+        // =========================
+        case 9:
+          itens = [
+            ConteudoItem(
+              titulo: 'Acertos',
+              texto: (data['Acertos'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Total de Questões',
+              texto: (data['TotalQuestoes'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Respostas',
+              texto: (data['Respostas'] ?? '').toString(),
+              reflexao: false,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 10
+        // =========================
+        case 10:
+          itens = [
+            ConteudoItem(
+              titulo: 'Resposta',
+              texto: data['Resposta'] ?? '',
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Nome',
+              texto: data['Nome'] ?? '',
+              reflexao: false,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 11 (quiz / VF)
+        // =========================
+        case 11:
+          itens = [
+            ConteudoItem(
+              titulo: 'Acertos',
+              texto: (data['Acertos'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Total de Questões',
+              texto: (data['TotalQuestoes'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Respostas',
+              texto: (data['Respostas'] ?? '').toString(),
+              reflexao: false,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 12
+        // =========================
+        case 12:
+          itens = [
+            ConteudoItem(
+              titulo: 'Resposta',
+              texto: data['Resposta'] ?? '',
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Nome',
+              texto: data['Nome'] ?? '',
+              reflexao: false,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 13 (reflexivo + quiz)
+        // =========================
+        case 13:
+          itens = [
+            ConteudoItem(
+              titulo: 'Acertos',
+              texto: (data['Acertos'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Total de Questões',
+              texto: (data['TotalQuestoes'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Reflexão',
+              texto: data['Reflexao'] ?? '',
+              reflexao: true,
             ),
           ];
           break;
