@@ -1,12 +1,11 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:temjeito/pages/conteudos/espacos/bloco_reflexoes_page.dart';
+
 import 'package:temjeito/pages/conteudos/espacos/desafios_feitos_page.dart';
 import 'package:temjeito/pages/conteudos/espacos/reflexoes_semanais_page.dart';
 
-import '../../services/conteudos_service.dart';
 import '../../services/feedback_service.dart';
 import '../../widgets/main_tab_header.dart';
-import 'conteudos_utils.dart';
+
 import 'espacos/livro_page.dart';
 import 'espacos/notificacoes_page.dart';
 import 'espacos/podcasts_page.dart';
@@ -21,62 +20,9 @@ class ConteudosPage extends StatefulWidget {
 }
 
 class _ConteudosPageState extends State<ConteudosPage> {
-  final ConteudosService service = ConteudosService();
-  static const List<int> missoesEspeciais = [7, 14, 21, 28];
-  static const Set<int> desafiosComAtividadeSalva = {2, 22, 26};
-  Map<int, ConteudoDesafio> conteudos = {};
-  List<BlocoReflexao> blocosReflexao = [];
-
-  @override
-  void initState() {
-    super.initState();
-    carregarConteudos();
-  }
-
-  @override
-  void didUpdateWidget(covariant ConteudosPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.refreshKey != widget.refreshKey) {
-      carregarConteudos();
-    }
-  }
-
-  Future<void> carregarConteudos() async {
-    final dados = await service.carregarConteudos();
-    final blocos = await service.carregarBlocosReflexao();
-    if (!mounted) return;
-
-    setState(() {
-      conteudos = dados;
-      blocosReflexao = blocos;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final fundo = Theme.of(context).scaffoldBackgroundColor;
-    final textoPrincipal = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
-    final textoSecundario = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white70
-        : Colors.black54;
-    final desafiosSalvos = conteudos.entries
-        .where(
-          (entry) =>
-              !missoesEspeciais.contains(entry.key) &&
-              !questionariosDePodcast.contains(entry.key) &&
-              conteudoDisponivelParaExibicao(entry.key, entry.value),
-        )
-        .length;
-    final especiaisSalvas = conteudos.entries
-        .where(
-          (entry) =>
-              missoesEspeciais.contains(entry.key) &&
-              entry.value.temReflexao,
-        )
-        .length;
 
     return Scaffold(
       backgroundColor: fundo,
@@ -87,6 +33,7 @@ class _ConteudosPageState extends State<ConteudosPage> {
             subtitle: 'Releia suas respostas e reflexões',
             icon: Icons.menu_book_rounded,
           ),
+
           Expanded(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(14, 18, 14, 18),
@@ -98,47 +45,30 @@ class _ConteudosPageState extends State<ConteudosPage> {
                 children: [
                   _ConteudoCard(
                     titulo: 'Desafios feitos',
-                    subtitulo: '$desafiosSalvos salvos',
+                    subtitulo: 'Ver respostas salvas',
                     icon: Icons.menu_book_rounded,
-                    onTap: () async {
-                      await carregarConteudos();
-                      if (!context.mounted) return;
-                      await Navigator.of(context).push(
+                    onTap: () {
+                      Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) =>
-                              const DesafiosFeitosPage(),
+                          builder: (context) => const DesafiosFeitosPage(),
                         ),
                       );
-                      carregarConteudos();
                     },
                   ),
+
                   _ConteudoCard(
-                    titulo: 'Reflexão da semana',
-                    subtitulo: '$especiaisSalvas salvas',
+                    titulo: 'Reflexões da semana',
+                    subtitulo: 'Revisitar decisões',
                     icon: Icons.auto_awesome_rounded,
-                    onTap: () async {
-                      await Navigator.of(context).push(
+                    onTap: () {
+                      Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) =>
-                              ReflexoesSemanaisPage(conteudos: conteudos),
+                          builder: (context) => const ReflexoesSemanaisPage(),
                         ),
                       );
-                      carregarConteudos();
                     },
                   ),
-                  _ConteudoCard(
-                    titulo: 'Bloco de reflexões',
-                    subtitulo: '${blocosReflexao.length} bloco(s)',
-                    icon: Icons.edit_note_rounded,
-                    onTap: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const BlocosReflexaoPage(),
-                        ),
-                      );
-                      carregarConteudos();
-                    },
-                  ),
+
                   _ConteudoCard(
                     titulo: 'Podcasts',
                     subtitulo: '5 episódios',
@@ -151,6 +81,7 @@ class _ConteudosPageState extends State<ConteudosPage> {
                       );
                     },
                   ),
+
                   _ConteudoCard(
                     titulo: 'Livro',
                     subtitulo: 'Leia ou baixe o PDF',
@@ -163,20 +94,19 @@ class _ConteudosPageState extends State<ConteudosPage> {
                       );
                     },
                   ),
+
                   StreamBuilder<List<FeedbackMensagem>>(
                     stream: FeedbackService().observarFeedbacks(),
                     builder: (context, snapshot) {
                       final naoLidas = (snapshot.data ?? const [])
-                          .where((feedback) => !feedback.lido)
+                          .where((f) => !f.lido)
                           .length;
 
                       return _ConteudoCard(
                         titulo: 'Notificações',
                         subtitulo: naoLidas == 0
                             ? 'Nenhuma mensagem nova'
-                            : naoLidas == 1
-                                ? '1 mensagem nova'
-                                : '$naoLidas mensagens novas',
+                            : '$naoLidas mensagem(s) nova(s)',
                         icon: naoLidas > 0
                             ? Icons.mark_email_unread_rounded
                             : Icons.mail_outline_rounded,
@@ -254,7 +184,7 @@ class _ConteudoCard extends StatelessWidget {
               titulo,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
@@ -265,7 +195,7 @@ class _ConteudoCard extends StatelessWidget {
               subtitulo,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Colors.white60, fontSize: 12),
+              style: const TextStyle(color: Colors.white60, fontSize: 12),
             ),
           ],
         ),
