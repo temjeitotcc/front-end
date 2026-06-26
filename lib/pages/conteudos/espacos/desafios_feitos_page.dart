@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../services/conteudos_service.dart';
+import '../../../services/firebase_desafios_service.dart';
 import '../../../widgets/main_tab_header.dart';
 import '../conteudos_utils.dart';
+import '../../../services/conteudos_service.dart';
 
 class DesafiosFeitosPage extends StatefulWidget {
   static const List<int> missoesEspeciais = [7, 14, 21, 28];
@@ -26,7 +27,8 @@ class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
   }
 
   Future<void> carregarConteudos() async {
-    final dados = await service.carregarConteudos();
+    final dados = await FirebaseDesafiosService().carregarConteudos();
+
     if (!mounted) return;
 
     setState(() {
@@ -54,7 +56,7 @@ class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
               )
               .map((entry) => entry.key)
               .toList()
-          ..sort());
+            ..sort());
 
     return Scaffold(
       backgroundColor: fundo,
@@ -97,10 +99,7 @@ class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
                       child: Text(
                         'Suas reflexões dos desafios aparecerão aqui.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white60,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.white60, fontSize: 16),
                       ),
                     ),
                   )
@@ -111,15 +110,16 @@ class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
                     itemBuilder: (context, index) {
                       final numero = numeros[index];
                       final conteudoCompleto = conteudos[numero];
-                      final mostraAtividadeCompleta =
-                          DesafiosFeitosPage.desafiosComAtividadeSalva
-                              .contains(numero);
+                      final mostraAtividadeCompleta = DesafiosFeitosPage
+                          .desafiosComAtividadeSalva
+                          .contains(numero);
                       final conteudo = conteudoCompleto == null
                           ? null
                           : mostraAtividadeCompleta
-                              ? conteudoCompleto
-                              : conteudoCompleto.somenteReflexoes();
-                      final temConteudo = conteudoCompleto != null &&
+                          ? conteudoCompleto
+                          : conteudoCompleto.somenteReflexoes();
+                      final temConteudo =
+                          conteudoCompleto != null &&
                           conteudoDisponivelParaExibicao(
                             numero,
                             conteudoCompleto,
@@ -132,8 +132,7 @@ class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
                             ? () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        ConteudoDesafioPage(
+                                    builder: (context) => ConteudoDesafioPage(
                                       conteudo: conteudo!,
                                     ),
                                   ),
@@ -155,15 +154,15 @@ class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
                           backgroundColor: temConteudo
                               ? Theme.of(context).colorScheme.primary
                               : Colors.white12,
-                          foregroundColor:
-                              temConteudo ? Colors.black : Colors.white54,
+                          foregroundColor: temConteudo
+                              ? Colors.black
+                              : Colors.white54,
                           child: Text('$numero'),
                         ),
                         title: Text(
                           temConteudo ? tituloDesafio(numero) : 'Dia $numero',
                           style: TextStyle(
-                            color:
-                                temConteudo ? Colors.white : Colors.white54,
+                            color: temConteudo ? Colors.white : Colors.white54,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -172,8 +171,7 @@ class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
                                 mostraAtividadeCompleta
                                     ? '${conteudo.itens.length} resposta(s) salva(s)'
                                     : '${conteudo.itens.length} reflexão(ões) salva(s)',
-                                style:
-                                    const TextStyle(color: Colors.white60),
+                                style: const TextStyle(color: Colors.white60),
                               )
                             : null,
                         trailing: Icon(
@@ -248,10 +246,9 @@ class ConteudoDesafioPage extends StatelessWidget {
                     color: const Color(0xFF2A2527),
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withAlpha(120),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withAlpha(120),
                     ),
                   ),
                   child: Column(
@@ -380,11 +377,7 @@ class ConteudoDesafio2Page extends StatelessWidget {
                         areas: areasPredio,
                         textos: textos,
                         onJanelaTap: (area) {
-                          _abrirLeitura(
-                            context,
-                            area,
-                            textos[area] ?? '',
-                          );
+                          _abrirLeitura(context, area, textos[area] ?? '');
                         },
                       ),
                     ),
@@ -411,7 +404,10 @@ class ConteudoDesafio2Page extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF2A2527),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -671,7 +667,9 @@ class _JanelaConteudo extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: preenchida ? Theme.of(context).colorScheme.secondary : Theme.of(context).colorScheme.primary,
+          color: preenchida
+              ? Theme.of(context).colorScheme.secondary
+              : Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: preenchida ? Colors.white : Colors.transparent,
