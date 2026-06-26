@@ -552,7 +552,7 @@ class _Desafio6PageState extends State<Desafio6Page> {
           'Carta 3 - Superação': carta3Controller.text.trim(),
           'Decisão a partir de hoje': resposta,
           'Nome': user.displayName ?? 'Usuário',
-          'Respondido em': FieldValue.serverTimestamp(),
+          'RespondidoEm': FieldValue.serverTimestamp(),
         });
 
     if (!mounted) return;
