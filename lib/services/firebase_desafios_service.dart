@@ -20,13 +20,25 @@ class FirebaseDesafiosService {
     final Map<int, ConteudoDesafio> resultado = {};
 
     for (final doc in snapshot.docs) {
-      final dia = int.tryParse(doc.id.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+      // ✅ FIX 1: parsing seguro do dia
+      final match = RegExp(r'\d+').firstMatch(doc.id);
+      final dia = match != null ? int.parse(match.group(0)!) : 0;
+
+      if (dia == 0) continue;
+
       final data = doc.data();
 
-      final timestamp = data['Respondido Em'] as Timestamp?;
+      // ✅ FIX 2: timestamp com fallback correto
+      final timestampRaw = data['RespondidoEm'] ?? data['Respondido Em'];
+      final timestamp = timestampRaw is Timestamp ? timestampRaw : null;
 
       List<ConteudoItem> itens = [];
-      ConteudoItem _buildBloco17(Map<String, dynamic> data, String key) {
+
+      // =========================
+      // HELPERS
+      // =========================
+
+      ConteudoItem buildBloco17(Map<String, dynamic> data, String key) {
         final bloco = data[key] as Map<String, dynamic>?;
 
         if (bloco == null) {
@@ -75,21 +87,22 @@ class FirebaseDesafiosService {
         return [
           ConteudoItem(
             titulo: 'Resposta',
-            texto: data['Resposta'] ?? '',
+            texto: (data['Resposta'] ?? data['resposta'] ?? '').toString(),
             reflexao: false,
           ),
           ConteudoItem(
             titulo: 'Nome',
-            texto: data['Nome'] ?? '',
+            texto: (data['Nome'] ?? data['nome'] ?? '').toString(),
             reflexao: false,
           ),
         ];
       }
 
+      // =========================
+      // SWITCH DOS DIAS
+      // =========================
+
       switch (dia) {
-        // =========================
-        // DIA 1 (único mesmo)
-        // =========================
         case 1:
           itens = buildCamposSimples(data, [
             'Familiar',
@@ -105,9 +118,6 @@ class FirebaseDesafiosService {
           ]);
           break;
 
-        // =========================
-        // PADRÃO: Resposta + Nome
-        // =========================
         case 4:
         case 5:
         case 8:
@@ -117,9 +127,6 @@ class FirebaseDesafiosService {
           itens = buildRespostaNome(data);
           break;
 
-        // =========================
-        // PADRÃO: QUIZ
-        // =========================
         case 9:
         case 11:
         case 13:
@@ -151,9 +158,6 @@ class FirebaseDesafiosService {
           ];
           break;
 
-        // =========================
-        // DIA 6 (único estruturado)
-        // =========================
         case 6:
           itens = buildCamposSimples(data, [
             'Carta 1 - Acusação e Consequências',
@@ -164,21 +168,15 @@ class FirebaseDesafiosService {
           ]);
           break;
 
-        // =========================
-        // DIA 17 (complexo)
-        // =========================
         case 17:
           itens = [
-            _buildBloco17(data, 'Medo_Aventura'),
-            _buildBloco17(data, 'Inveja_Inspiracao'),
-            _buildBloco17(data, 'Odio_AmorPerdao'),
-            _buildBloco17(data, 'Raiva_Tolerancia'),
+            buildBloco17(data, 'Medo_Aventura'),
+            buildBloco17(data, 'Inveja_Inspiracao'),
+            buildBloco17(data, 'Odio_AmorPerdao'),
+            buildBloco17(data, 'Raiva_Tolerancia'),
           ];
           break;
 
-        // =========================
-        // DIA 22
-        // =========================
         case 22:
           itens = buildCamposSimples(data, [
             'MinhaHistoriaEPadroes',
@@ -187,17 +185,11 @@ class FirebaseDesafiosService {
           ]);
           break;
 
-        // =========================
-        // DIA 23–24
-        // =========================
         case 23:
         case 24:
           itens = buildCamposSimples(data, data.keys.toList());
           break;
 
-        // =========================
-        // DIA 26 (complexo)
-        // =========================
         case 26:
           itens = [
             for (int i = 0; i < (data['Sonhos'] as List? ?? []).length; i++)
@@ -214,9 +206,6 @@ class FirebaseDesafiosService {
           ];
           break;
 
-        // =========================
-        // DIA 27
-        // =========================
         case 27:
           itens = buildCamposSimples(data, [
             'CartaDoFuturo',
@@ -224,9 +213,6 @@ class FirebaseDesafiosService {
           ]);
           break;
 
-        // =========================
-        // DEFAULT
-        // =========================
         default:
           itens = data.entries
               .where((e) => !e.key.toLowerCase().contains('respondido'))
