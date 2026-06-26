@@ -26,6 +26,21 @@ class FirebaseDesafiosService {
       final timestamp = data['Respondido Em'] as Timestamp?;
 
       List<ConteudoItem> itens = [];
+      ConteudoItem _buildBloco17(Map<String, dynamic> data, String key) {
+        final bloco = data[key] as Map<String, dynamic>?;
+
+        if (bloco == null) {
+          return ConteudoItem(titulo: key, texto: '', reflexao: false);
+        }
+
+        return ConteudoItem(
+          titulo: key.replaceAll('_', ' → '),
+          texto:
+              'Situação: ${bloco['Situacao'] ?? ''}\n'
+              'Nova Perspectiva: ${bloco['NovaPerspectiva'] ?? ''}',
+          reflexao: true,
+        );
+      }
 
       switch (dia) {
         // =========================
@@ -286,6 +301,122 @@ class FirebaseDesafiosService {
               titulo: 'Reflexão',
               texto: data['Reflexao'] ?? '',
               reflexao: true,
+            ),
+          ];
+          break;
+        // =========================
+        // DIA 15
+        // =========================
+        case 15:
+          itens = [
+            ConteudoItem(
+              titulo: 'Resposta',
+              texto: data['Resposta'] ?? '',
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Nome',
+              texto: data['Nome'] ?? '',
+              reflexao: false,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 16 (quiz)
+        // =========================
+        case 16:
+          itens = [
+            ConteudoItem(
+              titulo: 'Acertos',
+              texto: (data['Acertos'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Total de Questões',
+              texto: (data['TotalQuestoes'] ?? '').toString(),
+              reflexao: false,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 17 (estrutura aninhada forte)
+        // =========================
+        case 17:
+          itens = [
+            _buildBloco17(data, 'Medo_Aventura'),
+            _buildBloco17(data, 'Inveja_Inspiracao'),
+            _buildBloco17(data, 'Odio_AmorPerdao'),
+            _buildBloco17(data, 'Raiva_Tolerancia'),
+          ];
+          break;
+
+        // =========================
+        // DIA 18
+        // =========================
+        case 18:
+          itens = [
+            ConteudoItem(
+              titulo: 'Acertos',
+              texto: (data['Acertos'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Total de Questões',
+              texto: (data['TotalQuestoes'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Reflexão',
+              texto: data['Reflexao'] ?? '',
+              reflexao: true,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 19
+        // =========================
+        case 19:
+          itens = [
+            ConteudoItem(
+              titulo: 'Acertos',
+              texto: (data['Acertos'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Total de Questões',
+              texto: (data['TotalQuestoes'] ?? '').toString(),
+              reflexao: false,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 20
+        // =========================
+        case 20:
+          itens = [
+            ConteudoItem(
+              titulo: 'Acertos',
+              texto: (data['Acertos'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Total de Questões',
+              texto: (data['TotalQuestoes'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Respostas',
+              texto: (data['Respostas'] ?? []).toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Concluído',
+              texto: (data['concluido'] ?? false).toString(),
+              reflexao: false,
             ),
           ];
           break;
