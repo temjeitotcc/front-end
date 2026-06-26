@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../services/firebase_reflexoes_service.dart';
 import '../../../widgets/main_tab_header.dart';
+import '../conteudos_utils.dart';
 import 'desafios_feitos_page.dart';
 import '../../../services/conteudos_service.dart';
 
@@ -68,7 +69,6 @@ class _ReflexoesSemanaisPageState extends State<ReflexoesSemanaisPage> {
               ),
             ),
           ),
-
           Expanded(
             child: carregando
                 ? const Center(child: CircularProgressIndicator())
@@ -79,9 +79,7 @@ class _ReflexoesSemanaisPageState extends State<ReflexoesSemanaisPage> {
                     itemBuilder: (context, index) {
                       final numero = missoesEspeciais[index];
                       final numeroSemana = index + 1;
-
                       final conteudo = conteudos[numero];
-
                       final temConteudo =
                           conteudo != null && conteudo.itens.isNotEmpty;
 
@@ -121,12 +119,38 @@ class _ReflexoesSemanaisPageState extends State<ReflexoesSemanaisPage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        subtitle: Text(
-                          temConteudo
-                              ? 'Lembrança salva'
-                              : 'Nada escrito ainda',
-                          style: const TextStyle(color: Colors.white60),
-                        ),
+                        subtitle: temConteudo
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      formatarDataHoraBrasilia(
+                                        conteudo.atualizadoEm,
+                                      ),
+                                      style: const TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    const Text(
+                                      'Horário exibido no fuso de Brasília (BRT).',
+                                      style: TextStyle(
+                                        color: Colors.white38,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : const Text(
+                                'Nada escrito ainda',
+                                style: TextStyle(color: Colors.white60),
+                              ),
                         trailing: Icon(
                           temConteudo
                               ? Icons.chevron_right_rounded

@@ -1,13 +1,10 @@
 import '../../services/conteudos_service.dart';
 
 // Desative antes de gerar a versão de lançamento.
-const bool visualizarTodosDesafiosFeitos = true;
+const bool visualizarTodosDesafiosFeitos = false;
 const Set<int> questionariosDePodcast = {9, 11, 13, 16};
 
-bool conteudoDisponivelParaExibicao(
-  int numero,
-  ConteudoDesafio conteudo,
-) {
+bool conteudoDisponivelParaExibicao(int numero, ConteudoDesafio conteudo) {
   if (numero == 2) {
     return conteudo.itens.length >= 10 &&
         conteudo.itens.every((item) => item.texto.trim().isNotEmpty);
@@ -16,7 +13,17 @@ bool conteudoDisponivelParaExibicao(
   if (numero == 22) return conteudo.itens.length >= 3;
   if (numero == 26) return conteudo.itens.length >= 7;
 
-  return conteudo.temReflexao;
+  return conteudo.itens.any((item) => item.texto.trim().isNotEmpty);
+}
+
+String formatarDataHoraBrasilia(DateTime data) {
+  final brasilia = data.toUtc().subtract(const Duration(hours: 3));
+
+  return '${brasilia.day.toString().padLeft(2, '0')}/'
+      '${brasilia.month.toString().padLeft(2, '0')}/'
+      '${brasilia.year} às '
+      '${brasilia.hour.toString().padLeft(2, '0')}:'
+      '${brasilia.minute.toString().padLeft(2, '0')}';
 }
 
 String tituloDesafio(int numero) {

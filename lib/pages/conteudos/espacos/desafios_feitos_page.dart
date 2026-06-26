@@ -16,7 +16,6 @@ class DesafiosFeitosPage extends StatefulWidget {
 }
 
 class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
-  final ConteudosService service = ConteudosService();
   Map<int, ConteudoDesafio> conteudos = {};
   bool carregando = true;
 
@@ -43,15 +42,13 @@ class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
     final numeros = visualizarTodosDesafiosFeitos
         ? [
             for (int numero = 1; numero <= 28; numero++)
-              if (!DesafiosFeitosPage.missoesEspeciais.contains(numero) &&
-                  !questionariosDePodcast.contains(numero))
+              if (!DesafiosFeitosPage.missoesEspeciais.contains(numero))
                 numero,
           ]
         : (conteudos.entries
               .where(
                 (entry) =>
                     !DesafiosFeitosPage.missoesEspeciais.contains(entry.key) &&
-                    !questionariosDePodcast.contains(entry.key) &&
                     conteudoDisponivelParaExibicao(entry.key, entry.value),
               )
               .map((entry) => entry.key)
@@ -110,14 +107,7 @@ class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
                     itemBuilder: (context, index) {
                       final numero = numeros[index];
                       final conteudoCompleto = conteudos[numero];
-                      final mostraAtividadeCompleta = DesafiosFeitosPage
-                          .desafiosComAtividadeSalva
-                          .contains(numero);
-                      final conteudo = conteudoCompleto == null
-                          ? null
-                          : mostraAtividadeCompleta
-                          ? conteudoCompleto
-                          : conteudoCompleto.somenteReflexoes();
+                      final conteudo = conteudoCompleto;
                       final temConteudo =
                           conteudoCompleto != null &&
                           conteudoDisponivelParaExibicao(
@@ -133,7 +123,7 @@ class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => ConteudoDesafioPage(
-                                      conteudo: conteudo!,
+                                      conteudo: conteudo,
                                     ),
                                   ),
                                 );
@@ -168,9 +158,7 @@ class _DesafiosFeitosPageState extends State<DesafiosFeitosPage> {
                         ),
                         subtitle: temConteudo
                             ? Text(
-                                mostraAtividadeCompleta
-                                    ? '${conteudo.itens.length} resposta(s) salva(s)'
-                                    : '${conteudo.itens.length} reflexão(ões) salva(s)',
+                                '${conteudo.itens.length} resposta(s) salva(s)',
                                 style: const TextStyle(color: Colors.white60),
                               )
                             : null,
