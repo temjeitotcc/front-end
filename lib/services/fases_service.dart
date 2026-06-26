@@ -1,38 +1,61 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'regras_fases.dart';
 
 class FasesService {
-  static const String _versaoBloqueioKey = 'versao_bloqueio_fases';
-  static const int _versaoBloqueioAtual = 2;
+  final _db = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
 
   Future<void> prepararRegrasAtuais(int totalFases) async {
-    final prefs = await SharedPreferences.getInstance();
-    final versaoSalva = prefs.getInt(_versaoBloqueioKey) ?? 0;
-
-    if (versaoSalva >= _versaoBloqueioAtual) return;
-
-    for (int i = 0; i < totalFases; i++) {
-      await prefs.remove('fase_$i');
-    }
-
-    await prefs.setInt(_versaoBloqueioKey, _versaoBloqueioAtual);
+    // Mantido para preservar o contrato usado pela Home. A origem dos dados
+    // agora e o Firestore, entao nao ha estado local para migrar.
   }
 
   Future<List<DateTime?>> carregarFases(int totalFases) async {
-    final prefs = await SharedPreferences.getInstance();
+    final user = _auth.currentUser;
+    final fases = List<DateTime?>.filled(totalFases, null);
 
-    return List.generate(totalFases, (index) {
-      final dataSalva = prefs.getString('fase_$index');
+    if (user == null) return fases;
 
-      if (dataSalva == null) return null;
+    final usuarioRef = _db.collection('usuarios').doc(user.uid);
+    final snapshots = await Future.wait([
+      usuarioRef.collection('desafios').get(),
+      usuarioRef.collection('reflexoes').get(),
+    ]);
 
-      return DateTime.tryParse(dataSalva);
-    });
+    for (final snapshot in snapshots) {
+      for (final doc in snapshot.docs) {
+        final dia = _diaDoDocumento(doc.id);
+        if (dia == null || dia < 1 || dia > totalFases) continue;
+
+        fases[dia - 1] = _dataConclusao(doc.data());
+      }
+    }
+
+    return fases;
   }
 
   Future<List<bool>> carregarDesafiosConcluidos(int totalFases) async {
     final fases = await carregarFases(totalFases);
     return fases.map((dataConclusao) => dataConclusao != null).toList();
+  }
+
+  Future<DateTime?> carregarDataConclusao(int dia) async {
+    final user = _auth.currentUser;
+    if (user == null) return null;
+
+    final colecao = _ehMissaoEspecial(dia) ? 'reflexoes' : 'desafios';
+    final usuarioRef = _db.collection('usuarios').doc(user.uid);
+    final id = dia.toString().padLeft(2, '0');
+
+    var doc = await usuarioRef.collection(colecao).doc(id).get();
+    if (!doc.exists) {
+      doc = await usuarioRef.collection(colecao).doc('$dia').get();
+    }
+
+    final data = doc.data();
+    return data == null ? null : _dataConclusao(data);
   }
 
   bool faseLiberada(List<DateTime?> fasesConcluidas, int index) {
@@ -46,42 +69,25 @@ class FasesService {
   Future<List<DateTime?>> corrigirSequenciaDeFases(
     List<DateTime?> fasesConcluidas,
   ) async {
-    final corrigida = List<DateTime?>.from(fasesConcluidas);
-    var alterou = false;
-
-    for (int i = 1; i < corrigida.length; i++) {
-      if (corrigida[i] != null && !RegrasFases.faseLiberada(corrigida, i)) {
-        for (int j = i; j < corrigida.length; j++) {
-          corrigida[j] = null;
-        }
-        alterou = true;
-        break;
-      }
-
-      if (corrigida[i - 1] == null && corrigida[i] != null) {
-        corrigida[i] = null;
-        alterou = true;
-      }
-    }
-
-    if (alterou) {
-      await salvarFases(corrigida);
-    }
-
-    return corrigida;
+    return fasesConcluidas;
   }
 
-  Future<void> salvarFases(List<DateTime?> fasesConcluidas) async {
-    final prefs = await SharedPreferences.getInstance();
+  int? _diaDoDocumento(String id) {
+    return int.tryParse(id.trim()) ??
+        int.tryParse(RegExp(r'\d+').firstMatch(id)?.group(0) ?? '');
+  }
 
-    for (int i = 0; i < fasesConcluidas.length; i++) {
-      final data = fasesConcluidas[i];
+  DateTime _dataConclusao(Map<String, dynamic> data) {
+    final timestampRaw =
+        data['RespondidoEm'] ?? data['Respondido Em'] ?? data['Respondido em'];
 
-      if (data == null) {
-        await prefs.remove('fase_$i');
-      } else {
-        await prefs.setString('fase_$i', data.toIso8601String());
-      }
-    }
+    if (timestampRaw is Timestamp) return timestampRaw.toDate();
+    if (timestampRaw is DateTime) return timestampRaw;
+
+    return DateTime.now();
+  }
+
+  bool _ehMissaoEspecial(int dia) {
+    return dia == 7 || dia == 14 || dia == 21 || dia == 28;
   }
 }

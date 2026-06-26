@@ -1,7 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../../widgets/circulo_fase.dart';
 import '../../services/auth_service.dart';
-import '../../services/conteudos_service.dart';
 import '../../services/fases_service.dart';
 import '../../services/pontos_service.dart';
 import '../../widgets/main_tab_header.dart';
@@ -63,17 +62,14 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
-  Future<void> salvarFases() async {
-    await service.salvarFases(fasesConcluidas);
-  }
-
   bool faseLiberada(int index) {
     return service.faseLiberada(fasesConcluidas, index);
   }
 
   int get diaAtual {
-    final primeiroPendente =
-        fasesConcluidas.indexWhere((concluida) => concluida == null);
+    final primeiroPendente = fasesConcluidas.indexWhere(
+      (concluida) => concluida == null,
+    );
     return primeiroPendente < 0 ? totalFases : primeiroPendente + 1;
   }
 
@@ -111,8 +107,10 @@ class _HomePageState extends State<HomePage> {
               valueListenable: PontosService.pontos,
               builder: (context, pontos, _) {
                 return Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 7,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withAlpha(28),
                     borderRadius: BorderRadius.circular(14),
@@ -179,14 +177,13 @@ class _HomePageState extends State<HomePage> {
       pageBuilder: (context, animation, secondaryAnimation) {
         final modoEscuro = Theme.of(context).brightness == Brightness.dark;
         final corTema = Theme.of(context).colorScheme.primary;
-        final fundoPainel =
-            modoEscuro ? const Color(0xFF211D1F) : const Color(0xFFF8F7F3);
-        final fundoCard =
-            modoEscuro ? const Color(0xFF2A2527) : Colors.white;
+        final fundoPainel = modoEscuro
+            ? const Color(0xFF211D1F)
+            : const Color(0xFFF8F7F3);
+        final fundoCard = modoEscuro ? const Color(0xFF2A2527) : Colors.white;
         final textoPrincipal = modoEscuro ? Colors.white : Colors.black;
         final textoSecundario = modoEscuro ? Colors.white60 : Colors.black54;
-        final concluidos =
-            fasesConcluidas.where((data) => data != null).length;
+        final concluidos = fasesConcluidas.where((data) => data != null).length;
         final progresso = concluidos / totalFases;
         final largura = MediaQuery.of(context).size.width;
 
@@ -324,9 +321,7 @@ class _HomePageState extends State<HomePage> {
                             decoration: BoxDecoration(
                               color: fundoCard,
                               borderRadius: BorderRadius.circular(18),
-                              border: Border.all(
-                                color: corTema.withAlpha(75),
-                              ),
+                              border: Border.all(color: corTema.withAlpha(75)),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,8 +333,7 @@ class _HomePageState extends State<HomePage> {
                                       height: 38,
                                       decoration: BoxDecoration(
                                         color: corTema.withAlpha(35),
-                                        borderRadius:
-                                            BorderRadius.circular(11),
+                                        borderRadius: BorderRadius.circular(11),
                                       ),
                                       child: Icon(
                                         jornadaConcluida
@@ -393,8 +387,7 @@ class _HomePageState extends State<HomePage> {
                                     value: progresso,
                                     minHeight: 8,
                                     backgroundColor: corTema.withAlpha(28),
-                                    valueColor:
-                                        AlwaysStoppedAnimation(corTema),
+                                    valueColor: AlwaysStoppedAnimation(corTema),
                                   ),
                                 ),
                                 const SizedBox(height: 13),
@@ -422,12 +415,10 @@ class _HomePageState extends State<HomePage> {
         );
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final deslocamento = Tween<Offset>(
-          begin: const Offset(-1, 0),
-          end: Offset.zero,
-        ).animate(
-          CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-        );
+        final deslocamento =
+            Tween<Offset>(begin: const Offset(-1, 0), end: Offset.zero).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+            );
 
         return FadeTransition(
           opacity: animation,
@@ -444,10 +435,7 @@ class _HomePageState extends State<HomePage> {
       height: _alturaGrupo,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final posicoes = _posicoesCaminho(
-            constraints.maxWidth,
-            _alturaGrupo,
-          );
+          final posicoes = _posicoesCaminho(constraints.maxWidth, _alturaGrupo);
           final posicaoEspecial = Offset(
             constraints.maxWidth / 2,
             _alturaGrupo * 0.055,
@@ -515,13 +503,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> abrirFase(int index) async {
     if (fasesConcluidas[index] != null) {
-      final numero = index + 1;
-      if (await _precisaRecuperarConteudo(numero)) {
-        if (!mounted) return;
-        await _abrirFaseParaRecuperarConteudo(index);
-        return;
-      }
-
       _mostrarMensagemFaseConcluida(index);
       return;
     }
@@ -538,11 +519,12 @@ class _HomePageState extends State<HomePage> {
 
     if (concluida != true) return;
 
-    setState(() {
-      fasesConcluidas[index] = DateTime.now();
-    });
+    final dataConclusao = await service.carregarDataConclusao(index + 1);
+    if (dataConclusao == null) return;
 
-    await salvarFases();
+    setState(() {
+      fasesConcluidas[index] = dataConclusao;
+    });
 
     if (!mounted) return;
 
@@ -570,34 +552,6 @@ class _HomePageState extends State<HomePage> {
     if (desafiosComReflexaoFinal.contains(index + 1)) {
       await showReflectionFeedbackDialog(context);
     }
-  }
-
-  Future<bool> _precisaRecuperarConteudo(int numero) async {
-    if (numero != 2) return false;
-
-    final conteudos = await ConteudosService().carregarConteudos();
-    final conteudo = conteudos[numero];
-    if (conteudo == null) return true;
-
-    return conteudo.itens.length < 10 ||
-        conteudo.itens.any((item) => item.texto.trim().isEmpty);
-  }
-
-  Future<void> _abrirFaseParaRecuperarConteudo(int index) async {
-    final concluida = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(builder: (context) => FasePage(numero: '${index + 1}')),
-    );
-
-    if (concluida != true || !mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Respostas recuperadas. O Dia 2 já está disponível em Desafios feitos.',
-        ),
-      ),
-    );
   }
 
   void _mostrarMensagemFaseConcluida(int index) {
@@ -667,11 +621,7 @@ class _HomePageState extends State<HomePage> {
                 color: Theme.of(context).colorScheme.primary,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.lock_rounded,
-                color: Colors.black,
-                size: 20,
-              ),
+              child: Icon(Icons.lock_rounded, color: Colors.black, size: 20),
             ),
             const SizedBox(width: 12),
             Expanded(
