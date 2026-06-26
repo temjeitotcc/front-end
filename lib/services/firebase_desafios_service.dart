@@ -420,7 +420,118 @@ class FirebaseDesafiosService {
             ),
           ];
           break;
+        // =========================
+        // DIA 22
+        // =========================
+        case 22:
+          itens = [
+            ConteudoItem(
+              titulo: 'Minha História e Padrões',
+              texto: data['MinhaHistoriaEPadroes'] ?? '',
+              reflexao: true,
+            ),
+            ConteudoItem(
+              titulo: 'Minha Forma de Servir',
+              texto: data['MinhaFormaDeServir'] ?? '',
+              reflexao: true,
+            ),
+            ConteudoItem(
+              titulo: 'Quem escolho ser e meu legado',
+              texto: data['QuemEscolhoSerEMeuLegado'] ?? '',
+              reflexao: true,
+            ),
+          ];
+          break;
 
+        // =========================
+        // DIA 23
+        // =========================
+        case 23:
+          itens = [
+            ConteudoItem(
+              titulo: 'Reflexão sobre Linguagens do Amor',
+              texto: data['ReflexaoSobreLinguagensDoAmor'] ?? '',
+              reflexao: true,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 24
+        // =========================
+        case 24:
+          itens = [
+            ConteudoItem(
+              titulo: 'Minha Linguagem do Amor',
+              texto: data['ReflexaoSobreMinhaLinguagemDoAmor'] ?? '',
+              reflexao: true,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 25 (quiz + reflexão)
+        // =========================
+        case 25:
+          itens = [
+            ConteudoItem(
+              titulo: 'Acertos',
+              texto: (data['Acertos'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Total de Questões',
+              texto: (data['TotalQuestoes'] ?? '').toString(),
+              reflexao: false,
+            ),
+            ConteudoItem(
+              titulo: 'Reflexão Final',
+              texto: data['ReflexaoFinal'] ?? '',
+              reflexao: true,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 26 (LISTA COMPLEXA + FUTURO)
+        // =========================
+        case 26:
+          itens = [
+            for (int i = 0; i < (data['Sonhos'] as List? ?? []).length; i++)
+              ConteudoItem(
+                titulo: 'Sonho ${i + 1}',
+                texto:
+                    'Sonho: ${(data['Sonhos'][i]['Sonho'] ?? '')}\n'
+                    'Área da vida: ${(data['Sonhos'][i]['AreaDaVida'] ?? '')}\n'
+                    'O que proporcionará: ${(data['Sonhos'][i]['OQueProporcionara'] ?? '')}\n'
+                    'Como me sentirei: ${(data['Sonhos'][i]['ComoMeSentirei'] ?? '')}',
+                reflexao: false,
+              ),
+            ConteudoItem(
+              titulo: 'Decisão para construir o futuro',
+              texto: data['DecisaoParaConstruirOFuturo'] ?? '',
+              reflexao: true,
+            ),
+          ];
+          break;
+
+        // =========================
+        // DIA 27
+        // =========================
+        case 27:
+          itens = [
+            ConteudoItem(
+              titulo: 'Carta do Futuro',
+              texto: data['CartaDoFuturo'] ?? '',
+              reflexao: true,
+            ),
+            ConteudoItem(
+              titulo: 'Decisão para construir o futuro',
+              texto: data['DecisaoParaConstruirOFuturo'] ?? '',
+              reflexao: false,
+            ),
+          ];
+          break;
         // =========================
         // DEFAULT
         // =========================
