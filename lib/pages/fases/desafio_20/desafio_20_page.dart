@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../widgets/challenge_header_surface.dart';
+import '../../../widgets/challenge_feedback_dialog.dart';
 
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
@@ -386,30 +387,10 @@ class _Desafio20PageState extends State<Desafio20Page> {
   }
 
   Future<void> _mostrarResultado(int acertos) async {
-    final corTema = Theme.of(context).colorScheme.primary;
-    await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF2A2527)
-            : Colors.white,
-        title: Row(
-          children: [
-            Icon(Icons.fingerprint_rounded, color: corTema),
-            const SizedBox(width: 8),
-            const Expanded(child: Text('Sua essência importa')),
-          ],
-        ),
-        content: Text(
-          'Você acertou $acertos de 4. Reconheça seu valor, use suas capacidades para servir e avance sem precisar se moldar às expectativas dos outros.\n\nTem jeito e vale a pena.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Continuar'),
-          ),
-        ],
-      ),
+    await showQuizFeedbackDialog(
+      context,
+      correctAnswers: acertos,
+      totalQuestions: 4,
     );
   }
 }

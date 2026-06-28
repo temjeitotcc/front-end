@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../widgets/challenge_header_surface.dart';
+import '../../../widgets/challenge_feedback_dialog.dart';
 
 import '../../../services/auth_service.dart';
 import '../../../services/conteudos_service.dart';
@@ -483,32 +484,10 @@ class _Desafio19PageState extends State<Desafio19Page> {
   }
 
   Future<void> _mostrarResultado(int acertos) async {
-    final corTema = Theme.of(context).colorScheme.primary;
-    await showDialog<void>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Theme.of(context).brightness == Brightness.dark
-              ? const Color(0xFF2A2527)
-              : Colors.white,
-          title: Row(
-            children: [
-              Icon(Icons.business_center_rounded, color: corTema),
-              const SizedBox(width: 8),
-              const Expanded(child: Text('Sua empresa evoluiu')),
-            ],
-          ),
-          content: Text(
-            'Você acertou $acertos de 7. Continue acompanhando cada área da sua vida com consciência e autorresponsabilidade.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Continuar'),
-            ),
-          ],
-        );
-      },
+    await showQuizFeedbackDialog(
+      context,
+      correctAnswers: acertos,
+      totalQuestions: 7,
     );
   }
 }

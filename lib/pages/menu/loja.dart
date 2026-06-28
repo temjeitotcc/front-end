@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import '../../services/app_theme_service.dart';
+import '../../services/pet_customization_service.dart';
 import '../../services/pontos_service.dart';
 import '../../widgets/main_tab_header.dart';
 
@@ -12,12 +13,17 @@ class Page1 extends StatefulWidget {
 
 class _Page1State extends State<Page1> {
   Set<String> temasComprados = {AppThemeService.temaPadrao};
+  Set<String> petColorsCompradas = {PetCustomizationService.defaultColor};
+  Set<String> petAccessoriesComprados = {};
+  String corPetEquipada = PetCustomizationService.defaultColor;
 
   @override
   void initState() {
     super.initState();
     PontosService.carregarPontos();
+    PetCustomizationService.load();
     carregarTemasComprados();
+    carregarItensPet();
   }
 
   Future<void> carregarTemasComprados() async {
@@ -25,6 +31,30 @@ class _Page1State extends State<Page1> {
     if (!mounted) return;
 
     setState(() => temasComprados = comprados);
+  }
+
+  Future<void> carregarItensPet() async {
+    await PetCustomizationService.load();
+    final colors = <String>{};
+    for (final color in PetCustomizationService.colors) {
+      if (await PetCustomizationService.isColorPurchased(color.id)) {
+        colors.add(color.id);
+      }
+    }
+
+    final accessories = <String>{};
+    for (final accessory in PetCustomizationService.accessories) {
+      if (await PetCustomizationService.isAccessoryPurchased(accessory.id)) {
+        accessories.add(accessory.id);
+      }
+    }
+
+    if (!mounted) return;
+    setState(() {
+      petColorsCompradas = colors;
+      petAccessoriesComprados = accessories;
+      corPetEquipada = PetCustomizationService.equippedColor.value;
+    });
   }
 
   Future<void> comprarTema(AppThemeOption tema) async {
@@ -50,6 +80,57 @@ class _Page1State extends State<Page1> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${tema.nome} comprado! Veja em Configuracoes.')),
+    );
+  }
+
+  Future<void> comprarOuEquiparCor(PetColorOption color) async {
+    final comprado = petColorsCompradas.contains(color.id);
+
+    if (!comprado) {
+      final pontos = PontosService.pontos.value;
+      if (pontos < color.price) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Pontos insuficientes para comprar.')),
+        );
+        return;
+      }
+
+      await PontosService.salvarPontos(pontos - color.price);
+      await PetCustomizationService.purchaseColor(color.id);
+    }
+
+    await PetCustomizationService.equipColor(color.id);
+    await carregarItensPet();
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${color.name} equipada no Gratidão!')),
+    );
+  }
+
+  Future<void> comprarAcessorio(PetAccessoryOption accessory) async {
+    if (petAccessoriesComprados.contains(accessory.id)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${accessory.name} ja esta comprado.')),
+      );
+      return;
+    }
+
+    final pontos = PontosService.pontos.value;
+    if (pontos < accessory.price) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pontos insuficientes para comprar.')),
+      );
+      return;
+    }
+
+    await PontosService.salvarPontos(pontos - accessory.price);
+    await PetCustomizationService.purchaseAccessory(accessory.id);
+    await carregarItensPet();
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${accessory.name} comprado! Veja no Gratidão.')),
     );
   }
 
@@ -167,6 +248,21 @@ class _Page1State extends State<Page1> {
                           preco: 150,
                           imagem: "assets/loja6.png",
                         ),
+                        for (final color in PetCustomizationService.colors)
+                          PetColorLojaCard(
+                            color: color,
+                            comprado: petColorsCompradas.contains(color.id),
+                            equipado: corPetEquipada == color.id,
+                            onTap: () => comprarOuEquiparCor(color),
+                          ),
+                        for (final accessory
+                            in PetCustomizationService.accessories)
+                          PetAccessoryLojaCard(
+                            accessory: accessory,
+                            comprado:
+                                petAccessoriesComprados.contains(accessory.id),
+                            onTap: () => comprarAcessorio(accessory),
+                          ),
                         for (final tema in AppThemeService.temas.skip(1))
                           TemaLojaCard(
                             tema: tema,
@@ -231,6 +327,144 @@ class ItemCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class PetColorLojaCard extends StatelessWidget {
+  final PetColorOption color;
+  final bool comprado;
+  final bool equipado;
+  final VoidCallback onTap;
+
+  const PetColorLojaCard({
+    super.key,
+    required this.color,
+    required this.comprado,
+    required this.equipado,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final corTema = Theme.of(context).colorScheme.primary;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2A2526),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: equipado ? corTema : Colors.white12,
+            width: equipado ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Opacity(
+                    opacity: 0.36,
+                    child: Image.asset(color.baseAsset, fit: BoxFit.contain),
+                  ),
+                  Image.asset(color.collarAsset, fit: BoxFit.contain),
+                ],
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              color.name,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
+            Text(
+              equipado
+                  ? 'Equipado'
+                  : comprado
+                      ? 'Equipar'
+                      : '${color.price}',
+              style: TextStyle(
+                color: corTema,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PetAccessoryLojaCard extends StatelessWidget {
+  final PetAccessoryOption accessory;
+  final bool comprado;
+  final VoidCallback onTap;
+
+  const PetAccessoryLojaCard({
+    super.key,
+    required this.accessory,
+    required this.comprado,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final corTema = Theme.of(context).colorScheme.primary;
+
+    return GestureDetector(
+      onTap: comprado ? null : onTap,
+      child: Container(
+        margin: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2A2526),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: comprado ? corTema : Colors.white12,
+            width: comprado ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(child: Image.asset(accessory.asset, fit: BoxFit.contain)),
+            const SizedBox(height: 6),
+            Text(
+              accessory.name,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  comprado ? 'Comprado' : '${accessory.price}',
+                  style: TextStyle(
+                    color: corTema,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (!comprado) ...[
+                  const SizedBox(width: 4),
+                  Icon(Icons.star, size: 15, color: corTema),
+                ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

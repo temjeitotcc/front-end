@@ -1,71 +1,37 @@
 import 'package:flutter/material.dart';
 
+import 'pet_accessory_widget.dart';
+
 class PetWidget extends StatelessWidget {
   final String cor;
   final String estado;
-  final String? coleira;
-  final String? oculos;
-  final bool coroa;
+  final List<PetAccessory> accessories;
+  final double size;
 
   const PetWidget({
     super.key,
     required this.cor,
     required this.estado,
-    this.coleira,
-    this.oculos,
-    this.coroa = false,
+    this.accessories = const [],
+    this.size = 250,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 220,
-      height: 220,
+      width: size,
+      height: size,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Base
           Image.asset(
             'assets/pet/base/$cor$estado.png',
-            width: 220,
-            height: 220,
+            width: size,
+            height: size,
             fit: BoxFit.contain,
           ),
-
-          // Coleira
-          if (coleira != null)
-            Image.asset(
-              'assets/pet/acessorios/coleira$coleira.png',
-              width: 220,
-              height: 220,
-              fit: BoxFit.contain,
-            ),
-
-          // Óculos
-          if (oculos == 'normal')
-            Image.asset(
-              'assets/pet/acessorios/Oculos.png',
-              width: 220,
-              height: 220,
-              fit: BoxFit.contain,
-            ),
-
-          if (oculos == 'estrela')
-            Image.asset(
-              'assets/pet/acessorios/OculosEstrela.png',
-              width: 220,
-              height: 220,
-              fit: BoxFit.contain,
-            ),
-
-          // Coroa
-          if (coroa)
-            Image.asset(
-              'assets/pet/acessorios/coroa.png',
-              width: 220,
-              height: 220,
-              fit: BoxFit.contain,
-            ),
+          for (final accessory in accessories)
+            PetAccessoryWidget(accessory: accessory, size: size),
         ],
       ),
     );

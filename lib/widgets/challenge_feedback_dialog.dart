@@ -1,35 +1,53 @@
 import 'package:flutter/material.dart';
 
+import '../pages/fases/activity_result_page.dart';
+
 enum ChallengeFeedbackType { quizSuccess, quizEncouragement, reflection }
 
 Future<void> showQuizFeedbackDialog(
   BuildContext context, {
   required int correctAnswers,
   required int totalQuestions,
+  int? xpGained,
+  String petColor = 'Vermelha',
 }) {
-  final didWell = correctAnswers / totalQuestions > 0.5;
-
-  return _showChallengeFeedbackDialog(
-    context,
-    type: didWell
-        ? ChallengeFeedbackType.quizSuccess
-        : ChallengeFeedbackType.quizEncouragement,
-    eyebrow: 'Seu resultado',
-    title: didWell ? 'Você foi muito bem!' : 'Cada tentativa ensina',
-    message: didWell
-        ? 'Você acertou $correctAnswers de $totalQuestions questões. Seu resultado mostra que você ouviu com atenção e compreendeu os pontos mais importantes do podcast.'
-        : 'Você acertou $correctAnswers de $totalQuestions questões. Parabéns por chegar até aqui. Vale revisitar o podcast com calma: aprender também é perceber o que ainda pode ser fortalecido.',
+  return Navigator.of(context).push<void>(
+    PageRouteBuilder(
+      opaque: true,
+      transitionDuration: const Duration(milliseconds: 220),
+      reverseTransitionDuration: const Duration(milliseconds: 180),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return ActivityResultPage(
+          correctAnswers: correctAnswers,
+          totalQuestions: totalQuestions,
+          xpGained: xpGained ?? correctAnswers * 10,
+          petColor: petColor,
+        );
+      },
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+    ),
   );
 }
 
 Future<void> showReflectionFeedbackDialog(BuildContext context) {
-  return _showChallengeFeedbackDialog(
-    context,
-    type: ChallengeFeedbackType.reflection,
-    eyebrow: 'Reflexão concluída',
-    title: 'Obrigado por olhar para si',
-    message:
-        'Em uma rotina que quase sempre nos empurra para fora, escolher parar, refletir e se conhecer é um gesto valioso. O simples fato de você estar tentando já merece ser reconhecido. Continue respeitando o seu tempo e a sua caminhada.',
+  return Navigator.of(context).push<void>(
+    PageRouteBuilder(
+      opaque: true,
+      transitionDuration: const Duration(milliseconds: 220),
+      reverseTransitionDuration: const Duration(milliseconds: 180),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return const ActivityResultPage(
+          correctAnswers: 1,
+          totalQuestions: 1,
+          xpGained: 50,
+        );
+      },
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+    ),
   );
 }
 
@@ -82,10 +100,11 @@ class _ChallengeFeedbackCard extends StatelessWidget {
   });
 
   IconData get icon => switch (type) {
-    ChallengeFeedbackType.quizSuccess => Icons.workspace_premium_rounded,
-    ChallengeFeedbackType.quizEncouragement => Icons.psychology_alt_rounded,
-    ChallengeFeedbackType.reflection => Icons.auto_awesome_rounded,
-  };
+        ChallengeFeedbackType.quizSuccess => Icons.workspace_premium_rounded,
+        ChallengeFeedbackType.quizEncouragement =>
+          Icons.psychology_alt_rounded,
+        ChallengeFeedbackType.reflection => Icons.auto_awesome_rounded,
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +158,6 @@ class _ChallengeFeedbackCard extends StatelessWidget {
                       color: accent,
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 0,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -151,7 +169,6 @@ class _ChallengeFeedbackCard extends StatelessWidget {
                       fontSize: 23,
                       height: 1.15,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 0,
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -162,7 +179,6 @@ class _ChallengeFeedbackCard extends StatelessWidget {
                       color: secondaryText,
                       fontSize: 15,
                       height: 1.5,
-                      letterSpacing: 0,
                     ),
                   ),
                   const SizedBox(height: 24),
