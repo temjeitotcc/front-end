@@ -218,36 +218,6 @@ class _Page1State extends State<Page1> {
                       physics: const NeverScrollableScrollPhysics(),
                       childAspectRatio: 0.75,
                       children: [
-                        const ItemCard(
-                          nome: "Cartola",
-                          preco: 50,
-                          imagem: "assets/loja1.png",
-                        ),
-                        const ItemCard(
-                          nome: "Cachecol",
-                          preco: 50,
-                          imagem: "assets/loja2.png",
-                        ),
-                        const ItemCard(
-                          nome: "Óculos",
-                          preco: 65,
-                          imagem: "assets/loja3.png",
-                        ),
-                        const ItemCard(
-                          nome: "Touca",
-                          preco: 50,
-                          imagem: "assets/loja4.png",
-                        ),
-                        const ItemCard(
-                          nome: "Casaco",
-                          preco: 75,
-                          imagem: "assets/loja5.png",
-                        ),
-                        const ItemCard(
-                          nome: "Fundo",
-                          preco: 150,
-                          imagem: "assets/loja6.png",
-                        ),
                         for (final color in PetCustomizationService.colors)
                           PetColorLojaCard(
                             color: color,
@@ -277,54 +247,6 @@ class _Page1State extends State<Page1> {
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// 🔥 CARD DOS ITENS
-class ItemCard extends StatelessWidget {
-  final String nome;
-  final int preco;
-  final String imagem;
-
-  const ItemCard({
-    super.key,
-    required this.nome,
-    required this.preco,
-    required this.imagem,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final corTema = Theme.of(context).colorScheme.primary;
-
-    return Container(
-      margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A2526),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(child: Image.asset(imagem, fit: BoxFit.contain)),
-
-          Text(nome, style: TextStyle(color: Colors.white)),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                '$preco',
-                style: TextStyle(color: corTema, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(width: 4),
-              Icon(Icons.star, size: 16, color: corTema),
-            ],
           ),
         ],
       ),

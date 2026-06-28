@@ -526,7 +526,12 @@ class _HomePageState extends State<HomePage> {
       fasesConcluidas[index] = dataConclusao;
     });
 
+    final recompensa = await PontosService.creditarConclusaoDesafio(index + 1);
+
     if (!mounted) return;
+    if (recompensa > 0) {
+      _mostrarMensagemRecompensa(index + 1, recompensa);
+    }
 
     const desafiosComReflexaoFinal = {
       1,
@@ -585,6 +590,49 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: Text(
                 'Dia ${index + 1} concluído. Essa etapa já faz parte da sua jornada.',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _mostrarMensagemRecompensa(int dia, int recompensa) {
+    final corTema = Theme.of(context).colorScheme.primary;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF2A2527),
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        margin: const EdgeInsets.fromLTRB(18, 0, 18, 96),
+        duration: const Duration(seconds: 3),
+        content: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: corTema,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.paid_rounded,
+                color: Colors.black,
+                size: 21,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Dia $dia concluído: você ganhou $recompensa moedas.',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,

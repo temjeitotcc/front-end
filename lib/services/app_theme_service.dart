@@ -35,21 +35,21 @@ class AppThemeService {
       nome: 'Preto e azul',
       primary: Color(0xFF38BDF8),
       secondary: Color(0xFF7DD3FC),
-      preco: 150,
+      preco: 180,
     ),
     AppThemeOption(
       id: 'preto_vermelho',
       nome: 'Preto e vermelho',
       primary: Color(0xFFEF4444),
       secondary: Color(0xFFFCA5A5),
-      preco: 150,
+      preco: 180,
     ),
     AppThemeOption(
       id: 'preto_roxo',
       nome: 'Preto e roxo',
       primary: Color(0xFFA855F7),
       secondary: Color(0xFFD8B4FE),
-      preco: 150,
+      preco: 180,
     ),
   ];
 

@@ -6,6 +6,7 @@ import 'package:temjeito/pages/conteudos/espacos/reflexoes_semanais_page.dart';
 import '../../services/feedback_service.dart';
 import '../../widgets/main_tab_header.dart';
 
+import 'espacos/bloco_reflexoes_page.dart';
 import 'espacos/livro_page.dart';
 import 'espacos/notificacoes_page.dart';
 import 'espacos/podcasts_page.dart';
@@ -64,6 +65,19 @@ class _ConteudosPageState extends State<ConteudosPage> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => const ReflexoesSemanaisPage(),
+                        ),
+                      );
+                    },
+                  ),
+
+                  _ConteudoCard(
+                    titulo: 'Bloco de reflexões',
+                    subtitulo: 'Anotações livres',
+                    icon: Icons.edit_note_rounded,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const BlocosReflexaoPage(),
                         ),
                       );
                     },
