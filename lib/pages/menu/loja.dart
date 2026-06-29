@@ -138,6 +138,16 @@ class _Page1State extends State<Page1> {
   Widget build(BuildContext context) {
     final fundo = Theme.of(context).scaffoldBackgroundColor;
     final corTema = Theme.of(context).colorScheme.primary;
+    final coresDisponiveis = PetCustomizationService.colors
+        .where((color) => corPetEquipada != color.id)
+        .toList();
+    final acessoriosDisponiveis = PetCustomizationService.accessories
+        .where((accessory) => !petAccessoriesComprados.contains(accessory.id))
+        .toList();
+    final temasDisponiveis = AppThemeService.temas
+        .skip(1)
+        .where((tema) => !temasComprados.contains(tema.id))
+        .toList();
 
     return Scaffold(
       backgroundColor: fundo,
@@ -212,34 +222,41 @@ class _Page1State extends State<Page1> {
                   // GRID DE ITENS
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: GridView.count(
-                      crossAxisCount: 3,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      childAspectRatio: 0.75,
-                      children: [
-                        for (final color in PetCustomizationService.colors)
-                          PetColorLojaCard(
-                            color: color,
-                            comprado: petColorsCompradas.contains(color.id),
-                            equipado: corPetEquipada == color.id,
-                            onTap: () => comprarOuEquiparCor(color),
-                          ),
-                        for (final accessory
-                            in PetCustomizationService.accessories)
-                          PetAccessoryLojaCard(
-                            accessory: accessory,
-                            comprado:
-                                petAccessoriesComprados.contains(accessory.id),
-                            onTap: () => comprarAcessorio(accessory),
-                          ),
-                        for (final tema in AppThemeService.temas.skip(1))
-                          TemaLojaCard(
-                            tema: tema,
-                            comprado: temasComprados.contains(tema.id),
-                            onComprar: () => comprarTema(tema),
-                          ),
-                      ],
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 520),
+                        child: GridView.count(
+                          crossAxisCount: 3,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 0.86,
+                          children: [
+                            for (final color in coresDisponiveis)
+                              PetColorLojaCard(
+                                color: color,
+                                comprado: petColorsCompradas.contains(color.id),
+                                equipado: corPetEquipada == color.id,
+                                onTap: () => comprarOuEquiparCor(color),
+                              ),
+                            for (final accessory in acessoriosDisponiveis)
+                              PetAccessoryLojaCard(
+                                accessory: accessory,
+                                comprado: petAccessoriesComprados.contains(
+                                  accessory.id,
+                                ),
+                                onTap: () => comprarAcessorio(accessory),
+                              ),
+                            for (final tema in temasDisponiveis)
+                              TemaLojaCard(
+                                tema: tema,
+                                comprado: temasComprados.contains(tema.id),
+                                onComprar: () => comprarTema(tema),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
 
@@ -275,11 +292,10 @@ class PetColorLojaCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.all(8),
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: const Color(0xFF2A2526),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: equipado ? corTema : Colors.white12,
             width: equipado ? 2 : 1,
@@ -289,15 +305,9 @@ class PetColorLojaCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Opacity(
-                    opacity: 0.36,
-                    child: Image.asset(color.baseAsset, fit: BoxFit.contain),
-                  ),
-                  Image.asset(color.collarAsset, fit: BoxFit.contain),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Image.asset(color.collarAsset, fit: BoxFit.contain),
               ),
             ),
             const SizedBox(height: 6),
@@ -346,11 +356,10 @@ class PetAccessoryLojaCard extends StatelessWidget {
     return GestureDetector(
       onTap: comprado ? null : onTap,
       child: Container(
-        margin: const EdgeInsets.all(8),
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: const Color(0xFF2A2526),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: comprado ? corTema : Colors.white12,
             width: comprado ? 2 : 1,
@@ -409,11 +418,10 @@ class TemaLojaCard extends StatelessWidget {
     return GestureDetector(
       onTap: comprado ? null : onComprar,
       child: Container(
-        margin: const EdgeInsets.all(8),
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: const Color(0xFF2A2526),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: comprado ? tema.primary : Colors.white12,
             width: comprado ? 2 : 1,
