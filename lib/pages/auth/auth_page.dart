@@ -1,4 +1,4 @@
-﻿import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -36,10 +36,14 @@ class _AuthPageState extends State<AuthPage> {
     try {
       final googleSignIn = GoogleSignIn(
         signInOption: SignInOption.standard,
+        scopes: ['email'],
       );
 
-      await googleSignIn.disconnect().catchError((_) {});
-      await googleSignIn.signOut();
+      try {
+        await googleSignIn.disconnect();
+      } catch (_) {
+        await googleSignIn.signOut();
+      }
 
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) return;
@@ -50,8 +54,9 @@ class _AuthPageState extends State<AuthPage> {
         idToken: googleAuth.idToken,
       );
 
-      final credencial =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+      final credencial = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
       final nome = credencial.user?.displayName ?? googleUser.displayName;
       if (nome != null) {
         await AuthService.salvarNomeUsuario(nome);
@@ -61,9 +66,7 @@ class _AuthPageState extends State<AuthPage> {
     } catch (erro) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Não foi possível entrar com o Google.'),
-        ),
+        const SnackBar(content: Text('Não foi possível entrar com o Google.')),
       );
       debugPrint('Erro Google login: $erro');
     } finally {
@@ -88,9 +91,7 @@ class _AuthPageState extends State<AuthPage> {
         await credencial.user?.updateDisplayName(
           _nomeUsuarioController.text.trim(),
         );
-        await AuthService.salvarNomeUsuario(
-          _nomeUsuarioController.text.trim(),
-        );
+        await AuthService.salvarNomeUsuario(_nomeUsuarioController.text.trim());
         await FirebaseAuth.instance.currentUser?.reload();
       } else {
         await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -107,14 +108,14 @@ class _AuthPageState extends State<AuthPage> {
         'FirebaseAuth login: code=${erro.code}, message=${erro.message}',
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_mensagemErroFirebase(erro.code))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_mensagemErroFirebase(erro.code))));
     } catch (erro) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro inesperado: $erro')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro inesperado: $erro')));
     } finally {
       if (mounted) setState(() => _carregando = false);
     }
@@ -182,9 +183,7 @@ class _AuthPageState extends State<AuthPage> {
           ),
           Positioned.fill(
             child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withAlpha(145),
-              ),
+              decoration: BoxDecoration(color: Colors.black.withAlpha(145)),
             ),
           ),
           Column(
@@ -339,13 +338,13 @@ class _AuthPageState extends State<AuthPage> {
                               child: Column(
                                 children: [
                                   AnimatedSize(
-                                    duration:
-                                        const Duration(milliseconds: 330),
+                                    duration: const Duration(milliseconds: 330),
                                     curve: Curves.easeInOutCubic,
                                     alignment: Alignment.topCenter,
                                     child: AnimatedSwitcher(
-                                      duration:
-                                          const Duration(milliseconds: 260),
+                                      duration: const Duration(
+                                        milliseconds: 260,
+                                      ),
                                       transitionBuilder: (child, animation) {
                                         return SizeTransition(
                                           sizeFactor: animation,
@@ -358,9 +357,7 @@ class _AuthPageState extends State<AuthPage> {
                                       },
                                       child: _criandoConta
                                           ? Padding(
-                                              key: const ValueKey(
-                                                'campo_nome',
-                                              ),
+                                              key: const ValueKey('campo_nome'),
                                               padding: const EdgeInsets.only(
                                                 bottom: 14,
                                               ),
@@ -440,8 +437,8 @@ class _AuthPageState extends State<AuthPage> {
                                         ),
                                         onPressed: () {
                                           setState(
-                                            () => _ocultarSenha =
-                                                !_ocultarSenha,
+                                            () =>
+                                                _ocultarSenha = !_ocultarSenha,
                                           );
                                         },
                                       ),
@@ -480,18 +477,17 @@ class _AuthPageState extends State<AuthPage> {
                                         foregroundColor: Colors.black,
                                         elevation: 0,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                         ),
                                       ),
-                                      onPressed:
-                                          _carregando ? null : _enviar,
+                                      onPressed: _carregando ? null : _enviar,
                                       icon: _carregando
                                           ? const SizedBox(
                                               width: 20,
                                               height: 20,
-                                              child:
-                                                  CircularProgressIndicator(
+                                              child: CircularProgressIndicator(
                                                 strokeWidth: 2.5,
                                                 color: Colors.black,
                                               ),
@@ -499,7 +495,7 @@ class _AuthPageState extends State<AuthPage> {
                                           : Icon(
                                               _criandoConta
                                                   ? Icons
-                                                      .person_add_alt_1_rounded
+                                                        .person_add_alt_1_rounded
                                                   : Icons.login_rounded,
                                             ),
                                       label: Text(
@@ -509,8 +505,8 @@ class _AuthPageState extends State<AuthPage> {
                                         _carregando
                                             ? 'AGUARDE...'
                                             : _criandoConta
-                                                ? 'CRIAR CONTA'
-                                                : 'ENTRAR',
+                                            ? 'CRIAR CONTA'
+                                            : 'ENTRAR',
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w900,
                                         ),
@@ -559,8 +555,9 @@ class _AuthPageState extends State<AuthPage> {
                                         foregroundColor: textoPrincipal,
                                         side: BorderSide(color: borda),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -597,9 +594,7 @@ class _AuthPageState extends State<AuthPage> {
       prefixIcon: Icon(icon),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: escuro
-          ? Colors.white.withAlpha(8)
-          : Colors.black.withAlpha(5),
+      fillColor: escuro ? Colors.white.withAlpha(8) : Colors.black.withAlpha(5),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: borda),
@@ -647,9 +642,9 @@ class _AuthPageState extends State<AuthPage> {
         'FirebaseAuth reset: code=${erro.code}, message=${erro.message}',
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_mensagemErroFirebase(erro.code))),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_mensagemErroFirebase(erro.code))));
     } finally {
       if (mounted) setState(() => _carregando = false);
     }
